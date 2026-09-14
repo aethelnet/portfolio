@@ -241,63 +241,40 @@
           </div>
         </div>
 
-        <!-- Section: KI-Policy Value Evaluation V(s) & Minimax Rationality -->
+        <!-- Section: Deterministic OCGCore State-Machine & Rule Verification -->
         <div class="p-3 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] space-y-2.5">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-bold">
-                KI-POLICY & MINIMAX RATIONALITÄT:
+                OCGCORE STATE-MACHINE // REGEL-VERIFIKATION:
               </span>
             </div>
-            <div id="edison-v-badge" class="px-2 py-0.5 rounded font-mono text-[9px] font-bold border border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
-              V(s) = +0.884
+            <div id="edison-engine-badge" class="px-2 py-0.5 rounded font-mono text-[9px] font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+              DISPATCH: VALID (&lt; 0.5 ms)
             </div>
           </div>
 
-          <!-- Policy Action Comparison Bars (Minimax Rollouts) -->
-          <div id="edison-actions-container" class="space-y-1.5 text-[10px]">
-            <!-- Action A -->
-            <div class="p-2 rounded border border-emerald-500/30 bg-emerald-500/5 space-y-1">
-              <div class="flex justify-between items-center font-bold">
-                <span id="edison-action-a-name" class="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 text-[9px] truncate">
-                  AKTION A [GEWÄHLT]: SOLEMN JUDGMENT (-4000 LP)
-                </span>
-                <span id="edison-action-a-pct" class="font-mono text-emerald-600 dark:text-emerald-400 text-[10px]">94.2%</span>
-              </div>
-              <div class="w-full h-1 bg-[var(--bg-secondary)] rounded-full overflow-hidden border border-[var(--border-hairline)]">
-                <div id="edison-bar-action-a" class="h-full bg-emerald-500 transition-all duration-300" style="width: 94.2%;"></div>
-              </div>
-              <div class="flex justify-between text-[8px] sm:text-[9px] text-[var(--text-muted)] font-mono">
-                <span id="edison-action-a-q">Q(s, a) = +0.884</span>
-                <span id="edison-action-a-cost" class="truncate">KOSTEN: -4000 LP (8000 → 4000)</span>
-              </div>
+          <!-- Deterministic Rule Mechanics Grid -->
+          <div class="grid grid-cols-2 gap-2 text-[9px]">
+            <div class="p-2 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] space-y-1">
+              <div class="text-[var(--text-muted)] uppercase font-bold text-[8px]">SPELL SPEED / PRIORITÄT:</div>
+              <div id="edison-spell-speed" class="font-bold text-[var(--text-primary)]">SPELL SPEED 3 [KONTERFALLE]</div>
+              <div id="edison-spell-speed-desc" class="text-[var(--text-secondary)] text-[8px] leading-tight">Höchste Kettenstufe. Nur Konterfallen können anketten.</div>
             </div>
-
-            <!-- Action B -->
-            <div class="p-2 rounded border border-rose-500/20 bg-rose-500/5 space-y-1">
-              <div class="flex justify-between items-center font-bold">
-                <span id="edison-action-b-name" class="text-rose-600 dark:text-rose-400 flex items-center gap-1 text-[9px] truncate">
-                  AKTION B [VERWORFEN]: PASS / KETTE BEENDEN
-                </span>
-                <span id="edison-action-b-pct" class="font-mono text-rose-600 dark:text-rose-400 text-[10px]">2.1%</span>
-              </div>
-              <div class="w-full h-1 bg-[var(--bg-secondary)] rounded-full overflow-hidden border border-[var(--border-hairline)]">
-                <div id="edison-bar-action-b" class="h-full bg-rose-500 transition-all duration-300" style="width: 2.1%;"></div>
-              </div>
-              <div class="flex justify-between text-[8px] sm:text-[9px] text-[var(--text-muted)] font-mono">
-                <span id="edison-action-b-q">Q(s, a) = -0.958</span>
-                <span id="edison-action-b-cost" class="truncate">KOSTEN: 0 LP // BOARD-COLLAPSE</span>
-              </div>
+            <div class="p-2 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] space-y-1">
+              <div class="text-[var(--text-muted)] uppercase font-bold text-[8px]">KDE TIEBREAKER (TIME-CALL):</div>
+              <div id="edison-time-call-status" class="font-bold text-amber-600 dark:text-amber-400">TURN 2 VON 3 AKTIV</div>
+              <div id="edison-time-call-desc" class="text-[var(--text-secondary)] text-[8px] leading-tight">Höhere LP bei Turn-3-Ende entscheidet Match sofort.</div>
             </div>
           </div>
 
-          <!-- Strategic Rationale: "Warum ist das schlau?" -->
+          <!-- Rule Mechanics Explanation -->
           <div class="p-2.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] space-y-1">
-            <div class="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1">
-              <span>⚡</span> WARUM IST DAS SCHLAU? (SPIELTHEORETISCHE ANALYSE):
+            <div class="text-[9px] font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-1">
+              <span>⚖</span> REGELWERK-FORENSIK (APRIL 2010 STAND):
             </div>
-            <p id="edison-ai-rationale" class="text-[9px] sm:text-[10px] text-[var(--text-secondary)] leading-relaxed">
+            <p id="edison-rule-explanation" class="text-[9px] sm:text-[10px] text-[var(--text-secondary)] leading-relaxed">
               ...
             </p>
           </div>
@@ -376,21 +353,13 @@
     const cardSolemn = document.getElementById('card-solemn');
     const revealCards = document.querySelectorAll('.card-reveal');
 
-    // AI Policy Value & Minimax Inspector DOM Handles
-    const vBadge = document.getElementById('edison-v-badge');
-    const actionAName = document.getElementById('edison-action-a-name');
-    const actionAPct = document.getElementById('edison-action-a-pct');
-    const barActionA = document.getElementById('edison-bar-action-a');
-    const actionAQ = document.getElementById('edison-action-a-q');
-    const actionACost = document.getElementById('edison-action-a-cost');
-
-    const actionBName = document.getElementById('edison-action-b-name');
-    const actionBPct = document.getElementById('edison-action-b-pct');
-    const barActionB = document.getElementById('edison-bar-action-b');
-    const actionBQ = document.getElementById('edison-action-b-q');
-    const actionBCost = document.getElementById('edison-action-b-cost');
-
-    const aiRationale = document.getElementById('edison-ai-rationale');
+    // Deterministic OCGCore Rule Forensics DOM Handles
+    const engineBadge = document.getElementById('edison-engine-badge');
+    const spellSpeed = document.getElementById('edison-spell-speed');
+    const spellSpeedDesc = document.getElementById('edison-spell-speed-desc');
+    const timeCallStatus = document.getElementById('edison-time-call-status');
+    const timeCallDesc = document.getElementById('edison-time-call-desc');
+    const ruleExplanation = document.getElementById('edison-rule-explanation');
 
     if (!modal) return;
 
@@ -408,17 +377,13 @@
         cl2Active: false,
         cl3Active: false,
         resolved: false,
-        vBadgeText: 'V(s) = +0.620',
-        vBadgeClass: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
-        actionAName: 'AKTION A: HEAVY STORM AUSFÜHREN',
-        actionAPct: 88.5,
-        actionAQ: 'Q(s, a) = +0.620',
-        actionACost: '1 KARTE // BACKROW CLEAR',
-        actionBName: 'AKTION B: BLIND-ANGRIFF (BATTLE PHASE)',
-        actionBPct: 11.5,
-        actionBQ: 'Q(s, a) = -0.210',
-        actionBCost: '0 LP // HOHE FALLENGEFAHR',
-        rationale: 'Pilot A kontrolliert Stratos (1800) & Alius (1900). Gegner hat 2 verdeckte Backrow-Karten. Die Minimax-Evaluation prunt den direkten Battle-Phase-Angriff wegen 78% Wahrscheinlichkeit verdeckter defensiver Fallen (D-Prison, Bottomless). Heavy Storm maximiert den aggregierten Board-Value.'
+        engineBadge: 'OCGCORE: IDLE (< 0.2 ms)',
+        engineBadgeClass: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+        spellSpeed: 'PRIORITÄT BEI TURN-SPIELER',
+        spellSpeedDesc: 'Pilot A (Hero Beat) besitzt das Recht zur ersten Aktion in Main Phase 1.',
+        timeCallStatus: 'TURN 2 VON 3 AKTIV',
+        timeCallDesc: 'Offizielle KDE-Tiebreaker-Runde läuft. 4-Zug-Limit nach Time-Call.',
+        explanation: 'Ausgangssituation: Pilot A kontrolliert Stratos & Alius auf dem Feld. Pilot B besitzt 2 verdeckte Backrow-Karten und 2 Synchromonster. Die C++ OCGCore State-Machine wartet auf eine legale Spieler-Eingabe (MSG_SELECT_IDLECMD).'
       },
       {
         name: 'SCHRITT 1 / 4: CL1 DEKLARIERT',
@@ -429,17 +394,13 @@
         cl2Active: false,
         cl3Active: false,
         resolved: false,
-        vBadgeText: 'V(s) = +0.850',
-        vBadgeClass: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-        actionAName: 'AKTION A: PRIORITÄT AN GEGNER ABTRETTEN',
-        actionAPct: 96.0,
-        actionAQ: 'Q(s, a) = +0.850',
-        actionACost: 'REGEL-KONFORM // KETTE ÖFFNEN',
-        actionBName: 'AKTION B: EIGENE SCHNELLZAUBER ANKETTEN',
-        actionBPct: 4.0,
-        actionBQ: 'Q(s, a) = +0.310',
-        actionBCost: 'RESIDUAL // SUBOPTIMALES TIMING',
-        rationale: 'Heavy Storm erzeugt maximalen Tempo-Druck: Droht beide verdeckte Karten von Pilot B bedingungslos abzuräumen. Der Value-Head prognostiziert einen Netto-Vorteil von +1 Karte und erzwingt zwingend eine gegnerische Antwort.'
+        engineBadge: 'DISPATCH: CHAIN_OPEN (< 0.4 ms)',
+        engineBadgeClass: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+        spellSpeed: 'SPELL SPEED 1 [NORMALE ZAUBER]',
+        spellSpeedDesc: 'Startet Kette. Priorität zur Reaktion geht automatisch an Pilot B.',
+        timeCallStatus: 'TURN 2 VON 3 AKTIV',
+        timeCallDesc: 'Kettenbildungs-Phase. OCGCore übergibt MSG_SELECT_CHAIN an Seat 1.',
+        explanation: 'Heavy Storm wird aktiviert (CL1). Regelmechanisch wechselt die Reaktions-Priorität an Pilot B. Um eine normale Zauberkarte (Spell Speed 1) zu kontern, muss mindestens eine Karte mit Spell Speed 2 (Schnellzauber / Normale Falle) angekettet werden.'
       },
       {
         name: 'SCHRITT 2 / 4: CL2 GECHAINT',
@@ -450,20 +411,16 @@
         cl2Active: true,
         cl3Active: false,
         resolved: false,
-        vBadgeText: 'V(s) = -0.420',
-        vBadgeClass: 'border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400',
-        actionAName: 'DROHUNG: STARLIGHT ROAD RESOLVT',
-        actionAPct: 5.8,
-        actionAQ: 'Q(s, a) = -0.958',
-        actionACost: 'STARDUST DRAGON (2500 ATK) ERSCHEINT',
-        actionBName: 'KONTER-FENSTER: CL3 COUNTER TRAP',
-        actionBPct: 94.2,
-        actionAQ_B: 'Q(s, a) = +0.884',
-        actionBCost: 'ERFORDERLICH FÜR TEMPO-ERHALT',
-        rationale: 'Hinterhalt ausgelöst: Pilot B deckt Starlight Road auf. Ohne Gegenreaktion würde Heavy Storm negiert und zerstört, während Pilot B gratis einen Stardust Dragon (2500 ATK) beschwört und seine restliche Backrow behält. Board-Value stürzt im Rollout auf -0.958 ab!'
+        engineBadge: 'TRIGGER: ACTIVATION LEGAL (< 0.3 ms)',
+        engineBadgeClass: 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400',
+        spellSpeed: 'SPELL SPEED 2 [NORMALE FALLE]',
+        spellSpeedDesc: 'Legal aktiviert: Bedingung erfüllt (Heavy Storm zerstört 2+ Karten).',
+        timeCallStatus: 'TURN 2 VON 3 AKTIV',
+        timeCallDesc: 'Priorität wechselt zurück an Pilot A. Erfordert Spell Speed 2 oder 3.',
+        explanation: 'Pilot B chaint Starlight Road (CL2). Die Aktivierungsbedingung ist legal, da Heavy Storm 2+ Karten zerstören würde. Priorität wechselt zurück an Pilot A. Da CL2 Spell Speed 2 ist, kann Pilot A nur mit Spell Speed 2 (z. B. Schnellzauber) oder Konterfallen (Spell Speed 3) reagieren.'
       },
       {
-        name: 'SCHRITT 3 / 4: CL3 COUNTER (ENTSCHEIDUNGSPUNKT)',
+        name: 'SCHRITT 3 / 4: CL3 COUNTER (DECISION POINT)',
         p1Lp: 4000,
         p2Lp: 3400,
         summary: '3 KETTENGLIEDER // AKTIV: CL3 SOLEMN JUDGMENT',
@@ -471,17 +428,13 @@
         cl2Active: true,
         cl3Active: true,
         resolved: false,
-        vBadgeText: 'V(s) = +0.884',
-        vBadgeClass: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
-        actionAName: 'AKTION A [GEWÄHLT]: SOLEMN JUDGMENT (-4000 LP)',
-        actionAPct: 94.2,
-        actionAQ: 'Q(s, a) = +0.884',
-        actionACost: 'ZAHLT 50% LP (8000 → 4000 LP)',
-        actionBName: 'AKTION B [VERWORFEN]: PASS / KETTE BEENDEN',
-        actionBPct: 2.1,
-        actionBQ: 'Q(s, a) = -0.958',
-        actionBCost: '0 LP VERLUST // MATCH-VERLUST IN TURN 3',
-        rationale: 'DER GENIE-ZUG (SPIELTHEORETISCHE ASYMMETRIE): Ein menschlicher Pilot zögert aus Verlust-Aversion vor der 4.000-LP-Opferung. Die KI kalkuliert streng die diskrete Siegbedingung: Unter offiziellen KDE-Tiebreaker-Regeln (Turn 2 im Time-Call) gewinnt am Ende von Turn 3 der höhere LP-Stand. Da 4.000 > 3.400, besitzt 4.000 LP exakt denselben Siegwirkungsgrad wie 8.000 LP! Solemn Judgment tauscht 1 Karte + irrelevante Rest-LP gegen 3 gegnerische Ressourcen (Starlight Road negiert, Stardust Dragon verhindert, Backrow durch CL1 vernichtet).'
+        engineBadge: 'RESOLVE: COST DEDUCTION OK (< 0.4 ms)',
+        engineBadgeClass: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+        spellSpeed: 'SPELL SPEED 3 [KONTERFALLE]',
+        spellSpeedDesc: 'Höchste Kettenstufe im Spiel. Kann nur durch Spell Speed 3 gekontert werden.',
+        timeCallStatus: 'TURN 2: 4000 LP > 3400 LP',
+        timeCallDesc: 'Kosten (50% LP = -4000) deterministisch abgebucht. Pilot A bleibt in Führung.',
+        explanation: 'Solemn Judgment (CL3) wird aktiviert: Pilot A zahlt exakt die Hälfte der aktuellen Lebenspunkte (8000 → 4000 LP). Als Konterfalle (Spell Speed 3) sperrt Solemn Judgment das Kettenende für alle Karten unter Speed 3. Pilot B kann nicht reagieren (keine Konterfalle verfügbar).'
       },
       {
         name: 'SCHRITT 4 / 4: LIFO AUFGELÖST',
@@ -492,17 +445,13 @@
         cl2Active: false,
         cl3Active: false,
         resolved: true,
-        vBadgeText: 'V(s) = +0.965',
-        vBadgeClass: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-        actionAName: 'RESULTAT: TOTALER BOARD-WIPE DER GEGNER-BACKROW',
-        actionAPct: 96.5,
-        actionAQ: 'Q(s, a) = +0.965',
-        actionACost: 'PILOT B SCHUTZLOS OHNE VERTEIDIGUNG',
-        actionBName: 'TURN 3 OUTCOME: PILOT A BEHÄLT LP-LEAD (4000 > 3400)',
-        actionBPct: 3.5,
-        actionBQ: 'Q(s, a) = +0.035',
-        actionBCost: 'DETERMINISTISCHER MATCH-GEWINN',
-        rationale: 'LIFO-Auflösung vollstreckt: CL3 zerstört Starlight Road, Heavy Storm bricht ungestört durch und zerstört die verbliebene Backrow. Pilot B betritt den finalen Turn 3 mit leerem Feld und 3400 LP. Da Pilot A 4000 LP besitzt und keine Angriffe drohen, ist der Match-Gewinn mathematisch garantiert.'
+        engineBadge: 'LIFO RESOLVED // AUDIT LOGGED (< 0.5 ms)',
+        engineBadgeClass: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+        spellSpeed: 'RÜCKWÄRTS-AUFLÖSUNG (LIFO)',
+        spellSpeedDesc: 'CL3 negiert & zerstört CL2. CL1 zerstört restliche Backrow.',
+        timeCallStatus: 'TURN 3 TRANSITION READY',
+        timeCallDesc: 'Feld bereinigt. Pilot A führt mit 4000 zu 3400 LP. Sieg nach Turn 3 gesichert.',
+        explanation: 'Deterministische Stack-Auflösung nach LIFO-Prinzip: 1. CL3 resolvt: Negiert die Aktivierung von Starlight Road und zerstört sie (kein Stardust Dragon). 2. CL2 negiert: Kein Effekt. 3. CL1 resolvt: Heavy Storm zerstört die restliche gegnerische Backrow. Referee-Audit-Trail loggt den Zustand atomar in SQLite.'
       }
     ];
 
@@ -529,24 +478,16 @@
       if (cardStarlight) cardStarlight.style.opacity = s.cl2Active ? '1' : (s.resolved ? '0.2' : '0.8');
       if (cardSolemn) cardSolemn.style.opacity = s.cl3Active ? '1' : (s.resolved ? '0.2' : '0.8');
 
-      // Update AI Policy Value Box
-      if (vBadge) {
-        vBadge.textContent = s.vBadgeText;
-        vBadge.className = `px-2 py-0.5 rounded font-mono text-[9px] font-bold border ${s.vBadgeClass}`;
+      // Update Deterministic Engine Telemetry
+      if (engineBadge) {
+        engineBadge.textContent = s.engineBadge;
+        engineBadge.className = `px-2 py-0.5 rounded font-mono text-[9px] font-bold border ${s.engineBadgeClass}`;
       }
-      if (actionAName) actionAName.textContent = s.actionAName;
-      if (actionAPct) actionAPct.textContent = `${s.actionAPct}%`;
-      if (barActionA) barActionA.style.width = `${s.actionAPct}%`;
-      if (actionAQ) actionAQ.textContent = s.actionAQ;
-      if (actionACost) actionACost.textContent = s.actionACost;
-
-      if (actionBName) actionBName.textContent = s.actionBName;
-      if (actionBPct) actionBPct.textContent = `${s.actionBPct}%`;
-      if (barActionB) barActionB.style.width = `${s.actionBPct}%`;
-      if (actionBQ) actionBQ.textContent = (s as any).actionAQ_B || s.actionBQ;
-      if (actionBCost) actionBCost.textContent = s.actionBCost;
-
-      if (aiRationale) aiRationale.textContent = s.rationale;
+      if (spellSpeed) spellSpeed.textContent = s.spellSpeed;
+      if (spellSpeedDesc) spellSpeedDesc.textContent = s.spellSpeedDesc;
+      if (timeCallStatus) timeCallStatus.textContent = s.timeCallStatus;
+      if (timeCallDesc) timeCallDesc.textContent = s.timeCallDesc;
+      if (ruleExplanation) ruleExplanation.textContent = s.explanation;
     }
 
     function toggleFogOfWar() {
