@@ -1,0 +1,500 @@
+---
+// LiquidOdeAttractor.astro - Interactive Continuous-Time Dynamical Systems Visualizer
+---
+
+<div class="relative w-full border border-cyan-500/20 bg-[#090b10] rounded-lg overflow-hidden shadow-2xl shadow-cyan-950/20 font-mono text-xs select-none">
+  <!-- Header / Telemetry Bar -->
+  <div class="flex flex-wrap items-center justify-between px-4 py-2.5 bg-[#0d1017] border-b border-cyan-500/20 text-slate-300">
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+      <span class="font-bold tracking-wider text-cyan-400">AURATIC PRIME // LIQUID ODE PHASENRAUM-ATTRAKTOR</span>
+      <span class="hidden sm:inline-block px-1.5 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-500/30 text-[10px]">60 FPS RK4 SOLVER</span>
+    </div>
+    <div class="flex items-center gap-4 text-[11px] text-slate-400">
+      <div>τ(u): <span id="tau-readout" class="text-cyan-300 font-semibold font-mono">10.00s</span></div>
+      <div>DIV: <span id="div-readout" class="text-emerald-400 font-semibold font-mono">-0.24</span></div>
+      <div class="hidden md:block">STATUS: <span id="state-readout" class="text-cyan-400 font-semibold">ATTRACTOR BASIN</span></div>
+    </div>
+  </div>
+
+  <!-- Main Canvas Stage & Control Overlay -->
+  <div class="relative w-full h-[460px] bg-[#05070a] overflow-hidden cursor-crosshair group">
+    <!-- Background Canvas for Vector Field + Dynamic Trajectories -->
+    <canvas id="ode-canvas" class="w-full h-full block"></canvas>
+
+    <!-- Subdued CRT Scanline & Coordinate Reticle Overlay -->
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-950/5 via-transparent to-black/60"></div>
+    <div class="pointer-events-none absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(0,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,1)_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+
+    <!-- Canvas In-Flight Telemetry Readout Box (Top-Left) -->
+    <div class="pointer-events-none absolute top-3 left-3 bg-[#0d111a]/85 border border-cyan-500/30 rounded p-2.5 backdrop-blur-sm space-y-1 text-[11px] shadow-lg">
+      <div class="text-cyan-400 font-bold border-b border-cyan-500/20 pb-1 flex items-center justify-between gap-4">
+        <span>PHASE PLANE (h₁, h₂)</span>
+        <span class="text-[9px] text-slate-400">KLICKEN ZUM SPAWNEN</span>
+      </div>
+      <div class="text-slate-300">h₁(t) [Node A]: <span id="h1-val" class="text-cyan-300 font-mono">+0.000</span></div>
+      <div class="text-slate-300">h₂(t) [Node B]: <span id="h2-val" class="text-purple-300 font-mono">+0.000</span></div>
+      <div class="text-slate-400 text-[10px]">dh₁/dt: <span id="dh1-val" class="text-slate-200 font-mono">0.000</span> | dh₂/dt: <span id="dh2-val" class="text-slate-200 font-mono">0.000</span></div>
+    </div>
+
+    <!-- Active Viscosity Gauge Bar (Top-Right) -->
+    <div class="pointer-events-none absolute top-3 right-3 bg-[#0d111a]/85 border border-cyan-500/30 rounded p-2.5 backdrop-blur-sm text-[11px] min-w-[140px] shadow-lg">
+      <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">Adaptive Viskosität</div>
+      <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+        <div id="viscosity-bar" class="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-all duration-75" style="width: 100%;"></div>
+      </div>
+      <div class="flex justify-between text-[9px] text-slate-400 mt-1">
+        <span>Fast Reflex (0s)</span>
+        <span>Relaxed (10s)</span>
+      </div>
+    </div>
+
+    <!-- Floating Hint Banner (Bottom-Left) -->
+    <div class="pointer-events-none absolute bottom-3 left-3 text-[10px] text-cyan-400/60 bg-black/40 px-2 py-1 rounded border border-cyan-500/10">
+      ⚡ Ziehe die Maus über das Feld, um Strömungslinien im Phasenraum zu perturbieren.
+    </div>
+  </div>
+
+  <!-- Interactive Control Panel & Presets Footer -->
+  <div class="p-4 bg-[#090c12] border-t border-cyan-500/20 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+    <!-- Controls: Sliders -->
+    <div class="md:col-span-6 space-y-3">
+      <!-- Slider 1: External Input Flux u -->
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <label for="flux-input" class="text-slate-300 text-[11px] font-semibold flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+            EXTERNES FLUX-SIGNAL u (Markt/Sensor-Reiz):
+          </label>
+          <span id="flux-val-display" class="text-cyan-400 font-bold font-mono">0.00</span>
+        </div>
+        <input 
+          type="range" 
+          id="flux-input" 
+          min="-2.0" 
+          max="2.0" 
+          step="0.05" 
+          value="0.0" 
+          class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/50"
+        />
+      </div>
+
+      <!-- Slider 2: Nonlinear Coupling Beta -->
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <label for="beta-input" class="text-slate-300 text-[11px] font-semibold flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            VISKOSITÄTS-KOPPLUNG β (Fluiditäts-Sensitivität):
+          </label>
+          <span id="beta-val-display" class="text-emerald-400 font-bold font-mono">0.80</span>
+        </div>
+        <input 
+          type="range" 
+          id="beta-input" 
+          min="0.0" 
+          max="2.5" 
+          step="0.05" 
+          value="0.80" 
+          class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400/50"
+        />
+      </div>
+    </div>
+
+    <!-- Presets & State Injectors -->
+    <div class="md:col-span-6 flex flex-col gap-2">
+      <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Dynamische Regime-Presets:</div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <button id="preset-limit" class="px-2.5 py-2 rounded bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-bold tracking-wider transition-all duration-150 hover:border-cyan-400 active:scale-95 shadow-sm">
+          LIMIT CYCLE
+        </button>
+        <button id="preset-spiral" class="px-2.5 py-2 rounded bg-slate-900/80 hover:bg-slate-800 border border-slate-700 hover:border-emerald-500 text-emerald-400 text-[10px] font-bold tracking-wider transition-all duration-150 active:scale-95 shadow-sm">
+          SPIRAL SINK
+        </button>
+        <button id="preset-shock" class="px-2.5 py-2 rounded bg-slate-900/80 hover:bg-slate-800 border border-slate-700 hover:border-amber-500 text-amber-400 text-[10px] font-bold tracking-wider transition-all duration-150 active:scale-95 shadow-sm">
+          SHOCK FLUX
+        </button>
+        <button id="preset-reset" class="px-2.5 py-2 rounded bg-slate-900/80 hover:bg-slate-800 border border-slate-700 hover:border-purple-500 text-purple-400 text-[10px] font-bold tracking-wider transition-all duration-150 active:scale-95 shadow-sm">
+          RESET ORBIT
+        </button>
+      </div>
+      <div class="text-[10px] text-slate-400 leading-tight">
+        Löst das kontinuierliche Differenzialgleichungssystem <span class="text-cyan-300 font-mono">dh/dt = -h/τ(u) + tanh(Wh + u)</span> numerisch per 4th-Order Runge-Kutta in Echtzeit.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Continuous-Time Liquid Neural ODE Dynamical Simulator (Client-Side Vanilla JS)
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('ode-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Elements
+    const fluxInput = document.getElementById('flux-input') as HTMLInputElement;
+    const fluxValDisplay = document.getElementById('flux-val-display');
+    const betaInput = document.getElementById('beta-input') as HTMLInputElement;
+    const betaValDisplay = document.getElementById('beta-val-display');
+    const tauReadout = document.getElementById('tau-readout');
+    const divReadout = document.getElementById('div-readout');
+    const stateReadout = document.getElementById('state-readout');
+    const h1Val = document.getElementById('h1-val');
+    const h2Val = document.getElementById('h2-val');
+    const dh1Val = document.getElementById('dh1-val');
+    const dh2Val = document.getElementById('dh2-val');
+    const viscosityBar = document.getElementById('viscosity-bar');
+
+    // Preset Buttons
+    const btnLimit = document.getElementById('preset-limit');
+    const btnSpiral = document.getElementById('preset-spiral');
+    const btnShock = document.getElementById('preset-shock');
+    const btnReset = document.getElementById('preset-reset');
+
+    // Simulation Parameters
+    let u_flux = parseFloat(fluxInput?.value || '0.0');
+    let beta = parseFloat(betaInput?.value || '0.8');
+    const tau_base = 10.0;
+    
+    // Weight Matrix for Limit-Cycle Hopf Bifurcation resonance
+    // Coupled system:
+    // dh1/dt = -1/tau(u) * h1 + tanh(w11*h1 + w12*h2 + u)
+    // dh2/dt = -1/tau2   * h2 + tanh(w21*h1 + w22*h2)
+    let w11 = 0.5;
+    let w12 = -1.8;
+    let w21 = 1.8;
+    let w22 = 0.5;
+
+    // State Variables
+    let h1 = 0.8;
+    let h2 = -0.4;
+    const maxTrail = 320;
+    const trajectory: { x: number; y: number; vel: number }[] = [];
+
+    // Background Flow Particles
+    const numParticles = 75;
+    const particles: { x: number; y: number; life: number; maxLife: number }[] = [];
+
+    function initParticles() {
+      particles.length = 0;
+      for (let i = 0; i < numParticles; i++) {
+        particles.push({
+          x: (Math.random() - 0.5) * 3.6,
+          y: (Math.random() - 0.5) * 3.6,
+          life: Math.floor(Math.random() * 120),
+          maxLife: 80 + Math.floor(Math.random() * 80)
+        });
+      }
+    }
+    initParticles();
+
+    // Canvas Resizing (Hi-DPI support)
+    let width = 0;
+    let height = 0;
+    const domain = 2.4; // h in [-2.4, 2.4]
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Coordinate Transforms
+    function toScreenX(hx: number): number {
+      return width / 2 + (hx / domain) * (width / 2);
+    }
+    function toScreenY(hy: number): number {
+      return height / 2 - (hy / domain) * (height / 2);
+    }
+    function toPhaseX(sx: number): number {
+      return ((sx - width / 2) / (width / 2)) * domain;
+    }
+    function toPhaseY(sy: number): number {
+      return -((sy - height / 2) / (height / 2)) * domain;
+    }
+
+    // Liquid ODE Derivative Evaluation
+    function derivatives(x: number, y: number, u: number): [number, number] {
+      const active_tau = tau_base / (1.0 + beta * Math.abs(u));
+      const dh1 = (-1.0 / active_tau) * x + Math.tanh(w11 * x + w12 * y + u);
+      const dh2 = (-1.0 / 6.0) * y + Math.tanh(w21 * x + w22 * y);
+      return [dh1, dh2];
+    }
+
+    // 4th-Order Runge-Kutta (RK4) Step
+    function rk4Step(x: number, y: number, dt: number, u: number): [number, number] {
+      const [k1x, k1y] = derivatives(x, y, u);
+      const [k2x, k2y] = derivatives(x + 0.5 * dt * k1x, y + 0.5 * dt * k1y, u);
+      const [k3x, k3y] = derivatives(x + 0.5 * dt * k2x, y + 0.5 * dt * k2y, u);
+      const [k4x, k4y] = derivatives(x + dt * k3x, y + dt * k3y, u);
+
+      const nextX = x + (dt / 6.0) * (k1x + 2.0 * k2x + 2.0 * k3x + k4x);
+      const nextY = y + (dt / 6.0) * (k1y + 2.0 * k2y + 2.0 * k3y + k4y);
+      return [nextX, nextY];
+    }
+
+    // Slider Event Listeners
+    fluxInput?.addEventListener('input', (e) => {
+      u_flux = parseFloat((e.target as HTMLInputElement).value);
+      if (fluxValDisplay) fluxValDisplay.textContent = u_flux.toFixed(2);
+    });
+
+    betaInput?.addEventListener('input', (e) => {
+      beta = parseFloat((e.target as HTMLInputElement).value);
+      if (betaValDisplay) betaValDisplay.textContent = beta.toFixed(2);
+    });
+
+    // Preset Handlers
+    btnLimit?.addEventListener('click', () => {
+      w11 = 0.5; w12 = -1.8; w21 = 1.8; w22 = 0.5;
+      u_flux = 0.0;
+      fluxInput.value = '0.0';
+      if (fluxValDisplay) fluxValDisplay.textContent = '0.00';
+      trajectory.length = 0;
+      h1 = 0.7; h2 = -0.5;
+    });
+
+    btnSpiral?.addEventListener('click', () => {
+      w11 = -0.3; w12 = -1.2; w21 = 1.2; w22 = -0.3;
+      u_flux = 0.0;
+      fluxInput.value = '0.0';
+      if (fluxValDisplay) fluxValDisplay.textContent = '0.00';
+      trajectory.length = 0;
+      h1 = 1.8; h2 = 1.2;
+    });
+
+    btnShock?.addEventListener('click', () => {
+      u_flux = 1.75;
+      fluxInput.value = '1.75';
+      if (fluxValDisplay) fluxValDisplay.textContent = '1.75';
+      trajectory.length = 0;
+      h1 = -1.5; h2 = 1.0;
+    });
+
+    btnReset?.addEventListener('click', () => {
+      trajectory.length = 0;
+      h1 = (Math.random() - 0.5) * 2.0;
+      h2 = (Math.random() - 0.5) * 2.0;
+    });
+
+    // Canvas User Interaction (Click/Drag to set state)
+    let isInteracting = false;
+    function handlePointer(e: MouseEvent) {
+      const rect = canvas.getBoundingClientRect();
+      const sx = e.clientX - rect.left;
+      const sy = e.clientY - rect.top;
+      h1 = toPhaseX(sx);
+      h2 = toPhaseY(sy);
+      trajectory.length = 0;
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      isInteracting = true;
+      handlePointer(e);
+    });
+    window.addEventListener('mouseup', () => isInteracting = false);
+    canvas.addEventListener('mousemove', (e) => {
+      if (isInteracting) handlePointer(e);
+    });
+
+    // Touch support
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect();
+        h1 = toPhaseX(e.touches[0].clientX - rect.left);
+        h2 = toPhaseY(e.touches[0].clientY - rect.top);
+        trajectory.length = 0;
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect();
+        h1 = toPhaseX(e.touches[0].clientX - rect.left);
+        h2 = toPhaseY(e.touches[0].clientY - rect.top);
+      }
+    }, { passive: true });
+
+    // Main 60 FPS Render Loop
+    let lastTime = performance.now();
+    function render(time: number) {
+      const dt = Math.min((time - lastTime) / 1000, 0.05);
+      lastTime = time;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Draw Subtle Background Axes & Polar Reticle
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.08)';
+      ctx.lineWidth = 1;
+      // Axes
+      ctx.beginPath();
+      ctx.moveTo(0, height / 2);
+      ctx.lineTo(width, height / 2);
+      ctx.moveTo(width / 2, 0);
+      ctx.lineTo(width / 2, height);
+      ctx.stroke();
+
+      // Concentric circles
+      for (let r = 0.5; r <= 2.0; r += 0.5) {
+        ctx.beginPath();
+        const pxRadius = (r / domain) * (width / 2);
+        ctx.arc(width / 2, height / 2, pxRadius, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // 2. Draw Vector Field (Streamline needles)
+      const gridSteps = 16;
+      const stepX = width / gridSteps;
+      const stepY = height / gridSteps;
+
+      for (let i = 0; i <= gridSteps; i++) {
+        for (let j = 0; j <= gridSteps; j++) {
+          const sx = i * stepX;
+          const sy = j * stepY;
+          const px = toPhaseX(sx);
+          const py = toPhaseY(sy);
+
+          const [dh1_local, dh2_local] = derivatives(px, py, u_flux);
+          const mag = Math.sqrt(dh1_local * dh1_local + dh2_local * dh2_local) + 1e-6;
+          const arrowLen = Math.min(stepX * 0.45, 14);
+
+          const dirX = (dh1_local / mag) * arrowLen;
+          const dirY = (-dh2_local / mag) * arrowLen; // invert Y for screen coords
+
+          // Color based on velocity magnitude
+          const normMag = Math.min(mag / 2.5, 1.0);
+          ctx.strokeStyle = `rgba(${Math.floor(20 + 200 * normMag)}, ${Math.floor(240 * (1 - normMag))}, 255, 0.16)`;
+          ctx.lineWidth = 1.0;
+
+          ctx.beginPath();
+          ctx.moveTo(sx - dirX * 0.5, sy - dirY * 0.5);
+          ctx.lineTo(sx + dirX * 0.5, sy + dirY * 0.5);
+          ctx.stroke();
+        }
+      }
+
+      // 3. Update & Draw Ambient Flow Particles
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.35)';
+      for (const p of particles) {
+        // Step particle via RK4
+        const [nextPx, nextPy] = rk4Step(p.x, p.y, dt * 1.5, u_flux);
+        p.x = nextPx;
+        p.y = nextPy;
+        p.life++;
+
+        // Reset if out of bounds or expired
+        if (Math.abs(p.x) > domain || Math.abs(p.y) > domain || p.life > p.maxLife) {
+          p.x = (Math.random() - 0.5) * domain * 1.8;
+          p.y = (Math.random() - 0.5) * domain * 1.8;
+          p.life = 0;
+          p.maxLife = 60 + Math.floor(Math.random() * 80);
+        }
+
+        const alpha = Math.sin((p.life / p.maxLife) * Math.PI) * 0.4;
+        ctx.fillStyle = `rgba(0, 240, 255, ${alpha.toFixed(3)})`;
+        ctx.fillRect(toScreenX(p.x) - 1, toScreenY(p.y) - 1, 2, 2);
+      }
+
+      // 4. Step the Primary Sovereign Trajectory (Sub-stepping for stability)
+      const subSteps = 4;
+      const subDt = (dt * 2.2) / subSteps;
+      for (let s = 0; s < subSteps; s++) {
+        const [nextH1, nextH2] = rk4Step(h1, h2, subDt, u_flux);
+        h1 = nextH1;
+        h2 = nextH2;
+      }
+
+      // Bound check
+      if (isNaN(h1) || isNaN(h2) || Math.abs(h1) > 4 || Math.abs(h2) > 4) {
+        h1 = 0.5;
+        h2 = -0.2;
+        trajectory.length = 0;
+      }
+
+      const [curDh1, curDh2] = derivatives(h1, h2, u_flux);
+      const curVel = Math.sqrt(curDh1 * curDh1 + curDh2 * curDh2);
+      trajectory.push({ x: h1, y: h2, vel: curVel });
+      if (trajectory.length > maxTrail) {
+        trajectory.shift();
+      }
+
+      // 5. Draw Glowing Trajectory Ribbon
+      if (trajectory.length > 2) {
+        for (let i = 1; i < trajectory.length; i++) {
+          const p1 = trajectory[i - 1];
+          const p2 = trajectory[i];
+          const progress = i / trajectory.length; // 0 to 1
+
+          const alpha = (progress * progress).toFixed(3);
+          ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
+          ctx.lineWidth = 1.0 + progress * 2.5;
+
+          ctx.beginPath();
+          ctx.moveTo(toScreenX(p1.x), toScreenY(p1.y));
+          ctx.lineTo(toScreenX(p2.x), toScreenY(p2.y));
+          ctx.stroke();
+        }
+
+        // Glowing Head (Current State)
+        const headScreenX = toScreenX(h1);
+        const headScreenY = toScreenY(h2);
+
+        const radGrad = ctx.createRadialGradient(headScreenX, headScreenY, 0, headScreenX, headScreenY, 14);
+        radGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        radGrad.addColorStop(0.3, 'rgba(0, 240, 255, 0.9)');
+        radGrad.addColorStop(1, 'rgba(0, 240, 255, 0)');
+
+        ctx.fillStyle = radGrad;
+        ctx.beginPath();
+        ctx.arc(headScreenX, headScreenY, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Inner solid core
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(headScreenX, headScreenY, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 6. Update Real-Time Telemetry Readouts
+      const activeTau = tau_base / (1.0 + beta * Math.abs(u_flux));
+      const divergence = (-1.0 / activeTau) - (1.0 / 6.0); // Trace of Jacobian approximation
+
+      if (tauReadout) tauReadout.textContent = `${activeTau.toFixed(2)}s`;
+      if (divReadout) divReadout.textContent = divergence.toFixed(3);
+      if (h1Val) h1Val.textContent = (h1 >= 0 ? '+' : '') + h1.toFixed(3);
+      if (h2Val) h2Val.textContent = (h2 >= 0 ? '+' : '') + h2.toFixed(3);
+      if (dh1Val) dh1Val.textContent = (curDh1 >= 0 ? '+' : '') + curDh1.toFixed(2);
+      if (dh2Val) dh2Val.textContent = (curDh2 >= 0 ? '+' : '') + curDh2.toFixed(2);
+
+      if (viscosityBar) {
+        const pct = Math.max(5, Math.min(100, (activeTau / tau_base) * 100));
+        viscosityBar.style.width = `${pct.toFixed(1)}%`;
+      }
+
+      if (stateReadout) {
+        if (Math.abs(curVel) < 0.05) {
+          stateReadout.textContent = 'STABLE EQUILIBRIUM';
+          stateReadout.className = 'text-emerald-400 font-semibold';
+        } else if (activeTau < 4.0) {
+          stateReadout.textContent = 'FAST RELAXATION (SHOCK)';
+          stateReadout.className = 'text-amber-400 font-semibold';
+        } else {
+          stateReadout.textContent = 'NONLINEAR LIMIT CYCLE';
+          stateReadout.className = 'text-cyan-400 font-semibold';
+        }
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    requestAnimationFrame(render);
+  });
+</script>
