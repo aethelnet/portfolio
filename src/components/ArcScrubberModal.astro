@@ -191,7 +191,12 @@
 
     function buildCache(game: GameTrajectory) {
       frameCache = [];
-      const baseGrid: number[][] = JSON.parse(JSON.stringify(game.initial_frame));
+      let rawGrid = game.initial_frame;
+      // Defensive unwrapping if serialized from 3D tensor [1, H, W]
+      while (Array.isArray(rawGrid) && rawGrid.length === 1 && Array.isArray(rawGrid[0]) && Array.isArray(rawGrid[0][0])) {
+        rawGrid = (rawGrid as any)[0];
+      }
+      const baseGrid: number[][] = JSON.parse(JSON.stringify(rawGrid));
       frameCache.push(JSON.parse(JSON.stringify(baseGrid)));
 
       let runningGrid = JSON.parse(JSON.stringify(baseGrid));
