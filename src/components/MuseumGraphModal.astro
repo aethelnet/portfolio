@@ -342,6 +342,44 @@
       isPanning = false;
     });
 
+    // Touch Gestures (Mobile & Tablet)
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        const t = e.touches[0];
+        const { x, y } = getMouseWorldCoords(t as any);
+        const hit = findNodeAt(x, y);
+        if (hit) {
+          draggedNode = hit;
+          selectNode(hit);
+        } else {
+          isPanning = true;
+          panStartX = t.clientX - panX;
+          panStartY = t.clientY - panY;
+        }
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        const t = e.touches[0];
+        if (draggedNode) {
+          const { x, y } = getMouseWorldCoords(t as any);
+          draggedNode.x = x;
+          draggedNode.y = y;
+          draggedNode.vx = 0;
+          draggedNode.vy = 0;
+        } else if (isPanning) {
+          panX = t.clientX - panStartX;
+          panY = t.clientY - panStartY;
+        }
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      draggedNode = null;
+      isPanning = false;
+    });
+
     // Zoom
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();

@@ -55,3 +55,30 @@
 .border-hairline {
   border-color: var(--border-hairline);
 }
+
+/* Sleek brutalist scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-hairline);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-hairline) var(--bg-secondary);
+}
+
+/* Accessible outline rings */
+button:focus-visible, a:focus-visible, input:focus-visible {
+  outline: 1.5px solid var(--text-primary);
+  outline-offset: 1px;
+}
