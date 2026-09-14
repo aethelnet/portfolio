@@ -196,6 +196,12 @@
 
       if (id === 'arc') {
         interactiveContainer?.classList.remove('hidden');
+        const lbl = document.getElementById('dossier-interactive-label');
+        if (lbl) lbl.textContent = 'INTERAKTIVEN TRAJEKTORIE-SCRUBBER STARTEN';
+      } else if (id === 'museum') {
+        interactiveContainer?.classList.remove('hidden');
+        const lbl = document.getElementById('dossier-interactive-label');
+        if (lbl) lbl.textContent = 'INTERAKTIVEN PROVENIENZ-GRAPHEN ÖFFNEN';
       } else {
         interactiveContainer?.classList.add('hidden');
       }
@@ -209,13 +215,19 @@
       panel?.classList.add('translate-x-full');
     }
 
-    interactiveBtn?.addEventListener('click', () => {
-      close();
-      window.dispatchEvent(new CustomEvent('open-arc-scrubber'));
+    let activeId = 'arc';
+    window.addEventListener('open-dossier', (e: any) => {
+      activeId = e.detail.id;
+      open(e.detail.id);
     });
 
-    window.addEventListener('open-dossier', (e: any) => {
-      open(e.detail.id);
+    interactiveBtn?.addEventListener('click', () => {
+      close();
+      if (activeId === 'arc') {
+        window.dispatchEvent(new CustomEvent('open-arc-scrubber'));
+      } else if (activeId === 'museum') {
+        window.dispatchEvent(new CustomEvent('open-museum-graph'));
+      }
     });
 
     closeBtn?.addEventListener('click', close);

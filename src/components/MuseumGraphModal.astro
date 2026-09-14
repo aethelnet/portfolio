@@ -1,0 +1,457 @@
+---
+// MuseumGraphModal.astro - Interactive Force-Directed Provenance Network Graph
+---
+
+<div id="museum-graph-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300 font-mono-tech text-xs select-none">
+  <div class="relative w-full max-w-5xl h-[85vh] bg-[var(--bg-primary)] border border-[var(--border-strong)] rounded-lg shadow-2xl overflow-hidden flex flex-col">
+    
+    <!-- Modal Header -->
+    <div class="px-5 py-3 border-b border-[var(--border-hairline)] bg-[var(--bg-secondary)] flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+        <span class="font-bold text-[var(--text-primary)] tracking-wide">SHADOW MUSEUM ATLAS // FORENSISCHER WISSENSGRAPH</span>
+        <span class="text-[10px] text-[var(--text-muted)] hidden sm:inline">[FALLSTUDIE: NGONNSO / TIBATI / KUMBO EXPEDITION]</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] text-[var(--text-muted)] hidden md:inline">MAUSRAD: ZOOM | ZIEHEN: PAN &amp; KNOTEN BEWEGEN</span>
+        <button id="museum-close-btn" class="px-2.5 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all">
+          [SCHLIESSEN ✕]
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Workspace (Canvas + Node Inspector Panel) -->
+    <div class="relative flex-1 w-full h-full overflow-hidden flex">
+      <!-- Fullscreen Graph Canvas Stage -->
+      <div class="relative flex-1 h-full bg-[var(--bg-primary)] overflow-hidden">
+        <canvas id="museum-canvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+
+        <!-- Canvas HUD & Legend (Bottom-Left) -->
+        <div class="pointer-events-none absolute bottom-4 left-4 bg-[var(--bg-card)] border border-[var(--border-hairline)] rounded p-3 backdrop-blur-sm space-y-2 text-[10px] shadow-lg max-w-xs">
+          <div class="text-[var(--text-muted)] uppercase tracking-wider font-bold">Knoten-Klassifikation:</div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[var(--text-secondary)]">
+            <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Raubgut / Subjekt</div>
+            <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500"></span> Kolonial-Akteur</div>
+            <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Museum / Depot</div>
+            <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Geograph. Ort</div>
+            <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-purple-500"></span> Archiv-Quelle</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Node Inspector Sidebar (Collapsible / Dynamic) -->
+      <div id="node-inspector" class="w-80 border-l border-[var(--border-hairline)] bg-[var(--bg-secondary)] p-5 flex flex-col justify-between overflow-y-auto hidden md:flex">
+        <div class="space-y-4">
+          <div class="border-b border-[var(--border-hairline)] pb-2">
+            <div class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Entitäts-Inspektor</div>
+            <h3 id="inspector-name" class="font-bold text-sm text-[var(--text-primary)] mt-1">Ngonnso (Skulptur / Mutter)</h3>
+            <span id="inspector-type" class="inline-block mt-1 px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+              RAUBGUT / SUBJEKT
+            </span>
+          </div>
+
+          <div class="space-y-1.5 text-[11px]">
+            <div class="text-[10px] text-[var(--text-muted)] uppercase">Status:</div>
+            <div id="inspector-status" class="font-bold text-emerald-600 dark:text-emerald-400">Verifiziert im Bundesarchiv</div>
+          </div>
+
+          <div class="space-y-1.5 text-[11px]">
+            <div class="text-[10px] text-[var(--text-muted)] uppercase">Verknüpfte Relationen:</div>
+            <div id="inspector-links" class="space-y-1 text-[10px] text-[var(--text-secondary)]">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <div class="space-y-1.5 text-[11px] pt-2 border-t border-[var(--border-hairline)]">
+            <div class="text-[10px] text-[var(--text-muted)] uppercase">Juristische Relevanz (HLKO):</div>
+            <p id="inspector-legal" class="text-[10px] text-[var(--text-secondary)] leading-relaxed">
+              Militärische Aneignung durch Kolonialoffizier Kurt von Pavel während der Kumbo-Expedition (1902). Fällt unter Art. 47 &amp; 56 HLKO (Verbot der Plünderung und Beschlagnahme von Kulturgütern).
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-[var(--border-hairline)] text-[10px] text-[var(--text-muted)]">
+          QUELLE: SHADOW MUSEUM RESEARCH ARCHIVE
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-5 py-2 border-t border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[10px] text-[var(--text-muted)] flex justify-between">
+      <span>SHADOW MUSEUM ATLAS // ECHTE FORSCHUNGSDATEN</span>
+      <span>34 KNOTEN // 28 FORENSISCHE BEWEISKANTEN</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  import graphData from '../data/museum_knowledge_graph.json';
+
+  interface SimNode {
+    id: string;
+    label: string;
+    type: string;
+    status: string;
+    source?: string;
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    radius: number;
+  }
+
+  interface SimLink {
+    source: string;
+    target: string;
+    label: string;
+    status: string;
+  }
+
+  const TYPE_COLORS: Record<string, string> = {
+    Subject: '#f59e0b',     // Amber (Looted Art)
+    Actor: '#ef4444',       // Red (Colonial Actor)
+    Institution: '#3b82f6', // Blue (Museum / Depot)
+    Location: '#10b981',    // Emerald (Geographic Location)
+    Source: '#8b5cf6',      // Purple (Archival Source)
+    Document: '#64748b'     // Slate (Document)
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('museum-graph-modal');
+    const closeBtn = document.getElementById('museum-close-btn');
+    const canvas = document.getElementById('museum-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Inspector elements
+    const inspectorName = document.getElementById('inspector-name');
+    const inspectorType = document.getElementById('inspector-type');
+    const inspectorStatus = document.getElementById('inspector-status');
+    const inspectorLinks = document.getElementById('inspector-links');
+    const inspectorLegal = document.getElementById('inspector-legal');
+
+    let width = 0;
+    let height = 0;
+    let zoom = 1.0;
+    let panX = 0;
+    let panY = 0;
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resize);
+
+    // Initialize Simulation Nodes & Links
+    const nodes: SimNode[] = graphData.nodes.map((n: any, idx: number) => {
+      const angle = (idx / graphData.nodes.length) * Math.PI * 2;
+      const radiusDist = 140 + (idx % 3) * 60;
+      let r = 8;
+      if (n.type === 'Subject') r = 14;
+      else if (n.type === 'Actor') r = 11;
+      else if (n.type === 'Institution') r = 12;
+
+      return {
+        id: n.id,
+        label: n.label,
+        type: n.type,
+        status: n.status || 'verified',
+        source: n.source,
+        x: Math.cos(angle) * radiusDist,
+        y: Math.sin(angle) * radiusDist,
+        vx: 0,
+        vy: 0,
+        radius: r
+      };
+    });
+
+    const links: SimLink[] = graphData.edges.map((e: any) => ({
+      source: e.source,
+      target: e.target,
+      label: e.label || 'connected_to',
+      status: e.status || 'verified'
+    }));
+
+    const nodeMap = new Map<string, SimNode>();
+    nodes.forEach(n => nodeMap.set(n.id, n));
+
+    // Physics Simulation (Spring-Electrical Model)
+    function stepPhysics() {
+      const repulsion = 4500;
+      const springLength = 80;
+      const springK = 0.04;
+      const damping = 0.86;
+
+      // 1. Repulsion between all pairs (Coulomb)
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const n1 = nodes[i];
+          const n2 = nodes[j];
+          const dx = n2.x - n1.x;
+          const dy = n2.y - n1.y;
+          const distSq = dx * dx + dy * dy + 100;
+          const dist = Math.sqrt(distSq);
+          const force = repulsion / distSq;
+          const fx = (dx / dist) * force;
+          const fy = (dy / dist) * force;
+
+          n1.vx -= fx;
+          n1.vy -= fy;
+          n2.vx += fx;
+          n2.vy += fy;
+        }
+      }
+
+      // 2. Attraction along edges (Hooke's Law)
+      for (const link of links) {
+        const source = nodeMap.get(link.source);
+        const target = nodeMap.get(link.target);
+        if (!source || !target) continue;
+
+        const dx = target.x - source.x;
+        const dy = target.y - source.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) + 1e-4;
+        const displacement = dist - springLength;
+        const force = springK * displacement;
+        const fx = (dx / dist) * force;
+        const fy = (dy / dist) * force;
+
+        source.vx += fx;
+        source.vy += fy;
+        target.vx -= fx;
+        target.vy -= fy;
+      }
+
+      // 3. Central Gravity (Keep graph centered)
+      for (const n of nodes) {
+        n.vx -= n.x * 0.008;
+        n.vy -= n.y * 0.008;
+
+        n.vx *= damping;
+        n.vy *= damping;
+
+        if (n !== draggedNode) {
+          n.x += n.vx;
+          n.y += n.vy;
+        }
+      }
+    }
+
+    // Interaction State
+    let draggedNode: SimNode | null = null;
+    let hoveredNode: SimNode | null = null;
+    let isPanning = false;
+    let panStartX = 0;
+    let panStartY = 0;
+
+    function getMouseWorldCoords(e: MouseEvent): { x: number; y: number } {
+      const rect = canvas.getBoundingClientRect();
+      const sx = e.clientX - rect.left;
+      const sy = e.clientY - rect.top;
+      const wx = (sx - width / 2 - panX) / zoom;
+      const wy = (sy - height / 2 - panY) / zoom;
+      return { x: wx, y: wy };
+    }
+
+    function findNodeAt(wx: number, wy: number): SimNode | null {
+      for (let i = nodes.length - 1; i >= 0; i--) {
+        const n = nodes[i];
+        const dist = Math.hypot(n.x - wx, n.y - wy);
+        if (dist <= n.radius + 6) return n;
+      }
+      return null;
+    }
+
+    function selectNode(n: SimNode) {
+      if (!inspectorName || !inspectorType || !inspectorStatus || !inspectorLinks) return;
+      inspectorName.textContent = n.label;
+      inspectorType.textContent = n.type.toUpperCase();
+      const color = TYPE_COLORS[n.type] || '#64748b';
+      inspectorType.style.backgroundColor = `${color}20`;
+      inspectorType.style.borderColor = `${color}40`;
+      inspectorType.style.color = color;
+
+      // Connected relations
+      const rels: string[] = [];
+      links.forEach(l => {
+        if (l.source === n.id) {
+          const tgt = nodeMap.get(l.target);
+          if (tgt) rels.push(`→ [${l.label}] → ${tgt.label}`);
+        } else if (l.target === n.id) {
+          const src = nodeMap.get(l.source);
+          if (src) rels.push(`← [${l.label}] ← ${src.label}`);
+        }
+      });
+
+      inspectorLinks.innerHTML = rels.length > 0 
+        ? rels.map(r => `<div class="p-1.5 rounded bg-[var(--bg-primary)] border border-[var(--border-hairline)]">${r}</div>`).join('')
+        : `<div class="text-[var(--text-muted)]">Keine direkten Nachbarkanten</div>`;
+
+      if (inspectorLegal) {
+        if (n.label.includes('Ngonnso')) {
+          inspectorLegal.textContent = 'Militärische Aneignung durch Kurt von Pavel (1902). Eindeutige Raubkunst unter Art. 47 & 56 HLKO. Aktive Restitutionsverhandlungen mit Stiftung Preußischer Kulturbesitz (SPK).';
+        } else if (n.label.includes('Pavel')) {
+          inspectorLegal.textContent = 'Kommandeur der Schutztruppe für Kamerun. Leitete die Strafexpedition nach Kumbo und Banyo. Primärer Täter in der illegalen Aneignung sakraler Insignien.';
+        } else if (n.label.includes('Ethnologisches')) {
+          inspectorLegal.textContent = 'Humboldt Forum / SPK Depot. Hält nachweislich hunderte Objekte aus der Strafexpedition von 1902 ohne rechtmäßige Eigentumsübertragung.';
+        } else {
+          inspectorLegal.textContent = 'Historisches Akten- und Zeugnis-Dokument zur Schließung von Provenienzlücken gemäß Washingtoner Prinzipien.';
+        }
+      }
+    }
+
+    // Canvas Listeners
+    canvas.addEventListener('mousedown', (e) => {
+      const { x, y } = getMouseWorldCoords(e);
+      const hit = findNodeAt(x, y);
+      if (hit) {
+        draggedNode = hit;
+        selectNode(hit);
+      } else {
+        isPanning = true;
+        panStartX = e.clientX - panX;
+        panStartY = e.clientY - panY;
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (draggedNode) {
+        const { x, y } = getMouseWorldCoords(e);
+        draggedNode.x = x;
+        draggedNode.y = y;
+        draggedNode.vx = 0;
+        draggedNode.vy = 0;
+      } else if (isPanning) {
+        panX = e.clientX - panStartX;
+        panY = e.clientY - panStartY;
+      } else {
+        const { x, y } = getMouseWorldCoords(e);
+        hoveredNode = findNodeAt(x, y);
+        canvas.style.cursor = hoveredNode ? 'pointer' : 'grab';
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      draggedNode = null;
+      isPanning = false;
+    });
+
+    // Zoom
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+      zoom = Math.max(0.4, Math.min(3.0, zoom * zoomFactor));
+    }, { passive: false });
+
+    // Render Loop
+    function render() {
+      stepPhysics();
+
+      ctx.clearRect(0, 0, width, height);
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const edgeColor = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(18, 18, 18, 0.14)';
+      const textFill = isDark ? '#e5e7eb' : '#1f2937';
+
+      ctx.save();
+      ctx.translate(width / 2 + panX, height / 2 + panY);
+      ctx.scale(zoom, zoom);
+
+      // 1. Draw Links
+      ctx.strokeStyle = edgeColor;
+      ctx.lineWidth = 1.0;
+      for (const link of links) {
+        const s = nodeMap.get(link.source);
+        const t = nodeMap.get(link.target);
+        if (!s || !t) continue;
+
+        const isHighlighted = (hoveredNode && (hoveredNode.id === s.id || hoveredNode.id === t.id));
+
+        ctx.strokeStyle = isHighlighted 
+          ? (isDark ? 'rgba(0, 240, 255, 0.7)' : 'rgba(37, 99, 235, 0.7)') 
+          : edgeColor;
+        ctx.lineWidth = isHighlighted ? 2.0 : 1.0;
+
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(t.x, t.y);
+        ctx.stroke();
+
+        // Edge label (drawn at midpoint if zoomed in)
+        if (zoom > 0.8 && isHighlighted) {
+          const midX = (s.x + t.x) / 2;
+          const midY = (s.y + t.y) / 2;
+          ctx.fillStyle = isDark ? '#00f0ff' : '#2563eb';
+          ctx.font = '8px "JetBrains Mono", monospace';
+          ctx.fillText(link.label, midX + 3, midY - 3);
+        }
+      }
+
+      // 2. Draw Nodes
+      for (const n of nodes) {
+        const color = TYPE_COLORS[n.type] || '#64748b';
+        const isHovered = hoveredNode === n;
+
+        // Outer Glow / Ring
+        if (isHovered || n.type === 'Subject') {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.radius + (isHovered ? 4 : 2), 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Node Body
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Node Center Dot
+        ctx.fillStyle = isDark ? '#0a0b0d' : '#ffffff';
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, Math.max(2, n.radius * 0.3), 0, Math.PI * 2);
+        ctx.fill();
+
+        // Node Label Text
+        ctx.fillStyle = textFill;
+        ctx.font = `${isHovered ? 'bold 11px' : '9px'} "JetBrains Mono", monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillText(n.label, n.x, n.y + n.radius + 12);
+      }
+
+      ctx.restore();
+      requestAnimationFrame(render);
+    }
+
+    // Select initial subject
+    const initSubject = nodes.find(n => n.id === '36f61617') || nodes[0];
+    if (initSubject) selectNode(initSubject);
+
+    resize();
+    requestAnimationFrame(render);
+
+    // Modal Triggers
+    function openModal() {
+      modal?.classList.remove('opacity-0', 'pointer-events-none');
+      resize();
+    }
+    function closeModal() {
+      modal?.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    closeBtn?.addEventListener('click', closeModal);
+    window.addEventListener('open-museum-graph', openModal);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal?.classList.contains('pointer-events-none')) {
+        closeModal();
+      }
+    });
+  });
+</script>
