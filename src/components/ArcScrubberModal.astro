@@ -1,37 +1,51 @@
 ---
-// ArcScrubberModal.astro - Interactive Step-by-Step ARC-AGI-3 Canvas Scrubber
+// ArcScrubberModal.astro - Interactive Step-by-Step & Live WebSocket ARC-AGI-3 Solver Console
 ---
 
 <div id="arc-scrubber-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300">
-  <div class="relative w-full max-w-3xl bg-[var(--bg-primary)] border border-[var(--border-strong)] rounded-lg shadow-2xl overflow-hidden flex flex-col font-mono-tech text-xs">
+  <div class="relative w-full max-w-4xl bg-[var(--bg-primary)] border border-[var(--border-strong)] rounded-lg shadow-2xl overflow-hidden flex flex-col font-mono-tech text-xs">
     
     <!-- Modal Header -->
     <div class="px-5 py-3 border-b border-[var(--border-hairline)] bg-[var(--bg-secondary)] flex items-center justify-between">
       <div class="flex items-center gap-2.5">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="font-bold text-[var(--text-primary)] tracking-wide">ARC-AGI-3 // SOVEREIGN TRAJECTORY SCRUBBER</span>
+        <span id="scrubber-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="font-bold text-[var(--text-primary)] tracking-wide">ARC-AGI-3 // SOVEREIGN SOLVER CONSOLE</span>
         <span id="scrubber-game-badge" class="text-[10px] text-[var(--text-muted)]">[GAME: lp85 // LEVEL 0 SOLVED]</span>
       </div>
-      <button id="scrubber-close-btn" class="px-2.5 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer">
-        [SCHLIESSEN ✕]
-      </button>
+      <div class="flex items-center gap-3">
+        <!-- WebSocket Live Connection Badge -->
+        <div id="ws-status-badge" class="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded border border-[var(--border-hairline)] text-[9px] text-[var(--text-muted)] bg-[var(--bg-card)]">
+          <span id="ws-status-led" class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+          <span id="ws-status-text">WS: PRÜFEN...</span>
+        </div>
+        <button id="scrubber-close-btn" class="px-2.5 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer">
+          [SCHLIESSEN ✕]
+        </button>
+      </div>
     </div>
 
-    <!-- Multi-Game Benchmark Selector Reel -->
-    <div class="px-5 py-2 border-b border-[var(--border-hairline)] bg-[var(--bg-primary)] flex flex-wrap items-center gap-2">
-      <span class="text-[10px] text-[var(--text-muted)] mr-1 uppercase">BENCHMARK:</span>
-      <button class="scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold transition-all cursor-pointer" data-game="lp85">
-        01 // lp85 (POINT & CLICK)
-      </button>
-      <button class="scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-game="bp35">
-        02 // bp35 (INVERTED GRAVITY)
-      </button>
-      <button class="scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-game="tr87">
-        03 // tr87 (1D TAPE REGISTER)
-      </button>
-      <button class="scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-game="s5i5">
-        04 // s5i5 (MOMENTUM BRAKES)
-      </button>
+    <!-- Verified Benchmark Games Switcher Reel -->
+    <div class="px-5 py-2 border-b border-[var(--border-hairline)] bg-[var(--bg-primary)] flex flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-[10px] text-[var(--text-muted)] mr-1 uppercase">VERIFIZIERTE LEVEL:</span>
+        <button class="scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold transition-all cursor-pointer" data-game="lp85">
+          01 // lp85 (POINT &amp; CLICK CAUSAL)
+        </button>
+        <button class="scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-game="ls20">
+          02 // ls20 (SOKOBAN DYNAMICS)
+        </button>
+        <button class="scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-game="tn36">
+          03 // tn36 (TRANSITION AUTOMATA)
+        </button>
+      </div>
+
+      <!-- Live Solve Action Button -->
+      <div class="flex items-center gap-2">
+        <button id="btn-live-solve" class="px-3 py-1 rounded border border-emerald-600 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-600 hover:text-white dark:text-emerald-400 dark:hover:text-black font-bold text-[10px] transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 shadow-sm">
+          <span>⚡</span>
+          <span id="btn-live-label">LIVE LÖSEN (WEBSOCKET)</span>
+        </button>
+      </div>
     </div>
 
     <!-- Main Workspace (Canvas + Telemetry Terminal) -->
@@ -53,7 +67,7 @@
         <!-- Telemetry Status Box -->
         <div class="p-3.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] space-y-2 text-[11px]">
           <div class="flex justify-between border-b border-[var(--border-hairline)] pb-1 text-[var(--text-muted)] text-[10px]">
-            <span>SCHRITT // STATE</span>
+            <span>SCHRITT // ZUSTAND</span>
             <span id="step-counter" class="text-[var(--text-primary)] font-bold">00 / 28</span>
           </div>
           <div>
@@ -62,40 +76,68 @@
           </div>
           <div class="grid grid-cols-2 gap-2 text-[10px] pt-1">
             <div>Δ-PIXEL: <span id="delta-display" class="font-bold text-[var(--text-primary)]">0</span></div>
-            <div>STATUS: <span id="state-display" class="font-bold text-emerald-600 dark:text-emerald-400">EXPLORATION</span></div>
+            <div>LEVELS: <span id="state-display" class="font-bold text-emerald-600 dark:text-emerald-400">0 SOLVED</span></div>
           </div>
         </div>
 
         <!-- Causal Reasoning Log Box -->
-        <div class="p-3 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] text-[10px] space-y-1.5">
-          <div class="text-[var(--text-muted)] font-bold uppercase tracking-wider">Kausale Inferenz-Notiz:</div>
+        <div class="p-3 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] text-[10px] space-y-1.5 min-h-[95px]">
+          <div class="flex justify-between items-center text-[var(--text-muted)] font-bold uppercase tracking-wider">
+            <span>Kausale Inferenz-Notiz:</span>
+            <span id="think-time-badge" class="text-[9px] font-mono text-[var(--text-muted)] hidden">THINK: 1.2ms</span>
+          </div>
           <p id="reasoning-display" class="text-[var(--text-secondary)] leading-relaxed">
-            Dead-Click Pruning: Klick löst keine Pixelveränderung aus (ΔF = 0). Koordinate wird permanent im Gedächtnis geblacklistet.
+            Initialer Systemzustand geladen. Bereit für kausale Inferenz-Trajektorie.
           </p>
         </div>
 
-        <!-- Playback Controls -->
-        <div class="space-y-2 pt-1">
-          <!-- Timeline Range Slider -->
+        <!-- Scrubber Scroller Bar -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[10px] text-[var(--text-muted)]">
+            <span>TIMELINE-POSITION</span>
+            <span id="slider-percentage">0%</span>
+          </div>
           <input 
             type="range" 
             id="scrubber-slider" 
             min="0" 
             max="28" 
             value="0" 
-            class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded appearance-none cursor-pointer accent-[var(--text-primary)]"
+            class="w-full h-1.5 bg-[var(--bg-card)] rounded-lg appearance-none cursor-pointer accent-[var(--text-primary)]"
           />
+        </div>
 
-          <!-- Play / Step Buttons -->
-          <div class="flex items-center justify-between gap-2">
-            <button id="btn-play" class="flex-1 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] font-bold transition-all cursor-pointer">
+        <!-- Scrubber Controls -->
+        <div class="flex items-center justify-between gap-1.5 pt-1">
+          <div class="flex items-center gap-1.5">
+            <button id="btn-start" class="px-2 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[10px] cursor-pointer" title="Jump to start">
+              |◀
+            </button>
+            <button id="btn-prev5" class="px-2 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[10px] cursor-pointer" title="Back 5 steps">
+              -5
+            </button>
+            <button id="btn-prev" class="px-2 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[10px] cursor-pointer" title="Previous step (Arrow Left)">
+              ◀
+            </button>
+            <button id="btn-play" class="px-3 py-1 rounded border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold text-[10px] cursor-pointer transition-all" title="Play/Pause (Space)">
               ▶ PLAY
             </button>
-            <button id="btn-prev" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] transition-all cursor-pointer">
-              ◀ PREV
+            <button id="btn-next" class="px-2 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[10px] cursor-pointer" title="Next step (Arrow Right)">
+              ▶
             </button>
-            <button id="btn-next" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] transition-all cursor-pointer">
-              NEXT ▶
+            <button id="btn-next5" class="px-2 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[10px] cursor-pointer" title="Forward 5 steps">
+              +5
+            </button>
+            <button id="btn-end" class="px-2 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[10px] cursor-pointer" title="Jump to end">
+              ▶|
+            </button>
+          </div>
+
+          <!-- Speed Multiplier -->
+          <div class="flex items-center gap-1">
+            <span class="text-[9px] text-[var(--text-muted)]">TEMPO:</span>
+            <button id="btn-speed" class="px-1.5 py-0.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] text-[9px] font-mono">
+              2x
             </button>
           </div>
         </div>
@@ -103,24 +145,23 @@
     </div>
 
     <!-- Modal Footer -->
-    <div class="px-5 py-2.5 border-t border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[10px] text-[var(--text-muted)] flex items-center justify-between">
-      <div class="hidden sm:flex items-center gap-3">
-        <span>[LEERTASTE] PLAY/PAUSE</span>
-        <span>•</span>
-        <span>[← / →] STEP</span>
-        <span>•</span>
-        <span>[1-4] SPIEL WECHSELN</span>
+    <div class="px-5 py-2.5 border-t border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[10px] text-[var(--text-muted)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-[var(--text-primary)]">AGENT:</span>
+        <span>SOVEREIGN ARC-3 AGENT (DOMAIN-AGNOSTIC ACTIVE INFERENCE)</span>
       </div>
-      <span class="font-bold text-[var(--text-primary)]">100% EMPIRISCHE BENCHMARK-TRAJEKTORIEN</span>
+      <div>
+        <span>TASTATUR: [LEERTASTE] PLAY/PAUSE | [←/→] STEP | [1]-[3] BENCHMARKS | [ESC] SCHLIESSEN</span>
+      </div>
     </div>
+
   </div>
 </div>
 
 <script>
   import lp85Data from '../data/arc3_lp85.json';
-  import bp35Data from '../data/arc3_bp35.json';
-  import tr87Data from '../data/arc3_tr87.json';
-  import s5i5Data from '../data/arc3_s5i5.json';
+  import ls20Data from '../data/arc3_ls20.json';
+  import tn36Data from '../data/arc3_tn36.json';
 
   interface GameTrajectory {
     game_id: string;
@@ -134,9 +175,8 @@
 
   const GAMES: Record<string, GameTrajectory> = {
     lp85: lp85Data as GameTrajectory,
-    bp35: bp35Data as GameTrajectory,
-    tr87: tr87Data as GameTrajectory,
-    s5i5: s5i5Data as GameTrajectory,
+    ls20: ls20Data as GameTrajectory,
+    tn36: tn36Data as GameTrajectory,
   };
 
   // ARC 16-Color Palette Map
@@ -162,33 +202,210 @@
   function initArcScrubber() {
     const modal = document.getElementById('arc-scrubber-modal');
     const closeBtn = document.getElementById('scrubber-close-btn');
-    const canvas = document.getElementById('arc-canvas') as HTMLCanvasElement;
-    if (!canvas) return;
+    const canvas = document.getElementById('arc-canvas') as HTMLCanvasElement | null;
+    if (!canvas || !modal) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const slider = document.getElementById('scrubber-slider') as HTMLInputElement;
+    const slider = document.getElementById('scrubber-slider') as HTMLInputElement | null;
     const stepCounter = document.getElementById('step-counter');
     const actionDisplay = document.getElementById('action-display');
     const deltaDisplay = document.getElementById('delta-display');
     const stateDisplay = document.getElementById('state-display');
     const reasoningDisplay = document.getElementById('reasoning-display');
+    const thinkTimeBadge = document.getElementById('think-time-badge');
     const btnPlay = document.getElementById('btn-play');
     const btnPrev = document.getElementById('btn-prev');
     const btnNext = document.getElementById('btn-next');
+    const btnPrev5 = document.getElementById('btn-prev5');
+    const btnNext5 = document.getElementById('btn-next5');
+    const btnStart = document.getElementById('btn-start');
+    const btnEnd = document.getElementById('btn-end');
+    const btnSpeed = document.getElementById('btn-speed');
+    const btnLiveSolve = document.getElementById('btn-live-solve');
+    const btnLiveLabel = document.getElementById('btn-live-label');
     const clickReticle = document.getElementById('click-reticle');
     const cursorCoordDisplay = document.getElementById('canvas-cursor-pos');
     const gridSizeDisplay = document.getElementById('canvas-grid-size');
     const gameBadge = document.getElementById('scrubber-game-badge');
+    const sliderPercentage = document.getElementById('slider-percentage');
+    const gameBtns = document.querySelectorAll('.scrubber-game-btn');
+
+    const wsLed = document.getElementById('ws-status-led');
+    const wsText = document.getElementById('ws-status-text');
 
     let activeGameId = 'lp85';
     let activeGame = GAMES[activeGameId];
-    let totalSteps = activeGame.total_steps;
+    let totalSteps = activeGame.total_steps || activeGame.steps.length;
     let currentStep = 0;
     let isPlaying = false;
+    let isLiveSolving = false;
     let playInterval: any = null;
     let frameCache: number[][][] = [];
 
+    let speedIdx = 1;
+    const speeds = [
+      { label: '1x', delay: 350 },
+      { label: '2x', delay: 180 },
+      { label: '5x', delay: 80 },
+      { label: '10x', delay: 35 }
+    ];
+
+    // WebSocket Management
+    let ws: WebSocket | null = null;
+    let isWsConnected = false;
+
+    function connectWebSocket() {
+      try {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.hostname || '127.0.0.1';
+        const wsUrl = `${protocol}//${host}:8765`;
+
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+          isWsConnected = true;
+          if (wsLed) wsLed.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping';
+          if (wsText) wsText.textContent = 'WS: LIVE SOLVER BEREIT';
+        };
+
+        ws.onmessage = (evt) => {
+          try {
+            const data = JSON.parse(evt.data);
+            handleWsMessage(data);
+          } catch (e) {
+            console.error('Error parsing WS message:', e);
+          }
+        };
+
+        ws.onerror = () => {
+          isWsConnected = false;
+          if (wsLed) wsLed.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
+          if (wsText) wsText.textContent = 'WS: REPLAY-MODUS';
+        };
+
+        ws.onclose = () => {
+          isWsConnected = false;
+          if (wsLed) wsLed.className = 'w-1.5 h-1.5 rounded-full bg-slate-400';
+          if (wsText) wsText.textContent = 'WS: STANDALONE';
+          if (isLiveSolving) stopLiveSolve();
+        };
+      } catch (err) {
+        isWsConnected = false;
+        if (wsLed) wsLed.className = 'w-1.5 h-1.5 rounded-full bg-slate-400';
+        if (wsText) wsText.textContent = 'WS: STANDALONE';
+      }
+    }
+
+    function handleWsMessage(msg: any) {
+      if (msg.type === 'GAME_INIT') {
+        frameCache = [];
+        let rawGrid = msg.initial_frame;
+        while (Array.isArray(rawGrid) && rawGrid.length === 1 && Array.isArray(rawGrid[0]) && Array.isArray(rawGrid[0][0])) {
+          rawGrid = (rawGrid as any)[0];
+        }
+        const baseGrid: number[][] = JSON.parse(JSON.stringify(rawGrid));
+        frameCache.push(JSON.parse(JSON.stringify(baseGrid)));
+        renderFrame(0);
+        currentStep = 0;
+        updateUI();
+      } else if (msg.type === 'STEP_UPDATE') {
+        const lastGrid = frameCache[frameCache.length - 1];
+        const newGrid = JSON.parse(JSON.stringify(lastGrid));
+        if (msg.diffs && msg.diffs.length > 0) {
+          for (const [x, y, color] of msg.diffs) {
+            if (y < newGrid.length && x < newGrid[0].length) {
+              newGrid[y][x] = color;
+            }
+          }
+        }
+        frameCache.push(newGrid);
+        currentStep = frameCache.length - 1;
+
+        renderFrame(currentStep);
+
+        // Update live step telemetry
+        if (stepCounter) stepCounter.textContent = `${currentStep.toString().padStart(2, '0')} / LIVE`;
+        if (actionDisplay) actionDisplay.textContent = msg.action;
+        if (deltaDisplay) deltaDisplay.textContent = msg.delta_f.toString();
+        if (stateDisplay) {
+          stateDisplay.textContent = `${msg.levels_completed} SOLVED [${msg.state}]`;
+        }
+        if (reasoningDisplay) reasoningDisplay.textContent = msg.reasoning || '';
+        if (thinkTimeBadge) {
+          thinkTimeBadge.classList.remove('hidden');
+          thinkTimeBadge.textContent = `THINK: ${msg.think_time_ms || 1.0}ms`;
+        }
+
+        // Reticle
+        if (msg.action_type === 'ACTION6' && msg.action_data && clickReticle) {
+          const scale = canvas.width / 64;
+          clickReticle.style.left = `${msg.action_data.x * scale + scale / 2}px`;
+          clickReticle.style.top = `${msg.action_data.y * scale + scale / 2}px`;
+          clickReticle.style.opacity = '1';
+        } else if (clickReticle) {
+          clickReticle.style.opacity = '0';
+        }
+      } else if (msg.type === 'GAME_COMPLETED') {
+        stopLiveSolve();
+        totalSteps = frameCache.length;
+        if (slider) {
+          slider.max = (totalSteps - 1).toString();
+          slider.value = (totalSteps - 1).toString();
+        }
+        if (reasoningDisplay) {
+          reasoningDisplay.textContent = `[ABGESCHLOSSEN] Benchmark ${activeGameId} erfolgreich in ${msg.total_steps} Schritten gelöst (Status: ${msg.state}).`;
+        }
+      }
+    }
+
+    function startLiveSolve() {
+      if (!isWsConnected || !ws || ws.readyState !== WebSocket.OPEN) {
+        alert('WebSocket-Bridge nicht erreichbar. Starte den lokalen Server mit:\npython3 apps/portfolio/server/arc_live_bridge.py');
+        return;
+      }
+      if (isPlaying) togglePlay();
+      isLiveSolving = true;
+      if (btnLiveLabel) btnLiveLabel.textContent = '⏹ STOP LIVE LÖSEN';
+      if (btnLiveSolve) {
+        btnLiveSolve.classList.remove('border-emerald-600', 'bg-emerald-600/10', 'text-emerald-600');
+        btnLiveSolve.classList.add('border-red-600', 'bg-red-600/10', 'text-red-600');
+      }
+      if (slider) slider.disabled = true;
+
+      ws.send(jsonStringify({
+        command: 'START_SOLVE',
+        game_id: activeGameId,
+        delay_ms: speeds[speedIdx].delay
+      }));
+    }
+
+    function stopLiveSolve() {
+      isLiveSolving = false;
+      if (btnLiveLabel) btnLiveLabel.textContent = '⚡ LIVE LÖSEN (WEBSOCKET)';
+      if (btnLiveSolve) {
+        btnLiveSolve.classList.remove('border-red-600', 'bg-red-600/10', 'text-red-600');
+        btnLiveSolve.classList.add('border-emerald-600', 'bg-emerald-600/10', 'text-emerald-600');
+      }
+      if (slider) slider.disabled = false;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(jsonStringify({ command: 'STOP' }));
+      }
+    }
+
+    function jsonStringify(obj: any): string {
+      return JSON.stringify(obj);
+    }
+
+    btnLiveSolve?.addEventListener('click', () => {
+      if (isLiveSolving) {
+        stopLiveSolve();
+      } else {
+        startLiveSolve();
+      }
+    });
+
+    // Offline Frame-Cache Builder
     function buildCache(game: GameTrajectory) {
       frameCache = [];
       let rawGrid = game.initial_frame;
@@ -200,9 +417,10 @@
       frameCache.push(JSON.parse(JSON.stringify(baseGrid)));
 
       let runningGrid = JSON.parse(JSON.stringify(baseGrid));
-      for (let s = 0; s < game.total_steps; s++) {
+      const stepsCount = game.total_steps || game.steps.length;
+      for (let s = 0; s < stepsCount; s++) {
         const stepData = game.steps[s];
-        if (stepData.diffs && stepData.diffs.length > 0) {
+        if (stepData && stepData.diffs && stepData.diffs.length > 0) {
           for (const [x, y, color] of stepData.diffs) {
             if (y < runningGrid.length && x < runningGrid[0].length) {
               runningGrid[y][x] = color;
@@ -216,10 +434,11 @@
     function switchGame(gameId: string) {
       if (!GAMES[gameId]) return;
       if (isPlaying) togglePlay();
+      if (isLiveSolving) stopLiveSolve();
 
       activeGameId = gameId;
       activeGame = GAMES[gameId];
-      totalSteps = activeGame.total_steps;
+      totalSteps = activeGame.total_steps || activeGame.steps.length;
       buildCache(activeGame);
 
       if (slider) {
@@ -229,121 +448,125 @@
       }
 
       if (gameBadge) {
-        gameBadge.textContent = `[GAME: ${activeGame.game_id} // ${activeGame.genre} // ${totalSteps} SCHRITTE]`;
+        gameBadge.textContent = `[GAME: ${activeGame.game_id} // ${activeGame.genre}]`;
       }
 
       if (gridSizeDisplay) {
         gridSizeDisplay.textContent = `GRID: ${activeGame.grid_size[0]} × ${activeGame.grid_size[1]} PIXEL`;
       }
 
-      // Update active button classes
-      document.querySelectorAll('.scrubber-game-btn').forEach(btn => {
-        const g = btn.getAttribute('data-game');
-        if (g === gameId) {
-          btn.className = 'scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold transition-all cursor-pointer';
+      gameBtns.forEach(btn => {
+        const gid = btn.getAttribute('data-game');
+        if (gid === gameId) {
+          btn.classList.remove('bg-[var(--bg-card)]', 'text-[var(--text-primary)]');
+          btn.classList.add('bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'font-bold');
         } else {
-          btn.className = 'scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer';
+          btn.classList.remove('bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'font-bold');
+          btn.classList.add('bg-[var(--bg-card)]', 'text-[var(--text-primary)]');
         }
       });
 
-      setStep(0);
+      currentStep = 0;
+      renderFrame(0);
+      updateUI();
     }
 
-    // Render Grid onto 320x320 Canvas
+    gameBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const gid = btn.getAttribute('data-game') || 'lp85';
+        switchGame(gid);
+      });
+    });
+
+    // Render Canvas Frame
     function renderFrame(stepIdx: number) {
-      const grid = frameCache[Math.min(stepIdx, frameCache.length - 1)];
-      if (!grid || !grid.length) return;
+      const grid = frameCache[stepIdx];
+      if (!grid || grid.length === 0) return;
 
-      const gw = grid[0].length;
-      const gh = grid.length;
-      const pixelSizeX = canvas.width / gw;
-      const pixelSizeY = canvas.height / gh;
+      const h = grid.length;
+      const w = grid[0].length;
+      const cellW = canvas.width / w;
+      const cellH = canvas.height / h;
 
-      for (let y = 0; y < gh; y++) {
-        for (let x = 0; x < gw; x++) {
-          const colorCode = grid[y]?.[x] ?? 0;
-          ctx.fillStyle = ARC_PALETTE[colorCode] || '#000000';
-          ctx.fillRect(x * pixelSizeX, y * pixelSizeY, pixelSizeX, pixelSizeY);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const colorIdx = grid[y][x];
+          ctx.fillStyle = ARC_PALETTE[colorIdx] || '#000000';
+          ctx.fillRect(x * cellW, y * cellH, cellW, cellH);
         }
       }
 
-      // Update UI Telemetry
-      const stepInfo = activeGame.steps[Math.min(stepIdx, activeGame.steps.length - 1)];
-      if (!stepInfo) return;
-
-      if (slider) slider.value = stepIdx.toString();
-      if (stepCounter) stepCounter.textContent = `${stepIdx.toString().padStart(2, '0')} / ${(totalSteps - 1).toString().padStart(2, '0')}`;
-      if (actionDisplay) actionDisplay.textContent = stepInfo.action;
-      if (deltaDisplay) deltaDisplay.textContent = stepInfo.delta_f.toString();
-
-      // Show Click Reticle if action was a click
-      if (stepInfo.action_type === 'ACTION6' && stepInfo.action_data) {
-        const cx = stepInfo.action_data.x;
-        const cy = stepInfo.action_data.y;
-        if (clickReticle && canvas.parentElement) {
-          clickReticle.style.left = `${(cx / gw) * 320 + 6}px`;
-          clickReticle.style.top = `${(cy / gh) * 320 + 6}px`;
-          clickReticle.style.opacity = '1';
-        }
-      } else {
-        if (clickReticle) clickReticle.style.opacity = '0';
+      // Draw subtle grid overlay
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i <= w; i += 8) {
+        ctx.beginPath();
+        ctx.moveTo(i * cellW, 0);
+        ctx.lineTo(i * cellW, canvas.height);
+        ctx.stroke();
       }
-
-      // State and Reasoning Context per Game and State
-      if (stateDisplay && reasoningDisplay) {
-        if (stepInfo.transition || stepInfo.levels_completed > 0) {
-          stateDisplay.textContent = 'SOLVED // LEVEL COMPLETE';
-          stateDisplay.className = 'font-bold text-emerald-500';
-          if (activeGameId === 'lp85') {
-            reasoningDisplay.textContent = 'Zielzustand erreicht: Beide Kausalitäts-Schlüssel aktiviert. Level 0 erfolgreich abgeschlossen (Levels Completed: 1).';
-          } else if (activeGameId === 'bp35') {
-            reasoningDisplay.textContent = 'Zielzustand erreicht: Invertierter Gravitationsvektor g = (0, -1) katapultiert Avatar ins Decken-Portal.';
-          } else if (activeGameId === 'tr87') {
-            reasoningDisplay.textContent = 'Zielzustand erreicht: 1D-Registerband im Zielmuster arretiert. Level 0 erfolgreich gelöst.';
-          } else if (activeGameId === 's5i5') {
-            reasoningDisplay.textContent = 'Zielzustand erreicht: Reibungsbremse verhindert Überschwingen. Alle Slider im Zielbereich synchronisiert.';
-          } else {
-            reasoningDisplay.textContent = 'Level erfolgreich abgeschlossen.';
-          }
-        } else if (activeGameId === 'lp85') {
-          if (stepInfo.delta_f > 0) {
-            stateDisplay.textContent = 'AFFORDANCE EXPLOIT';
-            stateDisplay.className = 'font-bold text-amber-500';
-            reasoningDisplay.textContent = `Affordanz entdeckt (ΔF = ${stepInfo.delta_f}): Gezielter Burst aktiviert den Schlüssel-Aktuator.`;
-          } else {
-            stateDisplay.textContent = 'DEAD-CLICK PRUNING';
-            stateDisplay.className = 'font-bold text-slate-500 dark:text-slate-400';
-            reasoningDisplay.textContent = 'Kausalitäts-Check negativ (ΔF = 0): Klick bewirkt keine Veränderung. Koordinate im PSPACE-Graphen dauerhaft verworfen.';
-          }
-        } else if (activeGameId === 'bp35') {
-          if (stepIdx <= 3) {
-            stateDisplay.textContent = 'GRAVITY CALIBRATION';
-            stateDisplay.className = 'font-bold text-cyan-500';
-            reasoningDisplay.textContent = 'Physik-Inferenz: Agent misst negative Beschleunigung (Aufwärts-Fall gegen die Decke).';
-          } else {
-            stateDisplay.textContent = 'BALLISTIC MOMENTUM';
-            stateDisplay.className = 'font-bold text-amber-500';
-            reasoningDisplay.textContent = `Trajektorie-Schritt ${stepIdx}: Impuls nutzt elastischen Wandstoß zur horizontalen Zielausrichtung.`;
-          }
-        } else if (activeGameId === 'tr87') {
-          stateDisplay.textContent = 'REGISTER SHIFT';
-          stateDisplay.className = 'font-bold text-purple-500';
-          reasoningDisplay.textContent = `Zustands-Transition ${stepIdx}: Schrittweiser 1D-Taktimpuls verschiebt die Register-Bitfolge.`;
-        } else if (activeGameId === 's5i5') {
-          stateDisplay.textContent = 'MOMENTUM BRAKING';
-          stateDisplay.className = 'font-bold text-blue-500';
-          reasoningDisplay.textContent = `Slider-Justierung ${stepIdx}: Gegensteuer-Impuls kompensiert Trägheit und dämpft Überschwingen.`;
-        } else {
-          stateDisplay.textContent = 'ACTIVE INFERENCE';
-          stateDisplay.className = 'font-bold text-emerald-500';
-          reasoningDisplay.textContent = `Aktion ${stepInfo.action} ausgeführt (ΔF = ${stepInfo.delta_f}).`;
-        }
+      for (let j = 0; j <= h; j += 8) {
+        ctx.beginPath();
+        ctx.moveTo(0, j * cellH);
+        ctx.lineTo(canvas.width, j * cellH);
+        ctx.stroke();
       }
     }
 
-    function setStep(newStep: number) {
-      currentStep = Math.max(0, Math.min(newStep, totalSteps - 1));
+    // Update Telemetry & Scrubber UI
+    function updateUI() {
+      if (!activeGame || !activeGame.steps) return;
+      const stepIdx = Math.min(currentStep, activeGame.steps.length - 1);
+      const stepData = activeGame.steps[stepIdx] || {};
+
+      if (stepCounter) {
+        stepCounter.textContent = `${currentStep.toString().padStart(2, '0')} / ${(totalSteps - 1).toString().padStart(2, '0')}`;
+      }
+
+      if (slider) slider.value = currentStep.toString();
+
+      if (sliderPercentage) {
+        const pct = totalSteps > 1 ? Math.round((currentStep / (totalSteps - 1)) * 100) : 0;
+        sliderPercentage.textContent = `${pct}%`;
+      }
+
+      if (actionDisplay) {
+        actionDisplay.textContent = stepData.action || 'INITIAL STATE';
+      }
+
+      if (deltaDisplay) {
+        deltaDisplay.textContent = (stepData.delta_f ?? 0).toString();
+      }
+
+      if (stateDisplay) {
+        const lvls = stepData.levels_completed ?? 0;
+        const stateStr = stepData.state ?? 'NOT_FINISHED';
+        stateDisplay.textContent = `${lvls} SOLVED [${stateStr}]`;
+      }
+
+      if (reasoningDisplay) {
+        reasoningDisplay.textContent = stepData.reasoning || 'Kausale Inferenz-Trajektorie registriert.';
+      }
+
+      // Action 6 Click Reticle handling
+      if (stepData.action_type === 'ACTION6' && stepData.action_data && clickReticle) {
+        const scale = canvas.width / activeGame.grid_size[0];
+        clickReticle.style.left = `${stepData.action_data.x * scale + scale / 2}px`;
+        clickReticle.style.top = `${stepData.action_data.y * scale + scale / 2}px`;
+        clickReticle.style.opacity = '1';
+      } else if (clickReticle) {
+        clickReticle.style.opacity = '0';
+      }
+    }
+
+    function goToStep(s: number) {
+      if (s < 0) s = 0;
+      if (s >= totalSteps) s = totalSteps - 1;
+      currentStep = s;
       renderFrame(currentStep);
+      updateUI();
     }
 
     function togglePlay() {
@@ -352,73 +575,119 @@
         isPlaying = false;
         if (btnPlay) btnPlay.textContent = '▶ PLAY';
       } else {
+        if (currentStep >= totalSteps - 1) currentStep = 0;
         isPlaying = true;
         if (btnPlay) btnPlay.textContent = '⏸ PAUSE';
         playInterval = setInterval(() => {
-          if (currentStep >= totalSteps - 1) {
-            setStep(0);
+          if (currentStep < totalSteps - 1) {
+            goToStep(currentStep + 1);
           } else {
-            setStep(currentStep + 1);
+            togglePlay();
           }
-        }, 280); // ~3.5 FPS for readable observation
+        }, speeds[speedIdx].delay);
       }
     }
 
-    // Initial cache build
-    buildCache(activeGame);
+    // Speed Selector
+    btnSpeed?.addEventListener('click', () => {
+      speedIdx = (speedIdx + 1) % speeds.length;
+      btnSpeed.textContent = speeds[speedIdx].label;
+      if (isPlaying) {
+        clearInterval(playInterval);
+        playInterval = setInterval(() => {
+          if (currentStep < totalSteps - 1) {
+            goToStep(currentStep + 1);
+          } else {
+            togglePlay();
+          }
+        }, speeds[speedIdx].delay);
+      }
+    });
 
-    // Event Listeners
-    slider?.addEventListener('input', (e) => {
-      setStep(parseInt((e.target as HTMLInputElement).value, 10));
+    // Event Bindings
+    slider?.addEventListener('input', () => {
+      if (isPlaying) togglePlay();
+      goToStep(parseInt(slider.value, 10));
     });
 
     btnPlay?.addEventListener('click', togglePlay);
-    btnPrev?.addEventListener('click', () => setStep(currentStep - 1));
-    btnNext?.addEventListener('click', () => setStep(currentStep + 1));
+    btnPrev?.addEventListener('click', () => { if (isPlaying) togglePlay(); goToStep(currentStep - 1); });
+    btnNext?.addEventListener('click', () => { if (isPlaying) togglePlay(); goToStep(currentStep + 1); });
+    btnPrev5?.addEventListener('click', () => { if (isPlaying) togglePlay(); goToStep(currentStep - 5); });
+    btnNext5?.addEventListener('click', () => { if (isPlaying) togglePlay(); goToStep(currentStep + 5); });
+    btnStart?.addEventListener('click', () => { if (isPlaying) togglePlay(); goToStep(0); });
+    btnEnd?.addEventListener('click', () => { if (isPlaying) togglePlay(); goToStep(totalSteps - 1); });
 
-    // Game Selector Buttons
-    document.querySelectorAll('.scrubber-game-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const g = btn.getAttribute('data-game');
-        if (g) switchGame(g);
-      });
-    });
-
-    // Open & Close
-    function openModal() {
-      modal?.classList.remove('opacity-0', 'pointer-events-none');
-      setStep(0);
-    }
-
-    function closeModal() {
-      if (isPlaying) togglePlay();
-      modal?.classList.add('opacity-0', 'pointer-events-none');
-    }
-
-    closeBtn?.addEventListener('click', closeModal);
-    window.addEventListener('open-arc-scrubber', openModal);
-
-    window.addEventListener('keydown', (e) => {
-      if (modal?.classList.contains('pointer-events-none')) return;
-      if (e.key === 'Escape') closeModal();
-      if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); togglePlay(); }
-      if (e.key === 'ArrowRight') setStep(currentStep + 1);
-      if (e.key === 'ArrowLeft') setStep(currentStep - 1);
-      if (e.key === '1') switchGame('lp85');
-      if (e.key === '2') switchGame('bp35');
-      if (e.key === '3') switchGame('tr87');
-      if (e.key === '4') switchGame('s5i5');
-    });
-
-    // Canvas Mouseover Coordinates
+    // Cursor tracking
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      const gw = activeGame.grid_size[0] || 64;
-      const gh = activeGame.grid_size[1] || 64;
-      const x = Math.floor(((e.clientX - rect.left) / rect.width) * gw);
-      const y = Math.floor(((e.clientY - rect.top) / rect.height) * gh);
-      if (cursorCoordDisplay) cursorCoordDisplay.textContent = `X: ${x} | Y: ${y}`;
+      const scaleX = activeGame.grid_size[0] / rect.width;
+      const scaleY = activeGame.grid_size[1] / rect.height;
+      const x = Math.floor((e.clientX - rect.left) * scaleX);
+      const y = Math.floor((e.clientY - rect.top) * scaleY);
+      if (cursorCoordDisplay) {
+        cursorCoordDisplay.textContent = `X: ${x} | Y: ${y}`;
+      }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      if (cursorCoordDisplay) cursorCoordDisplay.textContent = 'X: -- | Y: --';
+    });
+
+    // Modal Visibility
+    let isOpen = false;
+    function open() {
+      isOpen = true;
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      connectWebSocket();
+      setTimeout(() => {
+        switchGame(activeGameId);
+      }, 50);
+    }
+
+    function close() {
+      isOpen = false;
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      if (isPlaying) togglePlay();
+      if (isLiveSolving) stopLiveSolve();
+      if (ws) {
+        ws.close();
+        ws = null;
+      }
+    }
+
+    closeBtn?.addEventListener('click', close);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) close();
+    });
+
+    window.addEventListener('open-arc-scrubber', () => open());
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (!isOpen) return;
+      if (e.key === 'Escape') close();
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlay();
+      }
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (isPlaying) togglePlay();
+        goToStep(currentStep - 1);
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (isPlaying) togglePlay();
+        goToStep(currentStep + 1);
+      }
+      if (e.key === '1') switchGame('lp85');
+      if (e.key === '2') switchGame('ls20');
+      if (e.key === '3') switchGame('tn36');
+      if (e.key === 'l' || e.key === 'L') {
+        if (isLiveSolving) stopLiveSolve();
+        else startLiveSolve();
+      }
     });
   }
 
