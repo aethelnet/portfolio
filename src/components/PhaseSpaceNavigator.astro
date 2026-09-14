@@ -1,0 +1,375 @@
+---
+// PhaseSpaceNavigator.astro - Fullscreen Continuous Dynamical Systems World Map
+---
+
+<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+  <!-- Fullscreen Interactive Canvas -->
+  <canvas id="world-canvas" class="w-full h-full block pointer-events-auto cursor-crosshair"></canvas>
+
+  <!-- Interactive Project Nodes Overlay (Anchored to Screen Coords via JS) -->
+  <div id="project-nodes-container" class="absolute inset-0 pointer-events-none">
+    <!-- Node A: ARC-AGI-3 -->
+    <div id="node-arc" class="project-node absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="arc">
+      <div class="flex items-center gap-2.5">
+        <div class="w-3 h-3 rounded-full border-2 border-[var(--text-primary)] bg-[var(--bg-primary)] group-hover:scale-125 transition-transform flex items-center justify-center">
+          <div class="w-1 h-1 rounded-full bg-[var(--text-primary)]"></div>
+        </div>
+        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm backdrop-blur-md">
+          <div class="text-[10px] uppercase font-mono-tech tracking-wider text-[var(--text-muted)]">01 // FRONTIER AI</div>
+          <div class="text-xs font-bold text-[var(--text-primary)] group-hover:underline underline-offset-4">ARC-AGI-3 Solver</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Node B: Shadow Museum -->
+    <div id="node-museum" class="project-node absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="museum">
+      <div class="flex items-center gap-2.5">
+        <div class="w-3 h-3 rounded-full border-2 border-[var(--text-primary)] bg-[var(--bg-primary)] group-hover:scale-125 transition-transform flex items-center justify-center">
+          <div class="w-1 h-1 rounded-full bg-[var(--text-primary)]"></div>
+        </div>
+        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm backdrop-blur-md">
+          <div class="text-[10px] uppercase font-mono-tech tracking-wider text-[var(--text-muted)]">02 // PROVENANCE GRAPH</div>
+          <div class="text-xs font-bold text-[var(--text-primary)] group-hover:underline underline-offset-4">Shadow Museum Atlas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Node C: Yu-Gi-Oh Edison Engine -->
+    <div id="node-edison" class="project-node absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="edison">
+      <div class="flex items-center gap-2.5">
+        <div class="w-3 h-3 rounded-full border-2 border-[var(--text-primary)] bg-[var(--bg-primary)] group-hover:scale-125 transition-transform flex items-center justify-center">
+          <div class="w-1 h-1 rounded-full bg-[var(--text-primary)]"></div>
+        </div>
+        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm backdrop-blur-md">
+          <div class="text-[10px] uppercase font-mono-tech tracking-wider text-[var(--text-muted)]">03 // DETERMINISTIC RL</div>
+          <div class="text-xs font-bold text-[var(--text-primary)] group-hover:underline underline-offset-4">Edison Engine (WASM)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Node D: Continuous Liquid ODE -->
+    <div id="node-lgnn" class="project-node absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="lgnn">
+      <div class="flex items-center gap-2.5">
+        <div class="w-3 h-3 rounded-full border-2 border-[var(--text-primary)] bg-[var(--bg-primary)] group-hover:scale-125 transition-transform flex items-center justify-center">
+          <div class="w-1 h-1 rounded-full bg-[var(--text-primary)]"></div>
+        </div>
+        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm backdrop-blur-md">
+          <div class="text-[10px] uppercase font-mono-tech tracking-wider text-[var(--text-muted)]">04 // DYNAMICAL SYSTEMS</div>
+          <div class="text-xs font-bold text-[var(--text-primary)] group-hover:underline underline-offset-4">Liquid Neural Core</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Dutch Architectural Phase Space Navigator
+  interface Waypoint {
+    id: string;
+    name: string;
+    sub: string;
+    hx: number;
+    hy: number;
+    w11: number;
+    w12: number;
+    w21: number;
+    w22: number;
+    u: number;
+  }
+
+  const WAYPOINTS: Waypoint[] = [
+    { id: 'arc', name: 'ARC-AGI-3 Solver', sub: 'Causal World Model', hx: -1.3, hy: 0.7, w11: 0.2, w12: -1.6, w21: 1.6, w22: 0.2, u: 0.8 },
+    { id: 'museum', name: 'Shadow Museum', sub: 'Provenance Cartography', hx: 1.4, hy: 0.8, w11: -0.4, w12: -1.2, w21: 1.2, w22: -0.4, u: -0.6 },
+    { id: 'edison', name: 'Edison Engine', sub: 'Deterministic State Machine', hx: -0.9, hy: -1.2, w11: 0.6, w12: -2.0, w21: 2.0, w22: 0.6, u: -1.0 },
+    { id: 'lgnn', name: 'Liquid Neural Core', sub: 'Continuous-Time ODE', hx: 1.2, hy: -1.0, w11: 0.0, w12: -1.4, w21: 1.4, w22: 0.0, u: 0.0 },
+  ];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('world-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let width = 0;
+    let height = 0;
+    const domain = 2.8;
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+      updateNodePositions();
+    }
+    window.addEventListener('resize', resize);
+
+    function toScreenX(hx: number): number {
+      return width / 2 + (hx / domain) * (Math.min(width, height) / 2);
+    }
+    function toScreenY(hy: number): number {
+      return height / 2 - (hy / domain) * (Math.min(width, height) / 2);
+    }
+    function toPhaseX(sx: number): number {
+      return ((sx - width / 2) / (Math.min(width, height) / 2)) * domain;
+    }
+    function toPhaseY(sy: number): number {
+      return -((sy - height / 2) / (Math.min(width, height) / 2)) * domain;
+    }
+
+    function updateNodePositions() {
+      WAYPOINTS.forEach(wp => {
+        const el = document.getElementById(`node-${wp.id}`);
+        if (el) {
+          el.style.left = `${toScreenX(wp.hx)}px`;
+          el.style.top = `${toScreenY(wp.hy)}px`;
+          el.style.opacity = '1';
+        }
+      });
+    }
+
+    // Dynamic ODE Parameters
+    let curW11 = 0.3, curW12 = -1.6, curW21 = 1.6, curW22 = 0.3;
+    let targetW11 = curW11, targetW12 = curW12, targetW21 = curW21, targetW22 = curW22;
+    let curU = 0.0, targetU = 0.0;
+    const tau_base = 8.0;
+    const beta = 0.8;
+
+    // Simulation State
+    let h1 = 0.4;
+    let h2 = 0.3;
+    const trailLength = 260;
+    const trajectory: { x: number; y: number }[] = [];
+
+    // Background Flow Particles
+    const numParticles = 60;
+    const particles = Array.from({ length: numParticles }, () => ({
+      x: (Math.random() - 0.5) * domain * 2,
+      y: (Math.random() - 0.5) * domain * 2,
+      life: Math.random() * 120,
+      maxLife: 80 + Math.random() * 80
+    }));
+
+    // Mouse Interaction (Soft Gravity Well)
+    let mouseX = width / 2;
+    let mouseY = height / 2;
+    let mouseIn = false;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      mouseIn = true;
+    });
+    window.addEventListener('mouseleave', () => { mouseIn = false; });
+
+    // Waypoint Selector Event
+    window.addEventListener('select-waypoint', (e: any) => {
+      const wp = WAYPOINTS.find(w => w.id === e.detail.id);
+      if (wp) {
+        targetW11 = wp.w11;
+        targetW12 = wp.w12;
+        targetW21 = wp.w21;
+        targetW22 = wp.w22;
+        targetU = wp.u;
+      }
+    });
+
+    // Node click handlers
+    document.querySelectorAll('.project-node').forEach(node => {
+      node.addEventListener('click', () => {
+        const projectId = node.getAttribute('data-project');
+        window.dispatchEvent(new CustomEvent('open-dossier', { detail: { id: projectId } }));
+        window.dispatchEvent(new CustomEvent('select-waypoint', { detail: { id: projectId } }));
+      });
+    });
+
+    // Derivative function
+    function derivatives(x: number, y: number, u: number): [number, number] {
+      const active_tau = tau_base / (1.0 + beta * Math.abs(u));
+      let dh1 = (-1.0 / active_tau) * x + Math.tanh(curW11 * x + curW12 * y + u);
+      let dh2 = (-1.0 / 6.0) * y + Math.tanh(curW21 * x + curW22 * y);
+
+      // Add gentle cursor gravity if mouse is present
+      if (mouseIn) {
+        const mx = toPhaseX(mouseX);
+        const my = toPhaseY(mouseY);
+        const dx = mx - x;
+        const dy = my - y;
+        const distSq = dx * dx + dy * dy + 0.1;
+        dh1 += (dx / distSq) * 0.15;
+        dh2 += (dy / distSq) * 0.15;
+      }
+
+      return [dh1, dh2];
+    }
+
+    // RK4 Step
+    function rk4(x: number, y: number, dt: number, u: number): [number, number] {
+      const [k1x, k1y] = derivatives(x, y, u);
+      const [k2x, k2y] = derivatives(x + 0.5 * dt * k1x, y + 0.5 * dt * k1y, u);
+      const [k3x, k3y] = derivatives(x + 0.5 * dt * k2x, y + 0.5 * dt * k2y, u);
+      const [k4x, k4y] = derivatives(x + dt * k3x, y + dt * k3y, u);
+      return [
+        x + (dt / 6) * (k1x + 2 * k2x + 2 * k3x + k4x),
+        y + (dt / 6) * (k1y + 2 * k2y + 2 * k3y + k4y)
+      ];
+    }
+
+    resize();
+
+    // Animation Loop
+    let lastTime = performance.now();
+    function animate(time: number) {
+      const dt = Math.min((time - lastTime) / 1000, 0.04);
+      lastTime = time;
+
+      // Smooth parameter interpolation
+      curW11 += (targetW11 - curW11) * 0.05;
+      curW12 += (targetW12 - curW12) * 0.05;
+      curW21 += (targetW21 - curW21) * 0.05;
+      curW22 += (targetW22 - curW22) * 0.05;
+      curU += (targetU - curU) * 0.05;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const inkTrace = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(18, 18, 18, 0.05)';
+      const inkSolid = isDark ? 'rgba(255, 255, 255, 0.85)' : 'rgba(18, 18, 18, 0.85)';
+      const gridLine = isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)';
+
+      // 1. Minimalist Dutch Coordinate Grid
+      ctx.strokeStyle = gridLine;
+      ctx.lineWidth = 1;
+
+      // Subtle axes
+      ctx.beginPath();
+      ctx.moveTo(0, height / 2);
+      ctx.lineTo(width, height / 2);
+      ctx.moveTo(width / 2, 0);
+      ctx.lineTo(width / 2, height);
+      ctx.stroke();
+
+      // Axis cross ticks
+      const minDim = Math.min(width, height);
+      for (let r = 0.5; r <= 2.5; r += 0.5) {
+        const pxR = (r / domain) * (minDim / 2);
+        ctx.beginPath();
+        ctx.arc(width / 2, height / 2, pxR, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // 2. Vector Field (Fine Lithographic Needles)
+      const cols = 24;
+      const rows = 16;
+      const stepX = width / cols;
+      const stepY = height / rows;
+
+      ctx.strokeStyle = inkTrace;
+      ctx.lineWidth = 0.75;
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          const sx = (i + 0.5) * stepX;
+          const sy = (j + 0.5) * stepY;
+          const px = toPhaseX(sx);
+          const py = toPhaseY(sy);
+
+          const [dh1_l, dh2_l] = derivatives(px, py, curU);
+          const mag = Math.hypot(dh1_l, dh2_l) + 1e-5;
+          const len = Math.min(stepX * 0.35, 12);
+          const dx = (dh1_l / mag) * len;
+          const dy = (-dh2_l / mag) * len;
+
+          ctx.beginPath();
+          ctx.moveTo(sx - dx * 0.5, sy - dy * 0.5);
+          ctx.lineTo(sx + dx * 0.5, sy + dy * 0.5);
+          ctx.stroke();
+        }
+      }
+
+      // 3. Flow Particles
+      for (const p of particles) {
+        const [nx, ny] = rk4(p.x, p.y, dt * 1.2, curU);
+        p.x = nx;
+        p.y = ny;
+        p.life++;
+
+        if (Math.abs(p.x) > domain || Math.abs(p.y) > domain || p.life > p.maxLife) {
+          p.x = (Math.random() - 0.5) * domain * 2;
+          p.y = (Math.random() - 0.5) * domain * 2;
+          p.life = 0;
+          p.maxLife = 60 + Math.random() * 80;
+        }
+
+        const alpha = Math.sin((p.life / p.maxLife) * Math.PI) * 0.25;
+        ctx.fillStyle = isDark ? `rgba(255, 255, 255, ${alpha.toFixed(3)})` : `rgba(18, 18, 18, ${alpha.toFixed(3)})`;
+        ctx.fillRect(toScreenX(p.x) - 0.5, toScreenY(p.y) - 0.5, 1.5, 1.5);
+      }
+
+      // 4. Primary Trajectory Step (Sub-steps)
+      const subSteps = 3;
+      const subDt = (dt * 1.8) / subSteps;
+      for (let s = 0; s < subSteps; s++) {
+        const [nx, ny] = rk4(h1, h2, subDt, curU);
+        h1 = nx;
+        h2 = ny;
+      }
+
+      if (isNaN(h1) || isNaN(h2) || Math.abs(h1) > domain * 1.5 || Math.abs(h2) > domain * 1.5) {
+        h1 = (Math.random() - 0.5) * 1.5;
+        h2 = (Math.random() - 0.5) * 1.5;
+        trajectory.length = 0;
+      }
+
+      trajectory.push({ x: h1, y: h2 });
+      if (trajectory.length > trailLength) trajectory.shift();
+
+      // 5. Draw Primary Continuous Ink Ribbon
+      if (trajectory.length > 2) {
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        for (let i = 1; i < trajectory.length; i++) {
+          const p1 = trajectory[i - 1];
+          const p2 = trajectory[i];
+          const prog = i / trajectory.length;
+          const alpha = (prog * prog).toFixed(3);
+
+          ctx.strokeStyle = isDark ? `rgba(255, 255, 255, ${alpha})` : `rgba(18, 18, 18, ${alpha})`;
+          ctx.lineWidth = 0.5 + prog * 1.8;
+
+          ctx.beginPath();
+          ctx.moveTo(toScreenX(p1.x), toScreenY(p1.y));
+          ctx.lineTo(toScreenX(p2.x), toScreenY(p2.y));
+          ctx.stroke();
+        }
+
+        // Kinetic Head Marker
+        const hx = toScreenX(h1);
+        const hy = toScreenY(h2);
+
+        ctx.fillStyle = inkSolid;
+        ctx.beginPath();
+        ctx.arc(hx, hy, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Subtle outer pulse
+        ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(18, 18, 18, 0.25)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(hx, hy, 8, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Update live coordinate telemetry in header
+        const coordDisplay = document.getElementById('live-coordinates');
+        if (coordDisplay) {
+          coordDisplay.textContent = `h₁: ${h1 >= 0 ? '+' : ''}${h1.toFixed(3)} | h₂: ${h2 >= 0 ? '+' : ''}${h2.toFixed(3)}`;
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  });
+</script>

@@ -1,231 +1,161 @@
 ---
-// index.astro - Aethelburg Systems & Sovereign Engineering Portfolio
-import LiquidOdeAttractor from '../components/LiquidOdeAttractor.astro';
+// index.astro - Aethelburg White Light Brutalism & Fullscreen Dynamic Systems Portfolio
+import PhaseSpaceNavigator from '../components/PhaseSpaceNavigator.astro';
+import ProjectDossier from '../components/ProjectDossier.astro';
 import '../styles/global.css';
 ---
 
 <!doctype html>
-<html lang="de" class="dark scroll-smooth bg-[#06080c] text-slate-200">
+<html lang="de" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AETHELBURG // Autonomous Neurosymbolics & Dynamical Systems</title>
-    <meta name="description" content="Engineering portfolio for autonomous neurosymbolic architectures, continuous-time Liquid Neural Networks, ARC-AGI-3 solvers, and provenance cartography." />
-    <!-- JetBrains Mono Web Font -->
+    <meta name="description" content="Portfolio für autonome Neurosymbolik, kontinuierliche Liquid Neural Networks, ARC-AGI-3 World Models und Provenienz-Kartographie." />
+    
+    <!-- Dutch & Swiss Typography Stack: Space Grotesk + Newsreader + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
-    <style>
-      body {
-        font-family: 'JetBrains Mono', monospace;
-      }
-      .cyber-scanlines {
-        background: linear-gradient(
-          rgba(18, 22, 34, 0) 50%, 
-          rgba(0, 0, 0, 0.25) 50%
-        ), linear-gradient(
-          90deg,
-          rgba(255, 0, 0, 0.03),
-          rgba(0, 255, 0, 0.01),
-          rgba(0, 0, 255, 0.03)
-        );
-        background-size: 100% 3px, 6px 100%;
-      }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Newsreader:ital,opsz,wght@1,6..72,300;1,6..72,400;1,6..72,600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
-  <body class="min-h-screen bg-[#06080c] text-slate-200 relative overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
-    <!-- Subtle Ambient Glow & Scanline Texture -->
-    <div class="fixed inset-0 pointer-events-none cyber-scanlines opacity-40 z-50"></div>
-    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-gradient-to-b from-cyan-950/20 via-purple-950/10 to-transparent blur-[140px] pointer-events-none -z-10"></div>
+  <body class="min-h-screen w-full relative overflow-hidden flex flex-col justify-between selection:bg-[var(--text-primary)] selection:text-[var(--bg-primary)]">
+    
+    <!-- 00 // Fullscreen Continuous Phase Space World Canvas -->
+    <PhaseSpaceNavigator />
 
-    <!-- Navigation Header -->
-    <header class="sticky top-0 z-40 w-full border-b border-cyan-500/20 bg-[#07090e]/90 backdrop-blur-md px-4 sm:px-8 py-3">
-      <div class="max-w-7xl mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-2.5 h-2.5 bg-cyan-400 rounded-sm shadow-[0_0_10px_#00f0ff]"></div>
-          <span class="font-extrabold tracking-widest text-sm text-cyan-400">AETHELBURG // SYSTEM-01</span>
-          <span class="hidden md:inline-block text-[11px] text-slate-400 border-l border-slate-700 pl-3">AUTONOMOUS RESEARCH NODE</span>
+    <!-- 01 // Top Editorial Header -->
+    <header class="relative z-10 w-full px-5 sm:px-10 py-5 flex items-center justify-between border-b border-[var(--border-hairline)] bg-[var(--bg-primary)]/80 backdrop-blur-md">
+      <div class="flex items-center gap-4">
+        <div class="w-2.5 h-2.5 bg-[var(--text-primary)]"></div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-bold tracking-tight text-sm text-[var(--text-primary)] uppercase">AETHELBURG</span>
+          <span class="text-[10px] font-mono-tech text-[var(--text-muted)] tracking-wider">[LAB-2026.09]</span>
         </div>
-        
-        <nav class="flex items-center gap-4 text-xs">
-          <a href="#lab" class="text-slate-300 hover:text-cyan-400 transition-colors">01//LAB</a>
-          <a href="#showcases" class="text-slate-300 hover:text-cyan-400 transition-colors">02//SHOWCASES</a>
-          <a href="#architecture" class="text-slate-300 hover:text-cyan-400 transition-colors">03//STACK</a>
-          <a href="https://github.com/ProphitEngine" target="_blank" rel="noreferrer" class="px-2.5 py-1 rounded bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 text-cyan-300 font-semibold transition-all">
-            GITHUB ↗
-          </a>
-        </nav>
+      </div>
+
+      <!-- Real-Time Dynamic Coordinates Readout -->
+      <div class="hidden md:flex items-center gap-3 font-mono-tech text-[11px] text-[var(--text-secondary)]">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="live-coordinates">h₁: +0.000 | h₂: +0.000</span>
+        <span class="text-[var(--text-muted)] text-[10px]">// 60 FPS CONTINUOUS ODE</span>
+      </div>
+
+      <!-- Theme Switcher & Local Time -->
+      <div class="flex items-center gap-4 font-mono-tech text-xs">
+        <div class="hidden sm:block text-[11px] text-[var(--text-muted)]" id="clock-display">
+          BERLIN --:--:--
+        </div>
+        <button id="theme-toggle-btn" class="px-2.5 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-[11px] font-mono-tech text-[var(--text-primary)] transition-all flex items-center gap-1.5 bg-[var(--bg-card)]">
+          <span id="theme-icon">☾</span>
+          <span id="theme-text">DARK</span>
+        </button>
       </div>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-8 py-10 space-y-16">
-      <!-- Hero Intro Section -->
-      <section class="space-y-4 max-w-4xl">
-        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-slate-900 border border-slate-700/80 text-[11px] text-cyan-400 font-mono">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          ACTIVE INFERENCE // CONTINUOUS-TIME DYNAMICAL SYSTEMS // ARC-AGI-3
+    <!-- 02 // Center Stage (Monumental Typography & Field Hint) -->
+    <main class="relative z-10 px-5 sm:px-10 my-auto max-w-4xl pointer-events-none">
+      <div class="space-y-4">
+        <div class="text-[11px] font-mono-tech uppercase tracking-widest text-[var(--text-muted)]">
+          // AUTONOME NEUROSYMBOLIK & ZEITKONTINUIERLICHE DYNAMIK
         </div>
-
-        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-          ARCHITEKTUR FÜR <br class="hidden sm:block" />
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-purple-400">
-            FLUIDE INTELLIGENZ & AUTONOMIE.
-          </span>
+        
+        <h1 class="text-3xl sm:text-6xl font-bold tracking-tight text-[var(--text-primary)] leading-[1.08]">
+          Architektur für <br />
+          <span class="font-editorial font-normal italic text-[var(--text-secondary)]">fluide Intelligenz</span> &amp; Nichtlinearität.
         </h1>
 
-        <p class="text-sm sm:text-base text-slate-400 leading-relaxed max-w-3xl">
-          Keine generischen LLM-Wrapper. Wir erforschen und bauen autonome Neurosymbolik: 
-          kontinuierliche neuronale Differenzialgleichungen (Liquid Neural Networks), kausale World Models für den 
-          <span class="text-cyan-300 font-semibold">ARC-AGI-3</span> Benchmark und interdisziplinäre Netzwerkkartographie für koloniale Provenienz.
+        <p class="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl">
+          Wir modellieren kontinuierliche physikalische Zustandsräume statt diskreter Textmuster. 
+          Bewege den Cursor, um das Vektorfeld zu krümmen – oder wähle einen Attraktor-Fixpunkt, um in das jeweilige Forschungs-Dossier zu spiralförmig einzutauchen.
         </p>
-      </section>
-
-      <!-- 01 // Interactive Laboratory Hero: The Liquid ODE Attractor -->
-      <section id="lab" class="space-y-4">
-        <div class="flex items-center justify-between border-b border-cyan-500/20 pb-2">
-          <div class="flex items-center gap-2">
-            <span class="text-cyan-400 font-bold text-xs">01 // INTERACTIVE LAB</span>
-            <span class="text-slate-400 text-xs">// ZEITKONTINUIERLICHER PHASENRAUM-ATTRAKTOR</span>
-          </div>
-          <span class="text-[10px] text-emerald-400 font-mono hidden sm:inline">LIVE SIMULATION IN BROWSER</span>
-        </div>
-
-        <LiquidOdeAttractor />
-      </section>
-
-      <!-- 02 // Deep Tech Showcase Pillars -->
-      <section id="showcases" class="space-y-6">
-        <div class="border-b border-cyan-500/20 pb-2">
-          <span class="text-cyan-400 font-bold text-xs">02 // RESEARCH & PRODUCTION SHOWCASES</span>
-          <p class="text-slate-400 text-xs mt-0.5">Empirische Systeme, die unter Realbedingungen getestet werden.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Card 1: ARC-AGI-3 Sovereign Solver -->
-          <div class="p-5 rounded-lg bg-[#090c12] border border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-200 flex flex-col justify-between group shadow-lg">
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/30">FRONTIER AI</span>
-                <span class="text-[11px] text-slate-400 font-mono">ARC-AGI-3</span>
-              </div>
-              <h3 class="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
-                Domain-Agnostic World Model & Causal Graph Search
-              </h3>
-              <p class="text-xs text-slate-400 leading-relaxed">
-                Autonomer Solver für das offizielle ARC-AGI-3 Format (François Chollet / Abstraction & Reasoning Corpus). 
-                Kombiniert kausale Affordance-Detektion, dynamische Vektorfeld-Physik (Invertierte Gravitation, Klick-Zustandsmaschinen) 
-                und PSPACE-Suchgraphen ohne manuelle Regelsätze.
-              </p>
-            </div>
-            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-              <span class="text-slate-400">Offline Kaggle Engine</span>
-              <span class="text-cyan-400 font-semibold font-mono">25 Games Evaluated →</span>
-            </div>
-          </div>
-
-          <!-- Card 2: Shadow Museum Atlas -->
-          <div class="p-5 rounded-lg bg-[#090c12] border border-purple-500/20 hover:border-purple-500/50 transition-all duration-200 flex flex-col justify-between group shadow-lg">
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-500/30">HUMANITIES & DATA</span>
-                <span class="text-[11px] text-slate-400 font-mono">GRAPH CARTOGRAPHY</span>
-              </div>
-              <h3 class="text-base font-bold text-white group-hover:text-purple-300 transition-colors">
-                Shadow Museum: Koloniale Provenienz-Netzwerke
-              </h3>
-              <p class="text-xs text-slate-400 leading-relaxed">
-                Interaktiver 3D- und 2D-Netzwerkgraph zur Rekonstruktion kolonialer Raubgut-Trajektorien (z. B. Tibati-Expedition / Linden-Museum Stuttgart). 
-                Strukturierte Entity-Extraktion, unvollständige historische Relationen und automatisierte Erstellung von Restitutionsdossiers.
-              </p>
-            </div>
-            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-              <span class="text-slate-400">Force-Directed Atlas</span>
-              <span class="text-purple-400 font-semibold font-mono">Dossier Engine →</span>
-            </div>
-          </div>
-
-          <!-- Card 3: Yu-Gi-Oh Edison Engine -->
-          <div class="p-5 rounded-lg bg-[#090c12] border border-emerald-500/20 hover:border-emerald-500/50 transition-all duration-200 flex flex-col justify-between group shadow-lg">
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30">LIVE PRODUCTION</span>
-                <span class="text-[11px] text-slate-400 font-mono">OCGCORE / RL</span>
-              </div>
-              <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
-                Edison Store Engine & Omniscient State Machine
-              </h3>
-              <p class="text-xs text-slate-400 leading-relaxed">
-                Produktionsfertige Turnier- und Simulator-Engine auf Basis von C++ WebAssembly / OCGCore. 
-                Mit Pre-Flight Banlist-Validierung, automatischer KDE-Tiebreaker-Automation, 
-                Zero-Dependency Edge-Launcher für Store Locals und kryptographischer Schiedsrichter-Audits.
-              </p>
-            </div>
-            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-              <span class="text-slate-400">Live auf aethelburg.network</span>
-              <span class="text-emerald-400 font-semibold font-mono">v1.0-RC1 Active →</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 03 // Tech Stack Architecture Table -->
-      <section id="architecture" class="space-y-4">
-        <div class="border-b border-cyan-500/20 pb-2">
-          <span class="text-cyan-400 font-bold text-xs">03 // TECHNOLOGISCHE PRINZIPIEN</span>
-        </div>
-
-        <div class="overflow-x-auto rounded-lg border border-slate-800 bg-[#090c12]">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-[#0e121b] text-cyan-400 text-[11px] uppercase tracking-wider border-b border-slate-800 font-semibold">
-              <tr>
-                <th class="p-3">Disziplin</th>
-                <th class="p-3">Technologien & Frameworks</th>
-                <th class="p-3">Architektur-Invariante</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-800/60 font-mono text-[11px]">
-              <tr class="hover:bg-cyan-950/20 transition-colors">
-                <td class="p-3 font-bold text-white">Dynamical Systems</td>
-                <td class="p-3 text-slate-300">Liquid Neural Networks, RK4 ODE Integrators, PyTorch</td>
-                <td class="p-3 text-cyan-300">Adaptive Viscosity τ(u) bricht Whipsaw in transienten Phasen</td>
-              </tr>
-              <tr class="hover:bg-cyan-950/20 transition-colors">
-                <td class="p-3 font-bold text-white">Autonomous RL & Search</td>
-                <td class="p-3 text-slate-300">Active Inference, ResNet Dual-Head, A*, BFS, TSP Solvers</td>
-                <td class="p-3 text-cyan-300">Zero Hardcoded Coordinates – Domain-agnostische Kausalität</td>
-              </tr>
-              <tr class="hover:bg-cyan-950/20 transition-colors">
-                <td class="p-3 font-bold text-white">Production Engineering</td>
-                <td class="p-3 text-slate-300">FastAPI, WebSockets, SQLite WAL, WebAssembly, Hyperliquid SDK</td>
-                <td class="p-3 text-cyan-300">Idempotente State Machines mit atomaren Bracket-Guards</td>
-              </tr>
-              <tr class="hover:bg-cyan-950/20 transition-colors">
-                <td class="p-3 font-bold text-white">Frontend & Visualization</td>
-                <td class="p-3 text-slate-300">Astro, Tailwind CSS v4, HTML5 Canvas 2D / WebGL, Web Audio API</td>
-                <td class="p-3 text-cyan-300">100/100 Lighthouse Performance, 0 KB unnötiger Runtime-Ballast</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Footer -->
-      <footer class="pt-8 pb-12 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
-        <div>
-          <span>© 2026 AETHELBURG NETWORK // SOVEREIGN SYSTEMS PRIME</span>
-        </div>
-        <div class="flex items-center gap-6 font-mono text-[11px]">
-          <span class="text-emerald-400 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            ALL SYSTEMS OPERATIONAL
-          </span>
-          <a href="https://github.com/ProphitEngine" target="_blank" rel="noreferrer" class="hover:text-cyan-400 transition-colors">
-            PROPHITENGINE
-          </a>
-        </div>
-      </footer>
+      </div>
     </main>
+
+    <!-- 03 // Bottom Horizontal Project Attractor Reel -->
+    <footer class="relative z-10 w-full px-5 sm:px-10 py-5 border-t border-[var(--border-hairline)] bg-[var(--bg-primary)]/80 backdrop-blur-md">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <!-- Waypoint Triggers -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-mono-tech">
+          <span class="text-[10px] text-[var(--text-muted)] mr-1 uppercase">ATTRAKTOREN:</span>
+          
+          <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="arc">
+            01 // ARC-AGI-3
+          </button>
+          
+          <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="museum">
+            02 // SHADOW MUSEUM
+          </button>
+          
+          <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="edison">
+            03 // EDISON ENGINE
+          </button>
+          
+          <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="lgnn">
+            04 // LIQUID ODE
+          </button>
+        </div>
+
+        <!-- Meta & Links -->
+        <div class="flex items-center gap-5 text-[11px] font-mono-tech text-[var(--text-muted)]">
+          <a href="https://github.com/ProphitEngine" target="_blank" rel="noreferrer" class="hover:text-[var(--text-primary)] transition-colors">
+            GITHUB ↗
+          </a>
+          <span>BERLIN // 52.5200° N, 13.4050° E</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 04 // Slide-Over Project Dossier Component -->
+    <ProjectDossier />
+
+    <script>
+      // Live Clock & Light/Dark Theme Controller
+      document.addEventListener('DOMContentLoaded', () => {
+        // 1. Clock
+        const clockEl = document.getElementById('clock-display');
+        function updateClock() {
+          if (!clockEl) return;
+          const now = new Date();
+          clockEl.textContent = `BERLIN ${now.toLocaleTimeString('de-DE', { timeZone: 'Europe/Berlin' })}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 2. Theme Toggle (Light / Dark)
+        const toggleBtn = document.getElementById('theme-toggle-btn');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+        const html = document.documentElement;
+
+        // Check stored preference or default to light
+        const storedTheme = localStorage.getItem('aethelburg-theme') || 'light';
+        if (storedTheme === 'dark') {
+          html.classList.add('dark');
+          if (themeIcon) themeIcon.textContent = '☀';
+          if (themeText) themeText.textContent = 'LIGHT';
+        } else {
+          html.classList.remove('dark');
+          if (themeIcon) themeIcon.textContent = '☾';
+          if (themeText) themeText.textContent = 'DARK';
+        }
+
+        toggleBtn?.addEventListener('click', () => {
+          const isDark = html.classList.toggle('dark');
+          localStorage.setItem('aethelburg-theme', isDark ? 'dark' : 'light');
+          if (themeIcon) themeIcon.textContent = isDark ? '☀' : '☾';
+          if (themeText) themeText.textContent = isDark ? 'LIGHT' : 'DARK';
+        });
+
+        // 3. Waypoint button event dispatchers
+        document.querySelectorAll('.waypoint-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            window.dispatchEvent(new CustomEvent('select-waypoint', { detail: { id } }));
+            window.dispatchEvent(new CustomEvent('open-dossier', { detail: { id } }));
+          });
+        });
+      });
+    </script>
   </body>
 </html>

@@ -1,0 +1,207 @@
+---
+// ProjectDossier.astro - Minimalist Dutch Editorial Slide-Over Dossier
+---
+
+<div id="dossier-backdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+<aside id="dossier-panel" class="fixed top-0 right-0 bottom-0 w-full max-w-xl bg-[var(--bg-primary)] border-l border-[var(--border-hairline)] z-50 translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between shadow-2xl overflow-y-auto">
+  <!-- Dossier Header -->
+  <div class="p-6 sm:p-8 border-b border-[var(--border-hairline)] flex items-start justify-between">
+    <div>
+      <div id="dossier-index" class="text-[11px] font-mono-tech uppercase tracking-widest text-[var(--text-muted)]">
+        DOSSIER // 01
+      </div>
+      <h2 id="dossier-title" class="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)] mt-1">
+        ARC-AGI-3 Solver
+      </h2>
+      <p id="dossier-sub" class="text-xs font-editorial text-[var(--text-secondary)] mt-1 text-base">
+        Autonomous Causal Graph Search & Fluid Intelligence
+      </p>
+    </div>
+    <button id="dossier-close-btn" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-xs font-mono-tech text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all">
+      [ESC // SCHLIESSEN]
+    </button>
+  </div>
+
+  <!-- Dossier Body Content -->
+  <div class="p-6 sm:p-8 space-y-8 flex-1">
+    <!-- Key Empirical Metrics -->
+    <div>
+      <div class="text-[10px] font-mono-tech uppercase tracking-wider text-[var(--text-muted)] mb-3">
+        Empirische Leistungsdaten (Hard Facts)
+      </div>
+      <div id="dossier-metrics" class="grid grid-cols-2 gap-3 font-mono-tech text-xs">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- Architectural Deep Dive -->
+    <div class="space-y-3">
+      <div class="text-[10px] font-mono-tech uppercase tracking-wider text-[var(--text-muted)]">
+        Architektur & Kern-Ingenieursleistung
+      </div>
+      <div id="dossier-body" class="text-xs text-[var(--text-secondary)] leading-relaxed space-y-3">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- Repository & Verification Link -->
+    <div class="pt-4 border-t border-[var(--border-hairline)]">
+      <div class="text-[10px] font-mono-tech uppercase tracking-wider text-[var(--text-muted)] mb-2">
+        Verifikation & Codebasis
+      </div>
+      <a id="dossier-link" href="#" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 rounded bg-[var(--text-primary)] text-[var(--bg-primary)] font-mono-tech text-xs font-bold hover:opacity-90 transition-opacity">
+        <span>CODE-AUDIT ÖFFNEN</span>
+        <span>↗</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Dossier Footer -->
+  <div class="px-6 py-4 border-t border-[var(--border-hairline)] bg-[var(--bg-secondary)] flex items-center justify-between text-[10px] font-mono-tech text-[var(--text-muted)]">
+    <span>SYSTEM: AETHELBURG // AUTONOMOUS NODE</span>
+    <span>STATUS: EMPIRICALLY VERIFIED</span>
+  </div>
+</aside>
+
+<script>
+  interface DossierData {
+    index: string;
+    title: string;
+    sub: string;
+    metrics: { label: string; value: string }[];
+    paragraphs: string[];
+    link: string;
+    linkLabel: string;
+  }
+
+  const DOSSIERS: Record<string, DossierData> = {
+    arc: {
+      index: 'DOSSIER // 01 - FRONTIER AI',
+      title: 'ARC-AGI-3 Sovereign Solver',
+      sub: 'Domain-Agnostische Kausale Weltmodelle & PSPACE-Graphensuche',
+      metrics: [
+        { label: 'Evaluation', value: '25 Offizielle ARC-3 Spiele' },
+        { label: 'Gelöste Level', value: '56 Benchmark-Instanzen' },
+        { label: 'Hardcoded Rules', value: '0 (Reine Aktive Inferenz)' },
+        { label: 'Kaggle Bundle', value: '0.94 MB Gzip-Komprimiert' }
+      ],
+      paragraphs: [
+        'Ein autonomer Solver für die offizielle ARC-AGI-3 Challenge (François Chollet / Abstraction & Reasoning Corpus). Statt auf statistische LLMs oder starre Regelbäume zu setzen, operiert das System über kausale Affordance-Detektion und diskrete Weltmodell-Simulation.',
+        'Wichtige Komponenten: Dynamische Vektorfeld-Physik (Invertierte Gravitation in bp35), 1D-Register-Zustandsmaschinen (tr87), Multi-Slider-Overshoot-Brakes (s5i5) und Connected-Component-Zentroide.',
+        'Läuft vollständig offline innerhalb des 12-stündigen Kaggle-Budgets ohne Internetzugriff.'
+      ],
+      link: 'https://github.com/ProphitEngine',
+      linkLabel: 'ARC-3 KERNEL AUDIT'
+    },
+    museum: {
+      index: 'DOSSIER // 02 - HUMANITIES & GRAPHS',
+      title: 'Shadow Museum Atlas',
+      sub: 'Koloniale Provenienz-Kartographie & Restitutions-Dossiers',
+      metrics: [
+        { label: 'Fokus-Dossier', value: 'Tibati-Expedition (Kamerun)' },
+        { label: 'Ziel-Institut', value: 'Linden-Museum Stuttgart' },
+        { label: 'Graph-Engine', value: 'Force-Directed Cartography' },
+        { label: 'Rechtliche Basis', value: 'HLKO 1907 / Restitution' }
+      ],
+      paragraphs: [
+        'Interdisziplinäres Forschungssystem zur visuellen und juristischen Rekonstruktion kolonialer Raubgut-Trajektorien aus dem späten 19. und frühen 20. Jahrhundert.',
+        'Verknüpft unvollständige Archiv-Notizen, militärische Tagebücher und Museumsinventare zu einem dynamischen Wissensgraphen. Das System generiert automatisch strukturierte, juristisch belastbare Restitutionsersuchen gemäß Haager Landkriegsordnung (HLKO).'
+      ],
+      link: 'https://github.com/ProphitEngine',
+      linkLabel: 'SHADOW MUSEUM ATLAS'
+    },
+    edison: {
+      index: 'DOSSIER // 03 - DETERMINISTIC RL',
+      title: 'Edison Store Engine (WASM)',
+      sub: 'WASM OCGCore Duel Simulator & Store Locals Platform',
+      metrics: [
+        { label: 'Engine Core', value: 'C++ OCGCore via WebAssembly' },
+        { label: 'Turn Latency', value: '< 0.5 ms pro Dispatch' },
+        { label: 'Production URL', value: 'play.aethelburg.network' },
+        { label: 'Audit Trail', value: 'Kryptographisch unveränderlich' }
+      ],
+      paragraphs: [
+        'Vollständige Produktionsplattform für Yu-Gi-Oh Edison-Format-Turniere mit echter Game-State-Verifikation im Browser. Ausgestattet mit Pre-Flight-Banlist-Gates, automatischer Runden-Sirene und KDE-Tiebreaker-Automation (Turns 0–3).',
+        'Inklusive Standalone Edge-Launcher (scripts/launch_store_locals.sh) für lokale Store-Turniere ohne Internetabhängigkeit und Cloud-Delta-Sync zum Hauptnetzwerk.'
+      ],
+      link: 'https://play.aethelburg.network',
+      linkLabel: 'LIVE-SYSTEM AUFRUFEN'
+    },
+    lgnn: {
+      index: 'DOSSIER // 04 - DYNAMICAL SYSTEMS',
+      title: 'Liquid Neural Core',
+      sub: 'Zeitkontinuierliche Nichtlineare Differenzialgleichungen',
+      metrics: [
+        { label: 'Synapsen-Modell', value: 'LiquidNode dh/dt = -h/τ(u) + W' },
+        { label: 'Relaxation τ0', value: '10.0s (Adaptive Fluidität)' },
+        { label: 'Integrator', value: '4th-Order Runge-Kutta (RK4)' },
+        { label: 'Execution', value: 'Hyperliquid ALO Zero-Fee' }
+      ],
+      paragraphs: [
+        'Mathematische Implementierung von Liquid Neural Networks (zeitkontinuierliche ODEs mit adaptiver Viskosität tau(u)). Entwickelt für latenzarme Zeitreihenanalyse unter hochgradig nichtstationären Bedingungen.',
+        'Das System passt seine interne Gedächtnisabklingzeit dynamisch an: In stabilen Regimen filtert hohe Viskosität Marktrauschen aus; bei Schock-Ereignissen bricht tau(u) zusammen und schaltet blitzschnelle Reflexe frei.'
+      ],
+      link: 'https://github.com/ProphitEngine',
+      linkLabel: 'LGNN MATHEMATISCHE SPEZIFIKATION'
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const backdrop = document.getElementById('dossier-backdrop');
+    const panel = document.getElementById('dossier-panel');
+    const closeBtn = document.getElementById('dossier-close-btn');
+
+    const dIndex = document.getElementById('dossier-index');
+    const dTitle = document.getElementById('dossier-title');
+    const dSub = document.getElementById('dossier-sub');
+    const dMetrics = document.getElementById('dossier-metrics');
+    const dBody = document.getElementById('dossier-body');
+    const dLink = document.getElementById('dossier-link') as HTMLAnchorElement;
+
+    function open(id: string) {
+      const data = DOSSIERS[id];
+      if (!data) return;
+
+      if (dIndex) dIndex.textContent = data.index;
+      if (dTitle) dTitle.textContent = data.title;
+      if (dSub) dSub.textContent = data.sub;
+
+      if (dMetrics) {
+        dMetrics.innerHTML = data.metrics.map(m => `
+          <div class="p-2.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)]">
+            <div class="text-[10px] text-[var(--text-muted)] uppercase">${m.label}</div>
+            <div class="font-bold text-[var(--text-primary)] mt-0.5">${m.value}</div>
+          </div>
+        `).join('');
+      }
+
+      if (dBody) {
+        dBody.innerHTML = data.paragraphs.map(p => `<p>${p}</p>`).join('');
+      }
+
+      if (dLink) {
+        dLink.href = data.link;
+        dLink.querySelector('span')!.textContent = data.linkLabel;
+      }
+
+      backdrop?.classList.remove('opacity-0', 'pointer-events-none');
+      panel?.classList.remove('translate-x-full');
+    }
+
+    function close() {
+      backdrop?.classList.add('opacity-0', 'pointer-events-none');
+      panel?.classList.add('translate-x-full');
+    }
+
+    window.addEventListener('open-dossier', (e: any) => {
+      open(e.detail.id);
+    });
+
+    closeBtn?.addEventListener('click', close);
+    backdrop?.addEventListener('click', close);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+    });
+  });
+</script>

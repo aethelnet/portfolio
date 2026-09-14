@@ -1,1 +1,57 @@
 @import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-primary: #f8f8f6;
+    --bg-secondary: #f0f0ec;
+    --bg-card: rgba(248, 248, 246, 0.85);
+    --border-hairline: #e2e2dc;
+    --border-strong: #1a1a1a;
+    --text-primary: #121212;
+    --text-secondary: #5a5a54;
+    --text-muted: #8c8c82;
+    --ink-trace: rgba(18, 18, 18, 0.12);
+    --ink-stream: #121212;
+    --ink-glow: rgba(18, 18, 18, 0.4);
+    --accent: #2563eb;
+    --accent-subtle: #eff6ff;
+  }
+
+  .dark {
+    --bg-primary: #0a0b0d;
+    --bg-secondary: #121418;
+    --bg-card: rgba(10, 11, 13, 0.85);
+    --border-hairline: #22252c;
+    --border-strong: #e5e7eb;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --ink-trace: rgba(243, 244, 246, 0.14);
+    --ink-stream: #00f0ff;
+    --ink-glow: rgba(0, 240, 255, 0.5);
+    --accent: #00f0ff;
+    --accent-subtle: rgba(0, 240, 255, 0.1);
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.015em;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+}
+
+.font-editorial {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+}
+
+.font-mono-tech {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Hairline rule utility */
+.border-hairline {
+  border-color: var(--border-hairline);
+}
