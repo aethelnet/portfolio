@@ -155,7 +155,7 @@
     }
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function initProjectDossier() {
     const backdrop = document.getElementById('dossier-backdrop');
     const panel = document.getElementById('dossier-panel');
     const closeBtn = document.getElementById('dossier-close-btn');
@@ -165,6 +165,7 @@
     const dSub = document.getElementById('dossier-sub');
     const dMetrics = document.getElementById('dossier-metrics');
     const dBody = document.getElementById('dossier-body');
+    const dLink = document.getElementById('dossier-link') as HTMLAnchorElement | null;
     const interactiveContainer = document.getElementById('dossier-interactive-container');
     const interactiveBtn = document.getElementById('dossier-interactive-btn');
 
@@ -191,7 +192,8 @@
 
       if (dLink) {
         dLink.href = data.link;
-        dLink.querySelector('span')!.textContent = data.linkLabel;
+        const span = dLink.querySelector('span');
+        if (span) span.textContent = data.linkLabel;
       }
 
       if (id === 'arc') {
@@ -217,8 +219,8 @@
 
     let activeId = 'arc';
     window.addEventListener('open-dossier', (e: any) => {
-      activeId = e.detail.id;
-      open(e.detail.id);
+      activeId = e.detail?.id || 'arc';
+      open(activeId);
     });
 
     interactiveBtn?.addEventListener('click', () => {
@@ -235,5 +237,11 @@
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') close();
     });
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProjectDossier);
+  } else {
+    initProjectDossier();
+  }
 </script>

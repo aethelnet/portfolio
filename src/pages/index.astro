@@ -119,7 +119,7 @@ import '../styles/global.css';
 
     <script>
       // Live Clock & Light/Dark Theme Controller
-      document.addEventListener('DOMContentLoaded', () => {
+      function initIndex() {
         // 1. Clock
         const clockEl = document.getElementById('clock-display');
         function updateClock() {
@@ -157,13 +157,20 @@ import '../styles/global.css';
 
         // 3. Waypoint button event dispatchers
         document.querySelectorAll('.waypoint-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const id = btn.getAttribute('data-id');
             window.dispatchEvent(new CustomEvent('select-waypoint', { detail: { id } }));
             window.dispatchEvent(new CustomEvent('open-dossier', { detail: { id } }));
           });
         });
-      });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initIndex);
+      } else {
+        initIndex();
+      }
     </script>
   </body>
 </html>

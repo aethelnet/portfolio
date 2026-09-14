@@ -116,7 +116,7 @@
     Document: '#64748b'     // Slate (Document)
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function initMuseumGraph() {
     const modal = document.getElementById('museum-graph-modal');
     const closeBtn = document.getElementById('museum-close-btn');
     const canvas = document.getElementById('museum-canvas') as HTMLCanvasElement;
@@ -453,5 +453,11 @@
         closeModal();
       }
     });
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMuseumGraph);
+  } else {
+    initMuseumGraph();
+  }
 </script>

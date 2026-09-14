@@ -116,7 +116,7 @@
     '#f7b6d2', // 15: Pink
   ];
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function initArcScrubber() {
     const modal = document.getElementById('arc-scrubber-modal');
     const closeBtn = document.getElementById('scrubber-close-btn');
     const canvas = document.getElementById('arc-canvas') as HTMLCanvasElement;
@@ -276,5 +276,11 @@
       const y = Math.floor(((e.clientY - rect.top) / rect.height) * 64);
       if (cursorCoordDisplay) cursorCoordDisplay.textContent = `X: ${x} | Y: ${y}`;
     });
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initArcScrubber);
+  } else {
+    initArcScrubber();
+  }
 </script>
