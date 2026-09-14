@@ -10,10 +10,27 @@
       <div class="flex items-center gap-2.5">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
         <span class="font-bold text-[var(--text-primary)] tracking-wide">ARC-AGI-3 // SOVEREIGN TRAJECTORY SCRUBBER</span>
-        <span class="text-[10px] text-[var(--text-muted)]">[GAME: lp85 // LEVEL 0 SOLVED]</span>
+        <span id="scrubber-game-badge" class="text-[10px] text-[var(--text-muted)]">[GAME: lp85 // LEVEL 0 SOLVED]</span>
       </div>
-      <button id="scrubber-close-btn" class="px-2.5 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all">
+      <button id="scrubber-close-btn" class="px-2.5 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer">
         [SCHLIESSEN ✕]
+      </button>
+    </div>
+
+    <!-- Multi-Game Benchmark Selector Reel -->
+    <div class="px-5 py-2 border-b border-[var(--border-hairline)] bg-[var(--bg-primary)] flex flex-wrap items-center gap-2">
+      <span class="text-[10px] text-[var(--text-muted)] mr-1 uppercase">BENCHMARK:</span>
+      <button class="scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold transition-all cursor-pointer" data-game="lp85">
+        01 // lp85 (POINT & CLICK)
+      </button>
+      <button class="scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-game="bp35">
+        02 // bp35 (INVERTED GRAVITY)
+      </button>
+      <button class="scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-game="tr87">
+        03 // tr87 (1D TAPE REGISTER)
+      </button>
+      <button class="scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-game="s5i5">
+        04 // s5i5 (MOMENTUM BRAKES)
       </button>
     </div>
 
@@ -26,7 +43,7 @@
           <div id="click-reticle" class="pointer-events-none absolute w-4 h-4 border-2 border-red-500 rounded-full -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity"></div>
         </div>
         <div class="text-[10px] text-[var(--text-muted)] mt-2 flex justify-between w-full px-2">
-          <span>GRID: 64 × 64 PIXEL</span>
+          <span id="canvas-grid-size">GRID: 64 × 64 PIXEL</span>
           <span id="canvas-cursor-pos">X: -- | Y: --</span>
         </div>
       </div>
@@ -71,13 +88,13 @@
 
           <!-- Play / Step Buttons -->
           <div class="flex items-center justify-between gap-2">
-            <button id="btn-play" class="flex-1 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] font-bold transition-all">
+            <button id="btn-play" class="flex-1 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] font-bold transition-all cursor-pointer">
               ▶ PLAY
             </button>
-            <button id="btn-prev" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] transition-all">
+            <button id="btn-prev" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] transition-all cursor-pointer">
               ◀ PREV
             </button>
-            <button id="btn-next" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] transition-all">
+            <button id="btn-next" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] transition-all cursor-pointer">
               NEXT ▶
             </button>
           </div>
@@ -86,15 +103,41 @@
     </div>
 
     <!-- Modal Footer -->
-    <div class="px-5 py-2.5 border-t border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[10px] text-[var(--text-muted)] flex justify-between">
-      <span>AUTONOMOUS SOVEREIGN AGENT // OFFLINE REPLAY</span>
-      <span>100% EMPIRISCHE LOG-DATEN AUS BENCHMARK</span>
+    <div class="px-5 py-2.5 border-t border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[10px] text-[var(--text-muted)] flex items-center justify-between">
+      <div class="hidden sm:flex items-center gap-3">
+        <span>[LEERTASTE] PLAY/PAUSE</span>
+        <span>•</span>
+        <span>[← / →] STEP</span>
+        <span>•</span>
+        <span>[1-4] SPIEL WECHSELN</span>
+      </div>
+      <span class="font-bold text-[var(--text-primary)]">100% EMPIRISCHE BENCHMARK-TRAJEKTORIEN</span>
     </div>
   </div>
 </div>
 
 <script>
-  import trajectoryData from '../data/arc3_lp85.json';
+  import lp85Data from '../data/arc3_lp85.json';
+  import bp35Data from '../data/arc3_bp35.json';
+  import tr87Data from '../data/arc3_tr87.json';
+  import s5i5Data from '../data/arc3_s5i5.json';
+
+  interface GameTrajectory {
+    game_id: string;
+    title: string;
+    genre: string;
+    grid_size: [number, number];
+    total_steps: number;
+    initial_frame: number[][];
+    steps: any[];
+  }
+
+  const GAMES: Record<string, GameTrajectory> = {
+    lp85: lp85Data as GameTrajectory,
+    bp35: bp35Data as GameTrajectory,
+    tr87: tr87Data as GameTrajectory,
+    s5i5: s5i5Data as GameTrajectory,
+  };
 
   // ARC 16-Color Palette Map
   const ARC_PALETTE: string[] = [
@@ -135,52 +178,96 @@
     const btnNext = document.getElementById('btn-next');
     const clickReticle = document.getElementById('click-reticle');
     const cursorCoordDisplay = document.getElementById('canvas-cursor-pos');
+    const gridSizeDisplay = document.getElementById('canvas-grid-size');
+    const gameBadge = document.getElementById('scrubber-game-badge');
 
-    const totalSteps = trajectoryData.total_steps;
+    let activeGameId = 'lp85';
+    let activeGame = GAMES[activeGameId];
+    let totalSteps = activeGame.total_steps;
     let currentStep = 0;
     let isPlaying = false;
     let playInterval: any = null;
+    let frameCache: number[][][] = [];
 
-    // Build frame cache
-    // Frame at step t is reconstructed by applying diffs sequentially
-    const frameCache: number[][][] = [];
-    const baseGrid: number[][] = JSON.parse(JSON.stringify(trajectoryData.initial_frame));
-    
-    // Step 0 frame
-    frameCache.push(JSON.parse(JSON.stringify(baseGrid)));
+    function buildCache(game: GameTrajectory) {
+      frameCache = [];
+      const baseGrid: number[][] = JSON.parse(JSON.stringify(game.initial_frame));
+      frameCache.push(JSON.parse(JSON.stringify(baseGrid)));
 
-    let runningGrid = JSON.parse(JSON.stringify(baseGrid));
-    for (let s = 0; s < totalSteps; s++) {
-      const stepData = trajectoryData.steps[s];
-      if (stepData.diffs && stepData.diffs.length > 0) {
-        for (const [x, y, color] of stepData.diffs) {
-          if (y < runningGrid.length && x < runningGrid[0].length) {
-            runningGrid[y][x] = color;
+      let runningGrid = JSON.parse(JSON.stringify(baseGrid));
+      for (let s = 0; s < game.total_steps; s++) {
+        const stepData = game.steps[s];
+        if (stepData.diffs && stepData.diffs.length > 0) {
+          for (const [x, y, color] of stepData.diffs) {
+            if (y < runningGrid.length && x < runningGrid[0].length) {
+              runningGrid[y][x] = color;
+            }
           }
         }
+        frameCache.push(JSON.parse(JSON.stringify(runningGrid)));
       }
-      frameCache.push(JSON.parse(JSON.stringify(runningGrid)));
     }
 
-    // Render 64x64 Grid onto 320x320 Canvas
+    function switchGame(gameId: string) {
+      if (!GAMES[gameId]) return;
+      if (isPlaying) togglePlay();
+
+      activeGameId = gameId;
+      activeGame = GAMES[gameId];
+      totalSteps = activeGame.total_steps;
+      buildCache(activeGame);
+
+      if (slider) {
+        slider.min = '0';
+        slider.max = (totalSteps - 1).toString();
+        slider.value = '0';
+      }
+
+      if (gameBadge) {
+        gameBadge.textContent = `[GAME: ${activeGame.game_id} // ${activeGame.genre} // ${totalSteps} SCHRITTE]`;
+      }
+
+      if (gridSizeDisplay) {
+        gridSizeDisplay.textContent = `GRID: ${activeGame.grid_size[0]} × ${activeGame.grid_size[1]} PIXEL`;
+      }
+
+      // Update active button classes
+      document.querySelectorAll('.scrubber-game-btn').forEach(btn => {
+        const g = btn.getAttribute('data-game');
+        if (g === gameId) {
+          btn.className = 'scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold transition-all cursor-pointer';
+        } else {
+          btn.className = 'scrubber-game-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer';
+        }
+      });
+
+      setStep(0);
+    }
+
+    // Render Grid onto 320x320 Canvas
     function renderFrame(stepIdx: number) {
       const grid = frameCache[Math.min(stepIdx, frameCache.length - 1)];
-      const pixelSize = canvas.width / 64;
+      if (!grid || !grid.length) return;
 
-      for (let y = 0; y < 64; y++) {
-        for (let x = 0; x < 64; x++) {
+      const gw = grid[0].length;
+      const gh = grid.length;
+      const pixelSizeX = canvas.width / gw;
+      const pixelSizeY = canvas.height / gh;
+
+      for (let y = 0; y < gh; y++) {
+        for (let x = 0; x < gw; x++) {
           const colorCode = grid[y]?.[x] ?? 0;
           ctx.fillStyle = ARC_PALETTE[colorCode] || '#000000';
-          ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+          ctx.fillRect(x * pixelSizeX, y * pixelSizeY, pixelSizeX, pixelSizeY);
         }
       }
 
       // Update UI Telemetry
-      const stepInfo = trajectoryData.steps[Math.min(stepIdx, trajectoryData.steps.length - 1)];
+      const stepInfo = activeGame.steps[Math.min(stepIdx, activeGame.steps.length - 1)];
       if (!stepInfo) return;
 
       if (slider) slider.value = stepIdx.toString();
-      if (stepCounter) stepCounter.textContent = `${stepIdx.toString().padStart(2, '0')} / ${totalSteps - 1}`;
+      if (stepCounter) stepCounter.textContent = `${stepIdx.toString().padStart(2, '0')} / ${(totalSteps - 1).toString().padStart(2, '0')}`;
       if (actionDisplay) actionDisplay.textContent = stepInfo.action;
       if (deltaDisplay) deltaDisplay.textContent = stepInfo.delta_f.toString();
 
@@ -189,28 +276,62 @@
         const cx = stepInfo.action_data.x;
         const cy = stepInfo.action_data.y;
         if (clickReticle && canvas.parentElement) {
-          clickReticle.style.left = `${(cx / 64) * 320 + 6}px`;
-          clickReticle.style.top = `${(cy / 64) * 320 + 6}px`;
+          clickReticle.style.left = `${(cx / gw) * 320 + 6}px`;
+          clickReticle.style.top = `${(cy / gh) * 320 + 6}px`;
           clickReticle.style.opacity = '1';
         }
       } else {
         if (clickReticle) clickReticle.style.opacity = '0';
       }
 
-      // State and Reasoning Context
+      // State and Reasoning Context per Game and State
       if (stateDisplay && reasoningDisplay) {
         if (stepInfo.transition || stepInfo.levels_completed > 0) {
           stateDisplay.textContent = 'SOLVED // LEVEL COMPLETE';
           stateDisplay.className = 'font-bold text-emerald-500';
-          reasoningDisplay.textContent = 'Zielzustand erreicht: Beide Kausalitäts-Schlüssel aktiviert. Level 0 erfolgreich abgeschlossen (Levels Completed: 1).';
-        } else if (stepInfo.delta_f > 0) {
-          stateDisplay.textContent = 'AFFORDANCE EXPLOIT';
-          stateDisplay.className = 'font-bold text-amber-500';
-          reasoningDisplay.textContent = `Massive Affordanz entdeckt (ΔF = ${stepInfo.delta_f}). Agent feuert gezielten Burst auf den Schlüssel-Aktuator.`;
+          if (activeGameId === 'lp85') {
+            reasoningDisplay.textContent = 'Zielzustand erreicht: Beide Kausalitäts-Schlüssel aktiviert. Level 0 erfolgreich abgeschlossen (Levels Completed: 1).';
+          } else if (activeGameId === 'bp35') {
+            reasoningDisplay.textContent = 'Zielzustand erreicht: Invertierter Gravitationsvektor g = (0, -1) katapultiert Avatar ins Decken-Portal.';
+          } else if (activeGameId === 'tr87') {
+            reasoningDisplay.textContent = 'Zielzustand erreicht: 1D-Registerband im Zielmuster arretiert. Level 0 erfolgreich gelöst.';
+          } else if (activeGameId === 's5i5') {
+            reasoningDisplay.textContent = 'Zielzustand erreicht: Reibungsbremse verhindert Überschwingen. Alle Slider im Zielbereich synchronisiert.';
+          } else {
+            reasoningDisplay.textContent = 'Level erfolgreich abgeschlossen.';
+          }
+        } else if (activeGameId === 'lp85') {
+          if (stepInfo.delta_f > 0) {
+            stateDisplay.textContent = 'AFFORDANCE EXPLOIT';
+            stateDisplay.className = 'font-bold text-amber-500';
+            reasoningDisplay.textContent = `Affordanz entdeckt (ΔF = ${stepInfo.delta_f}): Gezielter Burst aktiviert den Schlüssel-Aktuator.`;
+          } else {
+            stateDisplay.textContent = 'DEAD-CLICK PRUNING';
+            stateDisplay.className = 'font-bold text-slate-500 dark:text-slate-400';
+            reasoningDisplay.textContent = 'Kausalitäts-Check negativ (ΔF = 0): Klick bewirkt keine Veränderung. Koordinate im PSPACE-Graphen dauerhaft verworfen.';
+          }
+        } else if (activeGameId === 'bp35') {
+          if (stepIdx <= 3) {
+            stateDisplay.textContent = 'GRAVITY CALIBRATION';
+            stateDisplay.className = 'font-bold text-cyan-500';
+            reasoningDisplay.textContent = 'Physik-Inferenz: Agent misst negative Beschleunigung (Aufwärts-Fall gegen die Decke).';
+          } else {
+            stateDisplay.textContent = 'BALLISTIC MOMENTUM';
+            stateDisplay.className = 'font-bold text-amber-500';
+            reasoningDisplay.textContent = `Trajektorie-Schritt ${stepIdx}: Impuls nutzt elastischen Wandstoß zur horizontalen Zielausrichtung.`;
+          }
+        } else if (activeGameId === 'tr87') {
+          stateDisplay.textContent = 'REGISTER SHIFT';
+          stateDisplay.className = 'font-bold text-purple-500';
+          reasoningDisplay.textContent = `Zustands-Transition ${stepIdx}: Schrittweiser 1D-Taktimpuls verschiebt die Register-Bitfolge.`;
+        } else if (activeGameId === 's5i5') {
+          stateDisplay.textContent = 'MOMENTUM BRAKING';
+          stateDisplay.className = 'font-bold text-blue-500';
+          reasoningDisplay.textContent = `Slider-Justierung ${stepIdx}: Gegensteuer-Impuls kompensiert Trägheit und dämpft Überschwingen.`;
         } else {
-          stateDisplay.textContent = 'DEAD-CLICK PRUNING';
-          stateDisplay.className = 'font-bold text-slate-500 dark:text-slate-400';
-          reasoningDisplay.textContent = 'Kausalitäts-Check negativ (ΔF = 0). Klick bewirkt keine Veränderung. Koordinate wird im PSPACE-Graphen dauerhaft verworfen.';
+          stateDisplay.textContent = 'ACTIVE INFERENCE';
+          stateDisplay.className = 'font-bold text-emerald-500';
+          reasoningDisplay.textContent = `Aktion ${stepInfo.action} ausgeführt (ΔF = ${stepInfo.delta_f}).`;
         }
       }
     }
@@ -234,9 +355,12 @@
           } else {
             setStep(currentStep + 1);
           }
-        }, 300); // 3.3 FPS for clear observation
+        }, 280); // ~3.5 FPS for readable observation
       }
     }
+
+    // Initial cache build
+    buildCache(activeGame);
 
     // Event Listeners
     slider?.addEventListener('input', (e) => {
@@ -246,6 +370,15 @@
     btnPlay?.addEventListener('click', togglePlay);
     btnPrev?.addEventListener('click', () => setStep(currentStep - 1));
     btnNext?.addEventListener('click', () => setStep(currentStep + 1));
+
+    // Game Selector Buttons
+    document.querySelectorAll('.scrubber-game-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const g = btn.getAttribute('data-game');
+        if (g) switchGame(g);
+      });
+    });
 
     // Open & Close
     function openModal() {
@@ -267,13 +400,19 @@
       if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); togglePlay(); }
       if (e.key === 'ArrowRight') setStep(currentStep + 1);
       if (e.key === 'ArrowLeft') setStep(currentStep - 1);
+      if (e.key === '1') switchGame('lp85');
+      if (e.key === '2') switchGame('bp35');
+      if (e.key === '3') switchGame('tr87');
+      if (e.key === '4') switchGame('s5i5');
     });
 
     // Canvas Mouseover Coordinates
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      const x = Math.floor(((e.clientX - rect.left) / rect.width) * 64);
-      const y = Math.floor(((e.clientY - rect.top) / rect.height) * 64);
+      const gw = activeGame.grid_size[0] || 64;
+      const gh = activeGame.grid_size[1] || 64;
+      const x = Math.floor(((e.clientX - rect.left) / rect.width) * gw);
+      const y = Math.floor(((e.clientY - rect.top) / rect.height) * gh);
       if (cursorCoordDisplay) cursorCoordDisplay.textContent = `X: ${x} | Y: ${y}`;
     });
   }
