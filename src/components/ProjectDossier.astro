@@ -45,6 +45,14 @@
       </div>
     </div>
 
+    <!-- Interactive Demo Trigger Button (ARC Scrubber etc.) -->
+    <div id="dossier-interactive-container" class="hidden">
+      <button id="dossier-interactive-btn" class="w-full py-2.5 px-4 rounded border-2 border-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+        <span>▶</span>
+        <span id="dossier-interactive-label">INTERAKTIVEN TRAJEKTORIE-SCRUBBER STARTEN</span>
+      </button>
+    </div>
+
     <!-- Repository & Verification Link -->
     <div class="pt-4 border-t border-[var(--border-hairline)]">
       <div class="text-[10px] font-mono-tech uppercase tracking-wider text-[var(--text-muted)] mb-2">
@@ -157,7 +165,8 @@
     const dSub = document.getElementById('dossier-sub');
     const dMetrics = document.getElementById('dossier-metrics');
     const dBody = document.getElementById('dossier-body');
-    const dLink = document.getElementById('dossier-link') as HTMLAnchorElement;
+    const interactiveContainer = document.getElementById('dossier-interactive-container');
+    const interactiveBtn = document.getElementById('dossier-interactive-btn');
 
     function open(id: string) {
       const data = DOSSIERS[id];
@@ -185,6 +194,12 @@
         dLink.querySelector('span')!.textContent = data.linkLabel;
       }
 
+      if (id === 'arc') {
+        interactiveContainer?.classList.remove('hidden');
+      } else {
+        interactiveContainer?.classList.add('hidden');
+      }
+
       backdrop?.classList.remove('opacity-0', 'pointer-events-none');
       panel?.classList.remove('translate-x-full');
     }
@@ -193,6 +208,11 @@
       backdrop?.classList.add('opacity-0', 'pointer-events-none');
       panel?.classList.add('translate-x-full');
     }
+
+    interactiveBtn?.addEventListener('click', () => {
+      close();
+      window.dispatchEvent(new CustomEvent('open-arc-scrubber'));
+    });
 
     window.addEventListener('open-dossier', (e: any) => {
       open(e.detail.id);

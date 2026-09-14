@@ -1,0 +1,280 @@
+---
+// ArcScrubberModal.astro - Interactive Step-by-Step ARC-AGI-3 Canvas Scrubber
+---
+
+<div id="arc-scrubber-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300">
+  <div class="relative w-full max-w-3xl bg-[var(--bg-primary)] border border-[var(--border-strong)] rounded-lg shadow-2xl overflow-hidden flex flex-col font-mono-tech text-xs">
+    
+    <!-- Modal Header -->
+    <div class="px-5 py-3 border-b border-[var(--border-hairline)] bg-[var(--bg-secondary)] flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="font-bold text-[var(--text-primary)] tracking-wide">ARC-AGI-3 // SOVEREIGN TRAJECTORY SCRUBBER</span>
+        <span class="text-[10px] text-[var(--text-muted)]">[GAME: lp85 // LEVEL 0 SOLVED]</span>
+      </div>
+      <button id="scrubber-close-btn" class="px-2.5 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all">
+        [SCHLIESSEN ✕]
+      </button>
+    </div>
+
+    <!-- Main Workspace (Canvas + Telemetry Terminal) -->
+    <div class="p-5 grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+      <!-- 64x64 Pixel Canvas Stage -->
+      <div class="md:col-span-6 flex flex-col items-center justify-center">
+        <div class="relative p-1.5 rounded border border-[var(--border-hairline)] bg-black shadow-inner">
+          <canvas id="arc-canvas" width="320" height="320" class="block image-rendering-pixelated cursor-crosshair"></canvas>
+          <div id="click-reticle" class="pointer-events-none absolute w-4 h-4 border-2 border-red-500 rounded-full -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity"></div>
+        </div>
+        <div class="text-[10px] text-[var(--text-muted)] mt-2 flex justify-between w-full px-2">
+          <span>GRID: 64 × 64 PIXEL</span>
+          <span id="canvas-cursor-pos">X: -- | Y: --</span>
+        </div>
+      </div>
+
+      <!-- Action & Reasoning Stream (Right) -->
+      <div class="md:col-span-6 space-y-3 flex flex-col justify-between h-full">
+        <!-- Telemetry Status Box -->
+        <div class="p-3.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] space-y-2 text-[11px]">
+          <div class="flex justify-between border-b border-[var(--border-hairline)] pb-1 text-[var(--text-muted)] text-[10px]">
+            <span>SCHRITT // STATE</span>
+            <span id="step-counter" class="text-[var(--text-primary)] font-bold">00 / 28</span>
+          </div>
+          <div>
+            <div class="text-[10px] text-[var(--text-muted)] uppercase">Aktion:</div>
+            <div id="action-display" class="font-bold text-[var(--text-primary)] text-sm mt-0.5">CLICK (10, 17)</div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-[10px] pt-1">
+            <div>Δ-PIXEL: <span id="delta-display" class="font-bold text-[var(--text-primary)]">0</span></div>
+            <div>STATUS: <span id="state-display" class="font-bold text-emerald-600 dark:text-emerald-400">EXPLORATION</span></div>
+          </div>
+        </div>
+
+        <!-- Causal Reasoning Log Box -->
+        <div class="p-3 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] text-[10px] space-y-1.5">
+          <div class="text-[var(--text-muted)] font-bold uppercase tracking-wider">Kausale Inferenz-Notiz:</div>
+          <p id="reasoning-display" class="text-[var(--text-secondary)] leading-relaxed">
+            Dead-Click Pruning: Klick löst keine Pixelveränderung aus (ΔF = 0). Koordinate wird permanent im Gedächtnis geblacklistet.
+          </p>
+        </div>
+
+        <!-- Playback Controls -->
+        <div class="space-y-2 pt-1">
+          <!-- Timeline Range Slider -->
+          <input 
+            type="range" 
+            id="scrubber-slider" 
+            min="0" 
+            max="28" 
+            value="0" 
+            class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded appearance-none cursor-pointer accent-[var(--text-primary)]"
+          />
+
+          <!-- Play / Step Buttons -->
+          <div class="flex items-center justify-between gap-2">
+            <button id="btn-play" class="flex-1 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] font-bold transition-all">
+              ▶ PLAY
+            </button>
+            <button id="btn-prev" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] transition-all">
+              ◀ PREV
+            </button>
+            <button id="btn-next" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-secondary)] text-[var(--text-primary)] transition-all">
+              NEXT ▶
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-5 py-2.5 border-t border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[10px] text-[var(--text-muted)] flex justify-between">
+      <span>AUTONOMOUS SOVEREIGN AGENT // OFFLINE REPLAY</span>
+      <span>100% EMPIRISCHE LOG-DATEN AUS BENCHMARK</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  import trajectoryData from '../data/arc3_lp85.json';
+
+  // ARC 16-Color Palette Map
+  const ARC_PALETTE: string[] = [
+    '#000000', // 0: Black (Background)
+    '#1e77b4', // 1: Blue
+    '#d62728', // 2: Red
+    '#2ca02c', // 3: Green
+    '#ff7f0e', // 4: Yellow / Amber
+    '#7f7f7f', // 5: Gray
+    '#e377c2', // 6: Magenta
+    '#ffbb78', // 7: Orange
+    '#17becf', // 8: Cyan / Teal
+    '#bcbd22', // 9: Olive / Avatar Yellow
+    '#aec7e8', // 10: Light Blue
+    '#ff9896', // 11: Light Red
+    '#98df8a', // 12: Light Green
+    '#c5b0d5', // 13: Lavender
+    '#c49c94', // 14: Rust / Hazard
+    '#f7b6d2', // 15: Pink
+  ];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('arc-scrubber-modal');
+    const closeBtn = document.getElementById('scrubber-close-btn');
+    const canvas = document.getElementById('arc-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const slider = document.getElementById('scrubber-slider') as HTMLInputElement;
+    const stepCounter = document.getElementById('step-counter');
+    const actionDisplay = document.getElementById('action-display');
+    const deltaDisplay = document.getElementById('delta-display');
+    const stateDisplay = document.getElementById('state-display');
+    const reasoningDisplay = document.getElementById('reasoning-display');
+    const btnPlay = document.getElementById('btn-play');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const clickReticle = document.getElementById('click-reticle');
+    const cursorCoordDisplay = document.getElementById('canvas-cursor-pos');
+
+    const totalSteps = trajectoryData.total_steps;
+    let currentStep = 0;
+    let isPlaying = false;
+    let playInterval: any = null;
+
+    // Build frame cache
+    // Frame at step t is reconstructed by applying diffs sequentially
+    const frameCache: number[][][] = [];
+    const baseGrid: number[][] = JSON.parse(JSON.stringify(trajectoryData.initial_frame));
+    
+    // Step 0 frame
+    frameCache.push(JSON.parse(JSON.stringify(baseGrid)));
+
+    let runningGrid = JSON.parse(JSON.stringify(baseGrid));
+    for (let s = 0; s < totalSteps; s++) {
+      const stepData = trajectoryData.steps[s];
+      if (stepData.diffs && stepData.diffs.length > 0) {
+        for (const [x, y, color] of stepData.diffs) {
+          if (y < runningGrid.length && x < runningGrid[0].length) {
+            runningGrid[y][x] = color;
+          }
+        }
+      }
+      frameCache.push(JSON.parse(JSON.stringify(runningGrid)));
+    }
+
+    // Render 64x64 Grid onto 320x320 Canvas
+    function renderFrame(stepIdx: number) {
+      const grid = frameCache[Math.min(stepIdx, frameCache.length - 1)];
+      const pixelSize = canvas.width / 64;
+
+      for (let y = 0; y < 64; y++) {
+        for (let x = 0; x < 64; x++) {
+          const colorCode = grid[y]?.[x] ?? 0;
+          ctx.fillStyle = ARC_PALETTE[colorCode] || '#000000';
+          ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+        }
+      }
+
+      // Update UI Telemetry
+      const stepInfo = trajectoryData.steps[Math.min(stepIdx, trajectoryData.steps.length - 1)];
+      if (!stepInfo) return;
+
+      if (slider) slider.value = stepIdx.toString();
+      if (stepCounter) stepCounter.textContent = `${stepIdx.toString().padStart(2, '0')} / ${totalSteps - 1}`;
+      if (actionDisplay) actionDisplay.textContent = stepInfo.action;
+      if (deltaDisplay) deltaDisplay.textContent = stepInfo.delta_f.toString();
+
+      // Show Click Reticle if action was a click
+      if (stepInfo.action_type === 'ACTION6' && stepInfo.action_data) {
+        const cx = stepInfo.action_data.x;
+        const cy = stepInfo.action_data.y;
+        if (clickReticle && canvas.parentElement) {
+          clickReticle.style.left = `${(cx / 64) * 320 + 6}px`;
+          clickReticle.style.top = `${(cy / 64) * 320 + 6}px`;
+          clickReticle.style.opacity = '1';
+        }
+      } else {
+        if (clickReticle) clickReticle.style.opacity = '0';
+      }
+
+      // State and Reasoning Context
+      if (stateDisplay && reasoningDisplay) {
+        if (stepInfo.transition || stepInfo.levels_completed > 0) {
+          stateDisplay.textContent = 'SOLVED // LEVEL COMPLETE';
+          stateDisplay.className = 'font-bold text-emerald-500';
+          reasoningDisplay.textContent = 'Zielzustand erreicht: Beide Kausalitäts-Schlüssel aktiviert. Level 0 erfolgreich abgeschlossen (Levels Completed: 1).';
+        } else if (stepInfo.delta_f > 0) {
+          stateDisplay.textContent = 'AFFORDANCE EXPLOIT';
+          stateDisplay.className = 'font-bold text-amber-500';
+          reasoningDisplay.textContent = `Massive Affordanz entdeckt (ΔF = ${stepInfo.delta_f}). Agent feuert gezielten Burst auf den Schlüssel-Aktuator.`;
+        } else {
+          stateDisplay.textContent = 'DEAD-CLICK PRUNING';
+          stateDisplay.className = 'font-bold text-slate-500 dark:text-slate-400';
+          reasoningDisplay.textContent = 'Kausalitäts-Check negativ (ΔF = 0). Klick bewirkt keine Veränderung. Koordinate wird im PSPACE-Graphen dauerhaft verworfen.';
+        }
+      }
+    }
+
+    function setStep(newStep: number) {
+      currentStep = Math.max(0, Math.min(newStep, totalSteps - 1));
+      renderFrame(currentStep);
+    }
+
+    function togglePlay() {
+      if (isPlaying) {
+        clearInterval(playInterval);
+        isPlaying = false;
+        if (btnPlay) btnPlay.textContent = '▶ PLAY';
+      } else {
+        isPlaying = true;
+        if (btnPlay) btnPlay.textContent = '⏸ PAUSE';
+        playInterval = setInterval(() => {
+          if (currentStep >= totalSteps - 1) {
+            setStep(0);
+          } else {
+            setStep(currentStep + 1);
+          }
+        }, 300); // 3.3 FPS for clear observation
+      }
+    }
+
+    // Event Listeners
+    slider?.addEventListener('input', (e) => {
+      setStep(parseInt((e.target as HTMLInputElement).value, 10));
+    });
+
+    btnPlay?.addEventListener('click', togglePlay);
+    btnPrev?.addEventListener('click', () => setStep(currentStep - 1));
+    btnNext?.addEventListener('click', () => setStep(currentStep + 1));
+
+    // Open & Close
+    function openModal() {
+      modal?.classList.remove('opacity-0', 'pointer-events-none');
+      setStep(0);
+    }
+
+    function closeModal() {
+      if (isPlaying) togglePlay();
+      modal?.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    closeBtn?.addEventListener('click', closeModal);
+    window.addEventListener('open-arc-scrubber', openModal);
+
+    window.addEventListener('keydown', (e) => {
+      if (modal?.classList.contains('pointer-events-none')) return;
+      if (e.key === 'Escape') closeModal();
+      if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); togglePlay(); }
+      if (e.key === 'ArrowRight') setStep(currentStep + 1);
+      if (e.key === 'ArrowLeft') setStep(currentStep - 1);
+    });
+
+    // Canvas Mouseover Coordinates
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor(((e.clientX - rect.left) / rect.width) * 64);
+      const y = Math.floor(((e.clientY - rect.top) / rect.height) * 64);
+      if (cursorCoordDisplay) cursorCoordDisplay.textContent = `X: ${x} | Y: ${y}`;
+    });
+  });
+</script>
