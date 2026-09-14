@@ -2,8 +2,8 @@
 // EdisonReplayModal.astro - Interactive Match Forensics & Chain-Link Inspector (WASM OCGCore)
 ---
 
-<div id="edison-replay-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300 font-mono-tech text-xs select-none">
-  <div class="relative w-full max-w-5xl h-[88vh] bg-[var(--bg-primary)] border border-[var(--border-strong)] rounded-lg shadow-2xl overflow-hidden flex flex-col">
+<div id="edison-replay-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 opacity-0 pointer-events-none transition-opacity duration-300 font-mono-tech text-xs select-none">
+  <div class="relative w-full max-w-6xl h-[90vh] bg-[var(--bg-primary)] border border-[var(--border-strong)] rounded-lg shadow-2xl overflow-hidden flex flex-col">
     
     <!-- Modal Header -->
     <div class="px-5 py-3 border-b border-[var(--border-hairline)] bg-[var(--bg-secondary)] flex items-center justify-between">
@@ -182,7 +182,7 @@
       </div>
 
       <!-- Right: Chain Link Inspector & Referee Audit Trail -->
-      <div class="w-full md:w-88 border-t md:border-t-0 md:border-l border-[var(--border-hairline)] bg-[var(--bg-secondary)] p-4 flex flex-col justify-between overflow-y-auto space-y-4">
+      <div class="w-full md:w-[420px] border-t md:border-t-0 md:border-l border-[var(--border-hairline)] bg-[var(--bg-secondary)] p-4 flex flex-col justify-between overflow-y-auto space-y-4">
         
         <!-- Step-by-Step Chain Link Stack -->
         <div class="space-y-3">
@@ -241,12 +241,74 @@
           </div>
         </div>
 
+        <!-- Section: KI-Policy Value Evaluation V(s) & Minimax Rationality -->
+        <div class="p-3 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+              <span class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-bold">
+                KI-POLICY & MINIMAX RATIONALITÄT:
+              </span>
+            </div>
+            <div id="edison-v-badge" class="px-2 py-0.5 rounded font-mono text-[9px] font-bold border border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
+              V(s) = +0.884
+            </div>
+          </div>
+
+          <!-- Policy Action Comparison Bars (Minimax Rollouts) -->
+          <div id="edison-actions-container" class="space-y-1.5 text-[10px]">
+            <!-- Action A -->
+            <div class="p-2 rounded border border-emerald-500/30 bg-emerald-500/5 space-y-1">
+              <div class="flex justify-between items-center font-bold">
+                <span id="edison-action-a-name" class="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 text-[9px] truncate">
+                  AKTION A [GEWÄHLT]: SOLEMN JUDGMENT (-4000 LP)
+                </span>
+                <span id="edison-action-a-pct" class="font-mono text-emerald-600 dark:text-emerald-400 text-[10px]">94.2%</span>
+              </div>
+              <div class="w-full h-1 bg-[var(--bg-secondary)] rounded-full overflow-hidden border border-[var(--border-hairline)]">
+                <div id="edison-bar-action-a" class="h-full bg-emerald-500 transition-all duration-300" style="width: 94.2%;"></div>
+              </div>
+              <div class="flex justify-between text-[8px] sm:text-[9px] text-[var(--text-muted)] font-mono">
+                <span id="edison-action-a-q">Q(s, a) = +0.884</span>
+                <span id="edison-action-a-cost" class="truncate">KOSTEN: -4000 LP (8000 → 4000)</span>
+              </div>
+            </div>
+
+            <!-- Action B -->
+            <div class="p-2 rounded border border-rose-500/20 bg-rose-500/5 space-y-1">
+              <div class="flex justify-between items-center font-bold">
+                <span id="edison-action-b-name" class="text-rose-600 dark:text-rose-400 flex items-center gap-1 text-[9px] truncate">
+                  AKTION B [VERWORFEN]: PASS / KETTE BEENDEN
+                </span>
+                <span id="edison-action-b-pct" class="font-mono text-rose-600 dark:text-rose-400 text-[10px]">2.1%</span>
+              </div>
+              <div class="w-full h-1 bg-[var(--bg-secondary)] rounded-full overflow-hidden border border-[var(--border-hairline)]">
+                <div id="edison-bar-action-b" class="h-full bg-rose-500 transition-all duration-300" style="width: 2.1%;"></div>
+              </div>
+              <div class="flex justify-between text-[8px] sm:text-[9px] text-[var(--text-muted)] font-mono">
+                <span id="edison-action-b-q">Q(s, a) = -0.958</span>
+                <span id="edison-action-b-cost" class="truncate">KOSTEN: 0 LP // BOARD-COLLAPSE</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Strategic Rationale: "Warum ist das schlau?" -->
+          <div class="p-2.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] space-y-1">
+            <div class="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1">
+              <span>⚡</span> WARUM IST DAS SCHLAU? (SPIELTHEORETISCHE ANALYSE):
+            </div>
+            <p id="edison-ai-rationale" class="text-[9px] sm:text-[10px] text-[var(--text-secondary)] leading-relaxed">
+              ...
+            </p>
+          </div>
+        </div>
+
         <!-- Section: Immutable Referee Audit Trail Log -->
         <div class="p-3 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] space-y-2">
           <div class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-bold">
             Referee Audit-Trail (SQLite Log):
           </div>
-          <div id="edison-audit-log" class="font-mono text-[9px] text-[var(--text-secondary)] space-y-1 max-h-28 overflow-y-auto">
+          <div id="edison-audit-log" class="font-mono text-[9px] text-[var(--text-secondary)] space-y-1 max-h-24 overflow-y-auto">
             <div><span class="text-[var(--text-muted)]">17:14:01</span> [CL1] Heavy Storm deklariert.</div>
             <div><span class="text-[var(--text-muted)]">17:14:03</span> [CL2] Starlight Road gechaint.</div>
             <div><span class="text-[var(--text-muted)]">17:14:07</span> [CL3] Solemn Judgment gechaint (LP: 8000 &rarr; 4000).</div>
@@ -314,6 +376,22 @@
     const cardSolemn = document.getElementById('card-solemn');
     const revealCards = document.querySelectorAll('.card-reveal');
 
+    // AI Policy Value & Minimax Inspector DOM Handles
+    const vBadge = document.getElementById('edison-v-badge');
+    const actionAName = document.getElementById('edison-action-a-name');
+    const actionAPct = document.getElementById('edison-action-a-pct');
+    const barActionA = document.getElementById('edison-bar-action-a');
+    const actionAQ = document.getElementById('edison-action-a-q');
+    const actionACost = document.getElementById('edison-action-a-cost');
+
+    const actionBName = document.getElementById('edison-action-b-name');
+    const actionBPct = document.getElementById('edison-action-b-pct');
+    const barActionB = document.getElementById('edison-bar-action-b');
+    const actionBQ = document.getElementById('edison-action-b-q');
+    const actionBCost = document.getElementById('edison-action-b-cost');
+
+    const aiRationale = document.getElementById('edison-ai-rationale');
+
     if (!modal) return;
 
     let isGodMode = true;
@@ -325,11 +403,22 @@
         name: 'SCHRITT 0 / 4: AUSGANGSLAGE',
         p1Lp: 8000,
         p2Lp: 3400,
-        summary: 'KETTE LEER // MAIN PHASE 1',
+        summary: 'KETTE LEER // MAIN PHASE 1 (TURN 2)',
         cl1Active: false,
         cl2Active: false,
         cl3Active: false,
-        resolved: false
+        resolved: false,
+        vBadgeText: 'V(s) = +0.620',
+        vBadgeClass: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+        actionAName: 'AKTION A: HEAVY STORM AUSFÜHREN',
+        actionAPct: 88.5,
+        actionAQ: 'Q(s, a) = +0.620',
+        actionACost: '1 KARTE // BACKROW CLEAR',
+        actionBName: 'AKTION B: BLIND-ANGRIFF (BATTLE PHASE)',
+        actionBPct: 11.5,
+        actionBQ: 'Q(s, a) = -0.210',
+        actionBCost: '0 LP // HOHE FALLENGEFAHR',
+        rationale: 'Pilot A kontrolliert Stratos (1800) & Alius (1900). Gegner hat 2 verdeckte Backrow-Karten. Die Minimax-Evaluation prunt den direkten Battle-Phase-Angriff wegen 78% Wahrscheinlichkeit verdeckter defensiver Fallen (D-Prison, Bottomless). Heavy Storm maximiert den aggregierten Board-Value.'
       },
       {
         name: 'SCHRITT 1 / 4: CL1 DEKLARIERT',
@@ -339,7 +428,18 @@
         cl1Active: true,
         cl2Active: false,
         cl3Active: false,
-        resolved: false
+        resolved: false,
+        vBadgeText: 'V(s) = +0.850',
+        vBadgeClass: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+        actionAName: 'AKTION A: PRIORITÄT AN GEGNER ABTRETTEN',
+        actionAPct: 96.0,
+        actionAQ: 'Q(s, a) = +0.850',
+        actionACost: 'REGEL-KONFORM // KETTE ÖFFNEN',
+        actionBName: 'AKTION B: EIGENE SCHNELLZAUBER ANKETTEN',
+        actionBPct: 4.0,
+        actionBQ: 'Q(s, a) = +0.310',
+        actionBCost: 'RESIDUAL // SUBOPTIMALES TIMING',
+        rationale: 'Heavy Storm erzeugt maximalen Tempo-Druck: Droht beide verdeckte Karten von Pilot B bedingungslos abzuräumen. Der Value-Head prognostiziert einen Netto-Vorteil von +1 Karte und erzwingt zwingend eine gegnerische Antwort.'
       },
       {
         name: 'SCHRITT 2 / 4: CL2 GECHAINT',
@@ -349,17 +449,39 @@
         cl1Active: true,
         cl2Active: true,
         cl3Active: false,
-        resolved: false
+        resolved: false,
+        vBadgeText: 'V(s) = -0.420',
+        vBadgeClass: 'border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400',
+        actionAName: 'DROHUNG: STARLIGHT ROAD RESOLVT',
+        actionAPct: 5.8,
+        actionAQ: 'Q(s, a) = -0.958',
+        actionACost: 'STARDUST DRAGON (2500 ATK) ERSCHEINT',
+        actionBName: 'KONTER-FENSTER: CL3 COUNTER TRAP',
+        actionBPct: 94.2,
+        actionAQ_B: 'Q(s, a) = +0.884',
+        actionBCost: 'ERFORDERLICH FÜR TEMPO-ERHALT',
+        rationale: 'Hinterhalt ausgelöst: Pilot B deckt Starlight Road auf. Ohne Gegenreaktion würde Heavy Storm negiert und zerstört, während Pilot B gratis einen Stardust Dragon (2500 ATK) beschwört und seine restliche Backrow behält. Board-Value stürzt im Rollout auf -0.958 ab!'
       },
       {
-        name: 'SCHRITT 3 / 4: CL3 COUNTER',
+        name: 'SCHRITT 3 / 4: CL3 COUNTER (ENTSCHEIDUNGSPUNKT)',
         p1Lp: 4000,
         p2Lp: 3400,
         summary: '3 KETTENGLIEDER // AKTIV: CL3 SOLEMN JUDGMENT',
         cl1Active: true,
         cl2Active: true,
         cl3Active: true,
-        resolved: false
+        resolved: false,
+        vBadgeText: 'V(s) = +0.884',
+        vBadgeClass: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+        actionAName: 'AKTION A [GEWÄHLT]: SOLEMN JUDGMENT (-4000 LP)',
+        actionAPct: 94.2,
+        actionAQ: 'Q(s, a) = +0.884',
+        actionACost: 'ZAHLT 50% LP (8000 → 4000 LP)',
+        actionBName: 'AKTION B [VERWORFEN]: PASS / KETTE BEENDEN',
+        actionBPct: 2.1,
+        actionBQ: 'Q(s, a) = -0.958',
+        actionBCost: '0 LP VERLUST // MATCH-VERLUST IN TURN 3',
+        rationale: 'DER GENIE-ZUG (SPIELTHEORETISCHE ASYMMETRIE): Ein menschlicher Pilot zögert aus Verlust-Aversion vor der 4.000-LP-Opferung. Die KI kalkuliert streng die diskrete Siegbedingung: Unter offiziellen KDE-Tiebreaker-Regeln (Turn 2 im Time-Call) gewinnt am Ende von Turn 3 der höhere LP-Stand. Da 4.000 > 3.400, besitzt 4.000 LP exakt denselben Siegwirkungsgrad wie 8.000 LP! Solemn Judgment tauscht 1 Karte + irrelevante Rest-LP gegen 3 gegnerische Ressourcen (Starlight Road negiert, Stardust Dragon verhindert, Backrow durch CL1 vernichtet).'
       },
       {
         name: 'SCHRITT 4 / 4: LIFO AUFGELÖST',
@@ -369,7 +491,18 @@
         cl1Active: false,
         cl2Active: false,
         cl3Active: false,
-        resolved: true
+        resolved: true,
+        vBadgeText: 'V(s) = +0.965',
+        vBadgeClass: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+        actionAName: 'RESULTAT: TOTALER BOARD-WIPE DER GEGNER-BACKROW',
+        actionAPct: 96.5,
+        actionAQ: 'Q(s, a) = +0.965',
+        actionACost: 'PILOT B SCHUTZLOS OHNE VERTEIDIGUNG',
+        actionBName: 'TURN 3 OUTCOME: PILOT A BEHÄLT LP-LEAD (4000 > 3400)',
+        actionBPct: 3.5,
+        actionBQ: 'Q(s, a) = +0.035',
+        actionBCost: 'DETERMINISTISCHER MATCH-GEWINN',
+        rationale: 'LIFO-Auflösung vollstreckt: CL3 zerstört Starlight Road, Heavy Storm bricht ungestört durch und zerstört die verbliebene Backrow. Pilot B betritt den finalen Turn 3 mit leerem Feld und 3400 LP. Da Pilot A 4000 LP besitzt und keine Angriffe drohen, ist der Match-Gewinn mathematisch garantiert.'
       }
     ];
 
@@ -395,6 +528,25 @@
       if (cardHeavy) cardHeavy.style.opacity = s.cl1Active ? '1' : (s.resolved ? '0.4' : '0.8');
       if (cardStarlight) cardStarlight.style.opacity = s.cl2Active ? '1' : (s.resolved ? '0.2' : '0.8');
       if (cardSolemn) cardSolemn.style.opacity = s.cl3Active ? '1' : (s.resolved ? '0.2' : '0.8');
+
+      // Update AI Policy Value Box
+      if (vBadge) {
+        vBadge.textContent = s.vBadgeText;
+        vBadge.className = `px-2 py-0.5 rounded font-mono text-[9px] font-bold border ${s.vBadgeClass}`;
+      }
+      if (actionAName) actionAName.textContent = s.actionAName;
+      if (actionAPct) actionAPct.textContent = `${s.actionAPct}%`;
+      if (barActionA) barActionA.style.width = `${s.actionAPct}%`;
+      if (actionAQ) actionAQ.textContent = s.actionAQ;
+      if (actionACost) actionACost.textContent = s.actionACost;
+
+      if (actionBName) actionBName.textContent = s.actionBName;
+      if (actionBPct) actionBPct.textContent = `${s.actionBPct}%`;
+      if (barActionB) barActionB.style.width = `${s.actionBPct}%`;
+      if (actionBQ) actionBQ.textContent = (s as any).actionAQ_B || s.actionBQ;
+      if (actionBCost) actionBCost.textContent = s.actionBCost;
+
+      if (aiRationale) aiRationale.textContent = s.rationale;
     }
 
     function toggleFogOfWar() {
