@@ -1,0 +1,871 @@
+---
+// LgnnSandboxModal.astro - Interactive Continuous-Time Liquid Neural ODE Phase-Portrait Sandbox
+---
+
+<div id="lgnn-sandbox-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300 font-mono-tech text-xs select-none">
+  <div class="relative w-full max-w-5xl h-[88vh] bg-[var(--bg-primary)] border border-[var(--border-strong)] rounded-lg shadow-2xl overflow-hidden flex flex-col">
+    
+    <!-- Modal Header -->
+    <div class="px-5 py-3 border-b border-[var(--border-hairline)] bg-[var(--bg-secondary)] flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+        <span class="font-bold text-[var(--text-primary)] tracking-wide">AURATIC PRIME // UNIT 734 LIQUID NEURAL ODE CORE</span>
+        <span id="lgnn-regime-badge" class="text-[10px] text-[var(--text-muted)] hidden sm:inline">[REGIME: 15M MOMENTUM BREAKOUT]</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="hidden md:flex items-center gap-3 text-[10px] text-[var(--text-muted)]">
+          <span>τ(u): <strong id="lgnn-tau-readout" class="text-[var(--text-primary)]">10.00s</strong></span>
+          <span>DIV: <strong id="lgnn-div-readout" class="text-emerald-600 dark:text-emerald-400">-0.24</strong></span>
+          <span>SIGNAL: <strong id="lgnn-conviction-readout" class="text-cyan-600 dark:text-cyan-400">+0.82 [LONG]</strong></span>
+        </div>
+        <button id="lgnn-close-btn" class="px-2.5 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer">
+          [SCHLIESSEN ✕]
+        </button>
+      </div>
+    </div>
+
+    <!-- Presets Bar (Bifurcation Regimes) -->
+    <div class="px-5 py-2 border-b border-[var(--border-hairline)] bg-[var(--bg-primary)] flex flex-wrap items-center gap-2">
+      <span class="text-[10px] text-[var(--text-muted)] mr-1 uppercase">DYNAMISCHE REGIMES:</span>
+      <button class="lgnn-preset-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold transition-all cursor-pointer" data-preset="trend">
+        01 // 15M TREND BREAKOUT (PROD)
+      </button>
+      <button class="lgnn-preset-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-preset="limit">
+        02 // LIMIT CYCLE (HOPF BIFURKATION)
+      </button>
+      <button class="lgnn-preset-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-preset="shock">
+        03 // ADAPTIVE VISKOSITÄTS-KOLLAPS
+      </button>
+      <button class="lgnn-preset-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-preset="sink">
+        04 // GEDÄMPFTER FIXPUNKT-SINK
+      </button>
+    </div>
+
+    <!-- Main Workspace (Canvas + Sidebar Controls) -->
+    <div class="relative flex-1 w-full h-full overflow-hidden flex flex-col md:flex-row">
+      <!-- Left: Fullscreen Phase Plane Canvas Stage -->
+      <div class="relative flex-1 h-full bg-[var(--bg-primary)] overflow-hidden cursor-crosshair">
+        <canvas id="lgnn-phase-canvas" class="w-full h-full block"></canvas>
+
+        <!-- Canvas In-Flight Telemetry Readout Box (Top-Left) -->
+        <div class="pointer-events-none absolute top-3 left-3 bg-[var(--bg-card)] border border-[var(--border-hairline)] rounded p-2.5 backdrop-blur-sm space-y-1 text-[11px] shadow-lg">
+          <div class="text-[var(--text-primary)] font-bold border-b border-[var(--border-hairline)] pb-1 flex items-center justify-between gap-4">
+            <span>PHASENRAUM (h₁, h₂)</span>
+            <span class="text-[9px] text-[var(--text-muted)]">KLICKEN ZUM SETZEN</span>
+          </div>
+          <div class="text-[var(--text-secondary)]">h₁(t) [State A]: <span id="lgnn-h1-val" class="font-bold text-[var(--text-primary)] font-mono">+0.000</span></div>
+          <div class="text-[var(--text-secondary)]">h₂(t) [State B]: <span id="lgnn-h2-val" class="font-bold text-purple-600 dark:text-purple-400 font-mono">+0.000</span></div>
+          <div class="text-[var(--text-muted)] text-[10px]">dh₁/dt: <span id="lgnn-dh1-val" class="font-mono text-[var(--text-secondary)]">0.000</span> | dh₂/dt: <span id="lgnn-dh2-val" class="font-mono text-[var(--text-secondary)]">0.000</span></div>
+        </div>
+
+        <!-- Viscosity Gauge Bar (Top-Right) -->
+        <div class="pointer-events-none absolute top-3 right-3 bg-[var(--bg-card)] border border-[var(--border-hairline)] rounded p-2.5 backdrop-blur-sm text-[11px] min-w-[150px] shadow-lg">
+          <div class="text-[var(--text-muted)] text-[10px] uppercase tracking-wider mb-1 flex justify-between">
+            <span>Adaptive Viskosität</span>
+            <span id="lgnn-tau-percent" class="text-[var(--text-primary)] font-bold">100%</span>
+          </div>
+          <div class="w-full h-2 bg-[var(--bg-secondary)] rounded-full overflow-hidden border border-[var(--border-hairline)]">
+            <div id="lgnn-viscosity-bar" class="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-75" style="width: 100%;"></div>
+          </div>
+          <div class="flex justify-between text-[9px] text-[var(--text-muted)] mt-1">
+            <span>Fast Reflex</span>
+            <span>Relaxed Inertia</span>
+          </div>
+        </div>
+
+        <!-- Floating Hint Banner (Bottom-Left) -->
+        <div class="pointer-events-none absolute bottom-3 left-3 text-[10px] text-[var(--text-muted)] bg-[var(--bg-card)]/80 px-2.5 py-1 rounded border border-[var(--border-hairline)] backdrop-blur-sm">
+          ⚡ Klicken / Ziehen perturbiert Trajektorie | <kbd class="px-1 py-0.5 border border-[var(--border-hairline)] rounded bg-[var(--bg-secondary)] text-[var(--text-primary)]">Leertaste</kbd> Pause
+        </div>
+      </div>
+
+      <!-- Right: Sidebar Parameter Controls & Telemetry -->
+      <div class="w-full md:w-88 border-t md:border-t-0 md:border-l border-[var(--border-hairline)] bg-[var(--bg-secondary)] p-4 flex flex-col justify-between overflow-y-auto space-y-4">
+        
+        <!-- Section A: Hyperliquid Conviction Gauge -->
+        <div class="p-3 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] space-y-2">
+          <div class="flex justify-between items-center text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
+            <span>Trend-Signal (Conviction)</span>
+            <span id="lgnn-conviction-val" class="font-bold text-emerald-600 dark:text-emerald-400">+0.82</span>
+          </div>
+          <!-- Conviction Bidirectional Bar (-1.0 to +1.0) -->
+          <div class="relative w-full h-3 bg-[var(--bg-secondary)] rounded overflow-hidden border border-[var(--border-hairline)] flex items-center">
+            <!-- Center zero marker -->
+            <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-[var(--border-strong)] z-10"></div>
+            <!-- Dynamic Indicator Fill -->
+            <div id="lgnn-conviction-fill" class="h-full bg-emerald-500 transition-all duration-75" style="width: 41%; margin-left: 50%;"></div>
+          </div>
+          <div class="flex justify-between text-[9px] text-[var(--text-muted)] font-mono">
+            <span class="text-red-500 font-bold">SHORT (&le; -0.75)</span>
+            <span>0.00</span>
+            <span class="text-emerald-500 font-bold">LONG (&ge; +0.75)</span>
+          </div>
+        </div>
+
+        <!-- Section B: Sliders -->
+        <div class="space-y-3">
+          <div class="text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-bold">ODE-Parameter (Runge-Kutta 4):</div>
+          
+          <!-- Slider 1: Tau Base (Relaxation Time) -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label for="lgnn-tau-input" class="text-[var(--text-secondary)] text-[11px] font-semibold">
+                Basis-Trägheit τ₀ (Viskosität):
+              </label>
+              <span id="lgnn-tau-val-display" class="font-bold text-[var(--text-primary)] font-mono">10.0s</span>
+            </div>
+            <input 
+              type="range" 
+              id="lgnn-tau-input" 
+              min="1.0" 
+              max="30.0" 
+              step="0.5" 
+              value="10.0" 
+              class="w-full h-1.5 bg-[var(--bg-primary)] rounded-lg appearance-none cursor-pointer accent-[var(--text-primary)]"
+            />
+            <div class="flex justify-between text-[8px] text-[var(--text-muted)] mt-0.5">
+              <span>1.0s (Sehr fluide)</span>
+              <span>30.0s (Hohe Trägheit)</span>
+            </div>
+          </div>
+
+          <!-- Slider 2: Beta (Viscosity Coupling) -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label for="lgnn-beta-input" class="text-[var(--text-secondary)] text-[11px] font-semibold">
+                Kopplung β (Schock-Sensitivität):
+              </label>
+              <span id="lgnn-beta-val-display" class="font-bold text-[var(--text-primary)] font-mono">0.80</span>
+            </div>
+            <input 
+              type="range" 
+              id="lgnn-beta-input" 
+              min="0.0" 
+              max="2.5" 
+              step="0.05" 
+              value="0.80" 
+              class="w-full h-1.5 bg-[var(--bg-primary)] rounded-lg appearance-none cursor-pointer accent-[var(--text-primary)]"
+            />
+            <div class="flex justify-between text-[8px] text-[var(--text-muted)] mt-0.5">
+              <span>0.0 (Statische ODE)</span>
+              <span>2.5 (Extremer Kollaps)</span>
+            </div>
+          </div>
+
+          <!-- Slider 3: External Flux Signal u -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label for="lgnn-flux-input" class="text-[var(--text-secondary)] text-[11px] font-semibold">
+                Externer Reiz u (Z-Score / Flux):
+              </label>
+              <span id="lgnn-flux-val-display" class="font-bold text-[var(--text-primary)] font-mono">0.00</span>
+            </div>
+            <input 
+              type="range" 
+              id="lgnn-flux-input" 
+              min="-2.5" 
+              max="2.5" 
+              step="0.05" 
+              value="0.00" 
+              class="w-full h-1.5 bg-[var(--bg-primary)] rounded-lg appearance-none cursor-pointer accent-[var(--text-primary)]"
+            />
+          </div>
+
+          <!-- Slider 4: Coupling Weight W -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label for="lgnn-weight-input" class="text-[var(--text-secondary)] text-[11px] font-semibold">
+                Synapsen-Kopplung W₁₂:
+              </label>
+              <span id="lgnn-weight-val-display" class="font-bold text-[var(--text-primary)] font-mono">-1.80</span>
+            </div>
+            <input 
+              type="range" 
+              id="lgnn-weight-input" 
+              min="-3.0" 
+              max="3.0" 
+              step="0.1" 
+              value="-1.8" 
+              class="w-full h-1.5 bg-[var(--bg-primary)] rounded-lg appearance-none cursor-pointer accent-[var(--text-primary)]"
+            />
+          </div>
+        </div>
+
+        <!-- Section C: Action Triggers & Oscilloscope -->
+        <div class="space-y-3 pt-2 border-t border-[var(--border-hairline)]">
+          <div class="grid grid-cols-2 gap-2">
+            <button id="lgnn-btn-shock" class="px-2.5 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] hover:bg-[var(--bg-primary)] text-[var(--text-primary)] font-bold transition-all text-[10px] cursor-pointer active:scale-95">
+              ⚡ DIRAC-SCHOCK
+            </button>
+            <button id="lgnn-btn-sine" class="px-2.5 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] hover:bg-[var(--bg-primary)] text-[var(--text-primary)] font-bold transition-all text-[10px] cursor-pointer active:scale-95">
+              ∿ SINE-FLUX [AUS]
+            </button>
+            <button id="lgnn-btn-pause" class="px-2.5 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] hover:bg-[var(--bg-primary)] text-[var(--text-primary)] font-bold transition-all text-[10px] cursor-pointer active:scale-95">
+              ⏸ PAUSE
+            </button>
+            <button id="lgnn-btn-reset" class="px-2.5 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] hover:bg-[var(--bg-primary)] text-[var(--text-primary)] font-bold transition-all text-[10px] cursor-pointer active:scale-95">
+              ⟲ RESET ORBIT
+            </button>
+          </div>
+
+          <!-- Mini Real-Time Oscilloscope Canvas -->
+          <div class="p-2 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)]">
+            <div class="flex justify-between text-[9px] text-[var(--text-muted)] mb-1">
+              <span>OSZILLOSKOP (t vs h₁, h₂)</span>
+              <div class="flex gap-2">
+                <span class="text-blue-500">h₁</span>
+                <span class="text-purple-500">h₂</span>
+                <span class="text-amber-500">u</span>
+              </div>
+            </div>
+            <canvas id="lgnn-osc-canvas" class="w-full h-16 block rounded bg-[var(--bg-primary)]"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-5 py-2.5 border-t border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[10px] text-[var(--text-muted)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-[var(--text-primary)]">MODELL:</span>
+        <span class="font-mono">dh/dt = -h/τ(u) + tanh(Wh + u)  |  τ(u) = τ₀ / (1 + β|u|)</span>
+      </div>
+      <div>
+        <span>RK4 INTEGRATOR // Δt = 0.025s // SOVEREIGN 15M CANONICAL SPEC</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function initLgnnSandbox() {
+    const modal = document.getElementById('lgnn-sandbox-modal');
+    const closeBtn = document.getElementById('lgnn-close-btn');
+    const phaseCanvas = document.getElementById('lgnn-phase-canvas') as HTMLCanvasElement | null;
+    const oscCanvas = document.getElementById('lgnn-osc-canvas') as HTMLCanvasElement | null;
+    if (!modal || !phaseCanvas || !oscCanvas) return;
+
+    const ctx = phaseCanvas.getContext('2d');
+    const oscCtx = oscCanvas.getContext('2d');
+    if (!ctx || !oscCtx) return;
+
+    // Controls & Readouts
+    const tauInput = document.getElementById('lgnn-tau-input') as HTMLInputElement | null;
+    const tauValDisplay = document.getElementById('lgnn-tau-val-display');
+    const betaInput = document.getElementById('lgnn-beta-input') as HTMLInputElement | null;
+    const betaValDisplay = document.getElementById('lgnn-beta-val-display');
+    const fluxInput = document.getElementById('lgnn-flux-input') as HTMLInputElement | null;
+    const fluxValDisplay = document.getElementById('lgnn-flux-val-display');
+    const weightInput = document.getElementById('lgnn-weight-input') as HTMLInputElement | null;
+    const weightValDisplay = document.getElementById('lgnn-weight-val-display');
+
+    const tauReadout = document.getElementById('lgnn-tau-readout');
+    const tauPercent = document.getElementById('lgnn-tau-percent');
+    const divReadout = document.getElementById('lgnn-div-readout');
+    const convictionReadout = document.getElementById('lgnn-conviction-readout');
+    const convictionVal = document.getElementById('lgnn-conviction-val');
+    const convictionFill = document.getElementById('lgnn-conviction-fill');
+    const viscosityBar = document.getElementById('lgnn-viscosity-bar');
+    const regimeBadge = document.getElementById('lgnn-regime-badge');
+
+    const h1Val = document.getElementById('lgnn-h1-val');
+    const h2Val = document.getElementById('lgnn-h2-val');
+    const dh1Val = document.getElementById('lgnn-dh1-val');
+    const dh2Val = document.getElementById('lgnn-dh2-val');
+
+    const btnShock = document.getElementById('lgnn-btn-shock');
+    const btnSine = document.getElementById('lgnn-btn-sine');
+    const btnPause = document.getElementById('lgnn-btn-pause');
+    const btnReset = document.getElementById('lgnn-btn-reset');
+    const presetBtns = document.querySelectorAll('.lgnn-preset-btn');
+
+    // Simulation Parameters
+    let tau0 = parseFloat(tauInput?.value || '10.0');
+    let beta = parseFloat(betaInput?.value || '0.8');
+    let u_flux = parseFloat(fluxInput?.value || '0.0');
+    let w12 = parseFloat(weightInput?.value || '-1.8');
+    let w21 = 1.8;
+    let w11 = 0.5;
+    let w22 = 0.5;
+
+    // Simulation State
+    let h1 = 0.8;
+    let h2 = -0.4;
+    let isPaused = false;
+    let isSineFlux = false;
+    let simTime = 0;
+    let shockDecay = 0;
+
+    const domain = 2.5; // h in [-2.5, 2.5]
+    const maxTrail = 280;
+    const trajectory: { x: number; y: number }[] = [];
+
+    // Oscilloscope Ring Buffer (150 samples)
+    const oscHistory: { h1: number; h2: number; u: number }[] = [];
+    const maxOsc = 140;
+
+    // Background Flow Particles
+    const numParticles = 60;
+    const particles: { x: number; y: number; life: number; maxLife: number }[] = [];
+
+    function initParticles() {
+      particles.length = 0;
+      for (let i = 0; i < numParticles; i++) {
+        particles.push({
+          x: (Math.random() - 0.5) * (domain * 2),
+          y: (Math.random() - 0.5) * (domain * 2),
+          life: Math.floor(Math.random() * 100),
+          maxLife: 70 + Math.floor(Math.random() * 70)
+        });
+      }
+    }
+    initParticles();
+
+    // Resize Canvas (HiDPI)
+    let pWidth = 0;
+    let pHeight = 0;
+    let oWidth = 0;
+    let oHeight = 0;
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      
+      const pRect = phaseCanvas.getBoundingClientRect();
+      pWidth = pRect.width;
+      pHeight = pRect.height;
+      phaseCanvas.width = pWidth * dpr;
+      phaseCanvas.height = pHeight * dpr;
+      ctx.resetTransform?.();
+      ctx.scale(dpr, dpr);
+
+      const oRect = oscCanvas.getBoundingClientRect();
+      oWidth = oRect.width;
+      oHeight = oRect.height;
+      oscCanvas.width = oWidth * dpr;
+      oscCanvas.height = oHeight * dpr;
+      oscCtx.resetTransform?.();
+      oscCtx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resize);
+
+    // Coordinate Transforms
+    function toScreenX(hx: number): number {
+      return pWidth / 2 + (hx / domain) * (Math.min(pWidth, pHeight) / 2);
+    }
+    function toScreenY(hy: number): number {
+      return pHeight / 2 - (hy / domain) * (Math.min(pWidth, pHeight) / 2);
+    }
+    function toPhaseX(sx: number): number {
+      const scale = Math.min(pWidth, pHeight) / 2;
+      return ((sx - pWidth / 2) / scale) * domain;
+    }
+    function toPhaseY(sy: number): number {
+      const scale = Math.min(pWidth, pHeight) / 2;
+      return -((sy - pHeight / 2) / scale) * domain;
+    }
+
+    // Liquid ODE Derivatives
+    function derivatives(x: number, y: number, u: number): [number, number] {
+      // Adaptive relaxation time tau(u)
+      const tau_u = Math.max(0.5, tau0 / (1.0 + beta * Math.abs(u)));
+      const tau2 = tau0;
+
+      // Coupled Liquid Neural ODE:
+      // dh1/dt = -h1 / tau(u) + tanh(w11*h1 + w12*h2 + u)
+      // dh2/dt = -h2 / tau2   + tanh(w21*h1 + w22*h2)
+      const dh1 = -x / tau_u + Math.tanh(w11 * x + w12 * y + u);
+      const dh2 = -y / tau2 + Math.tanh(w21 * x + w22 * y);
+      return [dh1, dh2];
+    }
+
+    // RK4 Solver Step
+    function rk4(x: number, y: number, dt: number, u: number): [number, number] {
+      const [k1x, k1y] = derivatives(x, y, u);
+      const [k2x, k2y] = derivatives(x + 0.5 * dt * k1x, y + 0.5 * dt * k1y, u);
+      const [k3x, k3y] = derivatives(x + 0.5 * dt * k2x, y + 0.5 * dt * k2y, u);
+      const [k4x, k4y] = derivatives(x + dt * k3x, y + dt * k3y, u);
+      return [
+        x + (dt / 6) * (k1x + 2 * k2x + 2 * k3x + k4x),
+        y + (dt / 6) * (k1y + 2 * k2y + 2 * k3y + k4y)
+      ];
+    }
+
+    // Modal Visibility Triggers
+    let isOpen = false;
+    let animFrameId: number | null = null;
+
+    function open() {
+      isOpen = true;
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        resize();
+        if (!animFrameId) {
+          lastTime = performance.now();
+          animFrameId = requestAnimationFrame(animate);
+        }
+      }, 50);
+    }
+
+    function close() {
+      isOpen = false;
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      if (animFrameId) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+      }
+    }
+
+    closeBtn?.addEventListener('click', close);
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) close();
+    });
+
+    window.addEventListener('open-lgnn-sandbox', () => open());
+
+    window.addEventListener('keydown', (e) => {
+      if (!isOpen) return;
+      if (e.key === 'Escape') close();
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePause();
+      }
+      if (e.key === 's' || e.key === 'S') triggerShock();
+      if (e.key === 'r' || e.key === 'R') resetOrbit();
+      if (e.key === '1') applyPreset('trend');
+      if (e.key === '2') applyPreset('limit');
+      if (e.key === '3') applyPreset('shock');
+      if (e.key === '4') applyPreset('sink');
+    });
+
+    // Preset Applicator
+    function applyPreset(preset: string) {
+      presetBtns.forEach(b => {
+        const p = b.getAttribute('data-preset');
+        if (p === preset) {
+          b.classList.remove('bg-[var(--bg-card)]', 'text-[var(--text-primary)]');
+          b.classList.add('bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'font-bold');
+        } else {
+          b.classList.remove('bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'font-bold');
+          b.classList.add('bg-[var(--bg-card)]', 'text-[var(--text-primary)]');
+        }
+      });
+
+      if (preset === 'trend') {
+        tau0 = 25.0;
+        beta = 0.8;
+        u_flux = 0.85;
+        w11 = 0.5; w12 = 0.8; w21 = 0.8; w22 = 0.5;
+        isSineFlux = false;
+        if (regimeBadge) regimeBadge.textContent = '[REGIME: 15M MOMENTUM BREAKOUT]';
+      } else if (preset === 'limit') {
+        tau0 = 8.0;
+        beta = 0.2;
+        u_flux = 0.0;
+        w11 = 0.5; w12 = -1.8; w21 = 1.8; w22 = 0.5;
+        isSineFlux = false;
+        if (regimeBadge) regimeBadge.textContent = '[REGIME: LIMIT CYCLE HOPF BIFURKATION]';
+      } else if (preset === 'shock') {
+        tau0 = 15.0;
+        beta = 2.2;
+        u_flux = 0.0;
+        w11 = 0.3; w12 = -1.5; w21 = 1.5; w22 = 0.3;
+        isSineFlux = false;
+        triggerShock();
+        if (regimeBadge) regimeBadge.textContent = '[REGIME: ADAPTIVE VISKOSITÄTS-KOLLAPS]';
+      } else if (preset === 'sink') {
+        tau0 = 2.5;
+        beta = 0.1;
+        u_flux = 0.0;
+        w11 = -0.4; w12 = -0.6; w21 = 0.6; w22 = -0.4;
+        isSineFlux = false;
+        if (regimeBadge) regimeBadge.textContent = '[REGIME: GEDÄMPFTER FIXPUNKT-SINK]';
+      }
+
+      // Sync slider UI
+      if (tauInput) tauInput.value = tau0.toFixed(1);
+      if (tauValDisplay) tauValDisplay.textContent = `${tau0.toFixed(1)}s`;
+      if (betaInput) betaInput.value = beta.toFixed(2);
+      if (betaValDisplay) betaValDisplay.textContent = beta.toFixed(2);
+      if (fluxInput) fluxInput.value = u_flux.toFixed(2);
+      if (fluxValDisplay) fluxValDisplay.textContent = u_flux.toFixed(2);
+      if (weightInput) weightInput.value = w12.toFixed(1);
+      if (weightValDisplay) weightValDisplay.textContent = w12.toFixed(1);
+
+      trajectory.length = 0;
+    }
+
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = btn.getAttribute('data-preset') || 'trend';
+        applyPreset(p);
+      });
+    });
+
+    // Slider Event Handlers
+    tauInput?.addEventListener('input', () => {
+      tau0 = parseFloat(tauInput.value);
+      if (tauValDisplay) tauValDisplay.textContent = `${tau0.toFixed(1)}s`;
+    });
+    betaInput?.addEventListener('input', () => {
+      beta = parseFloat(betaInput.value);
+      if (betaValDisplay) betaValDisplay.textContent = beta.toFixed(2);
+    });
+    fluxInput?.addEventListener('input', () => {
+      u_flux = parseFloat(fluxInput.value);
+      if (fluxValDisplay) fluxValDisplay.textContent = u_flux.toFixed(2);
+    });
+    weightInput?.addEventListener('input', () => {
+      w12 = parseFloat(weightInput.value);
+      w21 = -w12; // preserve antisymmetric coupling
+      if (weightValDisplay) weightValDisplay.textContent = w12.toFixed(1);
+    });
+
+    // Actions
+    function triggerShock() {
+      shockDecay = 2.2;
+    }
+    btnShock?.addEventListener('click', triggerShock);
+
+    function togglePause() {
+      isPaused = !isPaused;
+      if (btnPause) btnPause.textContent = isPaused ? '▶ RUN' : '⏸ PAUSE';
+    }
+    btnPause?.addEventListener('click', togglePause);
+
+    function resetOrbit() {
+      h1 = 0.8;
+      h2 = -0.4;
+      trajectory.length = 0;
+    }
+    btnReset?.addEventListener('click', resetOrbit);
+
+    btnSine?.addEventListener('click', () => {
+      isSineFlux = !isSineFlux;
+      if (btnSine) btnSine.textContent = isSineFlux ? '∿ SINE-FLUX [AN]' : '∿ SINE-FLUX [AUS]';
+    });
+
+    // Mouse / Touch Interaction on Phase Plane
+    let isInteracting = false;
+    function setPhaseFromScreen(clientX: number, clientY: number) {
+      const rect = phaseCanvas.getBoundingClientRect();
+      const sx = clientX - rect.left;
+      const sy = clientY - rect.top;
+      h1 = Math.max(-domain, Math.min(domain, toPhaseX(sx)));
+      h2 = Math.max(-domain, Math.min(domain, toPhaseY(sy)));
+      trajectory.length = 0;
+    }
+
+    phaseCanvas.addEventListener('mousedown', (e) => {
+      isInteracting = true;
+      setPhaseFromScreen(e.clientX, e.clientY);
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isInteracting) return;
+      setPhaseFromScreen(e.clientX, e.clientY);
+    });
+    window.addEventListener('mouseup', () => { isInteracting = false; });
+
+    // Touch Support
+    phaseCanvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        isInteracting = true;
+        setPhaseFromScreen(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (!isInteracting || e.touches.length === 0) return;
+      setPhaseFromScreen(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    window.addEventListener('touchend', () => { isInteracting = false; });
+
+    // Main 60 FPS Simulation & Render Loop
+    let lastTime = performance.now();
+
+    function animate(time: number) {
+      if (!isOpen) {
+        animFrameId = null;
+        return;
+      }
+
+      const rawDt = Math.min((time - lastTime) / 1000, 0.05);
+      lastTime = time;
+
+      // Effective u(t)
+      let effectiveU = u_flux;
+      if (isSineFlux) {
+        simTime += rawDt;
+        effectiveU += Math.sin(simTime * 2.5) * 1.2;
+      }
+      if (shockDecay > 0.01) {
+        effectiveU += shockDecay;
+        shockDecay *= 0.94; // exponential dissipation
+      }
+
+      // Physics Integration (sub-stepping for high stability)
+      const subSteps = 3;
+      const stepDt = (rawDt * 1.5) / subSteps;
+
+      if (!isPaused) {
+        for (let i = 0; i < subSteps; i++) {
+          const [nextH1, nextH2] = rk4(h1, h2, stepDt, effectiveU);
+          h1 = nextH1;
+          h2 = nextH2;
+        }
+
+        // Clamp to domain bounds to prevent floating point explosions
+        h1 = Math.max(-domain * 1.2, Math.min(domain * 1.2, h1));
+        h2 = Math.max(-domain * 1.2, Math.min(domain * 1.2, h2));
+
+        trajectory.push({ x: h1, y: h2 });
+        if (trajectory.length > maxTrail) trajectory.shift();
+
+        oscHistory.push({ h1, h2, u: effectiveU });
+        if (oscHistory.length > maxOsc) oscHistory.shift();
+      }
+
+      // Compute Derivatives & Telemetry
+      const [dh1, dh2] = derivatives(h1, h2, effectiveU);
+      const tau_u = Math.max(0.5, tau0 / (1.0 + beta * Math.abs(effectiveU)));
+      const divergence = (-1.0 / tau_u) - (1.0 / tau0);
+      const conviction = Math.tanh(h1);
+
+      // Update Telemetry UI
+      if (h1Val) h1Val.textContent = (h1 >= 0 ? '+' : '') + h1.toFixed(3);
+      if (h2Val) h2Val.textContent = (h2 >= 0 ? '+' : '') + h2.toFixed(3);
+      if (dh1Val) dh1Val.textContent = (dh1 >= 0 ? '+' : '') + dh1.toFixed(3);
+      if (dh2Val) dh2Val.textContent = (dh2 >= 0 ? '+' : '') + dh2.toFixed(3);
+      if (tauReadout) tauReadout.textContent = `${tau_u.toFixed(2)}s`;
+      if (divReadout) divReadout.textContent = divergence.toFixed(2);
+
+      const tauPct = Math.min(100, Math.max(5, (tau_u / 30.0) * 100));
+      if (tauPercent) tauPercent.textContent = `${Math.round(tauPct)}%`;
+      if (viscosityBar) viscosityBar.style.width = `${tauPct}%`;
+
+      // Update Conviction Bar & Labels
+      if (convictionVal) {
+        convictionVal.textContent = (conviction >= 0 ? '+' : '') + conviction.toFixed(2);
+        if (conviction >= 0.75) {
+          convictionVal.className = 'font-bold text-emerald-600 dark:text-emerald-400';
+        } else if (conviction <= -0.75) {
+          convictionVal.className = 'font-bold text-red-600 dark:text-red-400';
+        } else {
+          convictionVal.className = 'font-bold text-[var(--text-muted)]';
+        }
+      }
+
+      if (convictionReadout) {
+        let label = 'NEUTRAL';
+        let col = 'text-[var(--text-muted)]';
+        if (conviction >= 0.75) {
+          label = 'LONG [ALO]';
+          col = 'text-emerald-600 dark:text-emerald-400';
+        } else if (conviction <= -0.75) {
+          label = 'SHORT [ALO]';
+          col = 'text-red-600 dark:text-red-400';
+        }
+        convictionReadout.innerHTML = `<span class="${col}">${(conviction >= 0 ? '+' : '') + conviction.toFixed(2)} [${label}]</span>`;
+      }
+
+      if (convictionFill) {
+        if (conviction >= 0) {
+          const w = (conviction / 1.0) * 50;
+          convictionFill.style.marginLeft = '50%';
+          convictionFill.style.width = `${w}%`;
+          convictionFill.className = 'h-full bg-emerald-500 transition-all duration-75';
+        } else {
+          const w = (-conviction / 1.0) * 50;
+          convictionFill.style.marginLeft = `${50 - w}%`;
+          convictionFill.style.width = `${w}%`;
+          convictionFill.className = 'h-full bg-red-500 transition-all duration-75';
+        }
+      }
+
+      // Render Phase Canvas
+      renderPhasePlane(effectiveU, tau_u);
+
+      // Render Mini-Oscilloscope
+      renderOscilloscope();
+
+      animFrameId = requestAnimationFrame(animate);
+    }
+
+    // Phase Plane Renderer
+    function renderPhasePlane(effectiveU: number, tau_u: number) {
+      ctx.clearRect(0, 0, pWidth, pHeight);
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(18, 18, 18, 0.05)';
+      const axisColor = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(18, 18, 18, 0.2)';
+      const fieldColor = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(18, 18, 18, 0.12)';
+      const trajColor = isDark ? '#38bdf8' : '#0284c7';
+      const stateColor = isDark ? '#ffffff' : '#09090b';
+
+      // 1. Grid & Axes
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = gridColor;
+
+      // Concentric circles / boxes for scale
+      const r1 = (1.0 / domain) * (Math.min(pWidth, pHeight) / 2);
+      const r2 = (2.0 / domain) * (Math.min(pWidth, pHeight) / 2);
+      ctx.beginPath();
+      ctx.arc(pWidth / 2, pHeight / 2, r1, 0, Math.PI * 2);
+      ctx.arc(pWidth / 2, pHeight / 2, r2, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Main Axes
+      ctx.strokeStyle = axisColor;
+      ctx.beginPath();
+      ctx.moveTo(pWidth / 2, 0);
+      ctx.lineTo(pWidth / 2, pHeight);
+      ctx.moveTo(0, pHeight / 2);
+      ctx.lineTo(pWidth, pHeight / 2);
+      ctx.stroke();
+
+      // 2. Vector Field Grid (sampled arrows)
+      const arrowStep = 0.35;
+      const arrowLen = 10;
+      ctx.strokeStyle = fieldColor;
+      ctx.fillStyle = fieldColor;
+
+      for (let gx = -2.1; gx <= 2.1; gx += arrowStep) {
+        for (let gy = -2.1; gy <= 2.1; gy += arrowStep) {
+          const [vx, vy] = derivatives(gx, gy, effectiveU);
+          const mag = Math.sqrt(vx * vx + vy * vy) + 1e-6;
+          const nx = vx / mag;
+          const ny = vy / mag;
+
+          const sx = toScreenX(gx);
+          const sy = toScreenY(gy);
+
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(sx + nx * arrowLen, sy - ny * arrowLen);
+          ctx.stroke();
+        }
+      }
+
+      // 3. Flow Streamlet Particles
+      ctx.fillStyle = isDark ? 'rgba(56, 189, 248, 0.25)' : 'rgba(2, 132, 199, 0.25)';
+      for (const p of particles) {
+        p.life++;
+        if (p.life >= p.maxLife || Math.abs(p.x) > domain || Math.abs(p.y) > domain) {
+          p.x = (Math.random() - 0.5) * (domain * 2);
+          p.y = (Math.random() - 0.5) * (domain * 2);
+          p.life = 0;
+        }
+
+        const [vx, vy] = derivatives(p.x, p.y, effectiveU);
+        p.x += vx * 0.035;
+        p.y += vy * 0.035;
+
+        const sx = toScreenX(p.x);
+        const sy = toScreenY(p.y);
+        const alpha = Math.sin((p.life / p.maxLife) * Math.PI);
+        ctx.globalAlpha = alpha * 0.5;
+        ctx.fillRect(sx - 1, sy - 1, 2, 2);
+      }
+      ctx.globalAlpha = 1.0;
+
+      // 4. State Trajectory Ribbon
+      if (trajectory.length > 1) {
+        ctx.lineWidth = 2;
+        for (let i = 1; i < trajectory.length; i++) {
+          const progress = i / trajectory.length;
+          ctx.strokeStyle = trajColor;
+          ctx.globalAlpha = progress * 0.9;
+
+          ctx.beginPath();
+          ctx.moveTo(toScreenX(trajectory[i - 1].x), toScreenY(trajectory[i - 1].y));
+          ctx.lineTo(toScreenX(trajectory[i].x), toScreenY(trajectory[i].y));
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1.0;
+      }
+
+      // 5. Current State Point
+      const curSx = toScreenX(h1);
+      const curSy = toScreenY(h2);
+
+      // Outer glow circle
+      ctx.beginPath();
+      ctx.arc(curSx, curSy, 7, 0, Math.PI * 2);
+      ctx.fillStyle = isDark ? 'rgba(56, 189, 248, 0.3)' : 'rgba(2, 132, 199, 0.2)';
+      ctx.fill();
+
+      // Solid core
+      ctx.beginPath();
+      ctx.arc(curSx, curSy, 4, 0, Math.PI * 2);
+      ctx.fillStyle = stateColor;
+      ctx.fill();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = trajColor;
+      ctx.stroke();
+    }
+
+    // Mini Oscilloscope Renderer
+    function renderOscilloscope() {
+      oscCtx.clearRect(0, 0, oWidth, oHeight);
+      if (oscHistory.length < 2) return;
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const midY = oHeight / 2;
+
+      // Zero line
+      oscCtx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(18, 18, 18, 0.1)';
+      oscCtx.lineWidth = 1;
+      oscCtx.beginPath();
+      oscCtx.moveTo(0, midY);
+      oscCtx.lineTo(oWidth, midY);
+      oscCtx.stroke();
+
+      const dx = oWidth / maxOsc;
+      const yVal = (v: number) => midY - (v / 2.5) * (midY * 0.85);
+
+      // Curve 1: h1 (Blue/Cyan)
+      oscCtx.strokeStyle = isDark ? '#38bdf8' : '#0284c7';
+      oscCtx.lineWidth = 1.5;
+      oscCtx.beginPath();
+      for (let i = 0; i < oscHistory.length; i++) {
+        const x = i * dx;
+        const y = yVal(oscHistory[i].h1);
+        if (i === 0) oscCtx.moveTo(x, y);
+        else oscCtx.lineTo(x, y);
+      }
+      oscCtx.stroke();
+
+      // Curve 2: h2 (Purple)
+      oscCtx.strokeStyle = isDark ? '#c084fc' : '#9333ea';
+      oscCtx.lineWidth = 1.2;
+      oscCtx.beginPath();
+      for (let i = 0; i < oscHistory.length; i++) {
+        const x = i * dx;
+        const y = yVal(oscHistory[i].h2);
+        if (i === 0) oscCtx.moveTo(x, y);
+        else oscCtx.lineTo(x, y);
+      }
+      oscCtx.stroke();
+
+      // Curve 3: u (Amber - dashed)
+      oscCtx.strokeStyle = isDark ? '#f59e0b' : '#d97706';
+      oscCtx.lineWidth = 1;
+      oscCtx.setLineDash([2, 2]);
+      oscCtx.beginPath();
+      for (let i = 0; i < oscHistory.length; i++) {
+        const x = i * dx;
+        const y = yVal(oscHistory[i].u);
+        if (i === 0) oscCtx.moveTo(x, y);
+        else oscCtx.lineTo(x, y);
+      }
+      oscCtx.stroke();
+      oscCtx.setLineDash([]);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLgnnSandbox);
+  } else {
+    initLgnnSandbox();
+  }
+</script>
