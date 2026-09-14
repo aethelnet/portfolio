@@ -1,0 +1,498 @@
+---
+// EdisonReplayModal.astro - Interactive Match Forensics & Chain-Link Inspector (WASM OCGCore)
+---
+
+<div id="edison-replay-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300 font-mono-tech text-xs select-none">
+  <div class="relative w-full max-w-5xl h-[88vh] bg-[var(--bg-primary)] border border-[var(--border-strong)] rounded-lg shadow-2xl overflow-hidden flex flex-col">
+    
+    <!-- Modal Header -->
+    <div class="px-5 py-3 border-b border-[var(--border-hairline)] bg-[var(--bg-secondary)] flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+        <span class="font-bold text-[var(--text-primary)] tracking-wide">AURATIC PRIME // EDISON ENGINE (OCGCORE WASM)</span>
+        <span class="text-[10px] text-[var(--text-muted)] hidden sm:inline">[MATCH FORENSIK: TISCH 01 // SWISS RUNDE 3]</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <!-- Fog of War / God Mode Toggle -->
+        <button id="edison-fog-btn" class="px-2.5 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[10px] text-[var(--text-primary)] font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm">
+          <span id="edison-fog-led" class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+          <span id="edison-fog-label">GOD-MODE: UNMASKED</span>
+        </button>
+
+        <button id="edison-close-btn" class="px-2.5 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer">
+          [SCHLIESSEN ✕]
+        </button>
+      </div>
+    </div>
+
+    <!-- Match Scenario Banner Strip -->
+    <div class="px-5 py-2 border-b border-[var(--border-hairline)] bg-[var(--bg-primary)] flex flex-wrap items-center justify-between gap-3 text-[10px]">
+      <div class="flex items-center gap-4 text-[var(--text-secondary)]">
+        <div>MATCH: <strong class="text-[var(--text-primary)]">HERO BEAT (PILOT A)</strong> vs <strong class="text-[var(--text-primary)]">DIVA ZOMBIE (PILOT B)</strong></div>
+        <div class="hidden md:inline">FORMAT: <span class="text-amber-600 dark:text-amber-400 font-bold">EDISON (APRIL 2010)</span></div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-[var(--text-muted)]">STATUS:</span>
+        <span class="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold">
+          KDE TIEBREAKER TURN 02 // TIME-CALL
+        </span>
+      </div>
+    </div>
+
+    <!-- Main Workspace (Dual Columns) -->
+    <div class="relative flex-1 w-full h-full overflow-hidden flex flex-col md:flex-row">
+      
+      <!-- Left: Board Matrix & Life Point Field Stage -->
+      <div class="relative flex-1 h-full bg-[var(--bg-primary)] p-4 flex flex-col justify-between overflow-y-auto space-y-4">
+        
+        <!-- Opponent (Pilot B - Diva Zombie) Status Bar -->
+        <div class="p-3 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] space-y-2">
+          <div class="flex justify-between items-center text-[10px]">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+              <span class="font-bold text-[var(--text-primary)]">PILOT B (DIVA ZOMBIE)</span>
+              <span class="text-[var(--text-muted)]">[P2]</span>
+            </div>
+            <div class="font-mono text-sm font-bold text-[var(--text-primary)]" id="edison-lp-p2">3,400 LP</div>
+          </div>
+          <!-- LP Bar -->
+          <div class="w-full h-2 bg-[var(--bg-secondary)] rounded-full overflow-hidden border border-[var(--border-hairline)]">
+            <div id="edison-lp-bar-p2" class="h-full bg-purple-500 transition-all duration-300" style="width: 42.5%;"></div>
+          </div>
+          <!-- Hand Cards Representation -->
+          <div class="pt-1 flex items-center justify-between text-[10px] text-[var(--text-muted)]">
+            <span>HAND: 3 KARTEN</span>
+            <div id="edison-p2-hand-cards" class="flex gap-1.5">
+              <span class="px-1.5 py-0.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[var(--text-secondary)] card-reveal">Gorz the Emissary of Darkness</span>
+              <span class="px-1.5 py-0.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[var(--text-secondary)] card-reveal">Book of Moon</span>
+              <span class="px-1.5 py-0.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[var(--text-secondary)] card-reveal">Plaguespreader Zombie</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Board Grid Representation -->
+        <div class="p-4 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] space-y-4 shadow-inner">
+          
+          <!-- P2 Field (Monsters & Spells) -->
+          <div class="space-y-2">
+            <div class="text-[9px] text-[var(--text-muted)] uppercase tracking-wider">Gegnerische Feldzone (Pilot B):</div>
+            <!-- Monsters P2 -->
+            <div class="grid grid-cols-5 gap-2 text-center text-[10px]">
+              <div class="p-2 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] flex flex-col justify-center min-h-[52px]">
+                <div class="font-bold text-[var(--text-primary)] leading-tight">Stardust Dragon</div>
+                <div class="text-[9px] text-[var(--text-muted)]">ATK 2500 / DEF 2000</div>
+              </div>
+              <div class="p-2 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] flex flex-col justify-center min-h-[52px]">
+                <div class="font-bold text-[var(--text-primary)] leading-tight">Goyo Guardian</div>
+                <div class="text-[9px] text-[var(--text-muted)]">ATK 2800 / DEF 2000</div>
+              </div>
+              <div class="p-2 rounded border border-dashed border-[var(--border-hairline)] text-[var(--text-muted)] flex items-center justify-center min-h-[52px]">LEER</div>
+              <div class="p-2 rounded border border-dashed border-[var(--border-hairline)] text-[var(--text-muted)] flex items-center justify-center min-h-[52px]">LEER</div>
+              <div class="p-2 rounded border border-dashed border-[var(--border-hairline)] text-[var(--text-muted)] flex items-center justify-center min-h-[52px]">LEER</div>
+            </div>
+            <!-- Backrow P2 -->
+            <div class="grid grid-cols-5 gap-2 text-center text-[10px]">
+              <div id="card-starlight" class="p-2 rounded border border-amber-500/50 bg-amber-500/10 flex flex-col justify-center min-h-[46px] transition-all">
+                <div class="font-bold text-amber-600 dark:text-amber-400 leading-tight">Starlight Road</div>
+                <div class="text-[9px] text-[var(--text-muted)]">[CL2 AKTIVIERT]</div>
+              </div>
+              <div class="p-2 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] flex flex-col justify-center min-h-[46px]">
+                <div class="font-bold text-[var(--text-primary)] leading-tight card-reveal">Bottomless Trap Hole</div>
+                <div class="text-[9px] text-[var(--text-muted)]">Falle (Face-down)</div>
+              </div>
+              <div class="p-2 rounded border border-dashed border-[var(--border-hairline)] text-[var(--text-muted)] flex items-center justify-center min-h-[46px]">LEER</div>
+              <div class="p-2 rounded border border-dashed border-[var(--border-hairline)] text-[var(--text-muted)] flex items-center justify-center min-h-[46px]">LEER</div>
+              <div class="p-2 rounded border border-dashed border-[var(--border-hairline)] text-[var(--text-muted)] flex items-center justify-center min-h-[46px]">LEER</div>
+            </div>
+          </div>
+
+          <!-- Central Conflict Horizon / Chain Resolution Arena -->
+          <div class="py-2 px-3 rounded border border-dashed border-[var(--border-strong)] bg-[var(--bg-primary)] flex items-center justify-between text-[11px]">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+              <span class="font-bold text-[var(--text-primary)]">KETTEN-AUFLÖSUNG (LIFO ARENA):</span>
+            </div>
+            <div id="edison-chain-summary" class="font-bold text-cyan-600 dark:text-cyan-400">
+              3 KETTENGLIEDER // AKTIV: CL3
+            </div>
+          </div>
+
+          <!-- P1 Field (Hero Beat) -->
+          <div class="space-y-2">
+            <!-- Backrow P1 -->
+            <div class="grid grid-cols-5 gap-2 text-center text-[10px]">
+              <div id="card-heavystorm" class="p-2 rounded border border-emerald-500/50 bg-emerald-500/10 flex flex-col justify-center min-h-[46px] transition-all">
+                <div class="font-bold text-emerald-600 dark:text-emerald-400 leading-tight">Heavy Storm</div>
+                <div class="text-[9px] text-[var(--text-muted)]">[CL1 INITIIERT]</div>
+              </div>
+              <div id="card-solemn" class="p-2 rounded border border-cyan-500/50 bg-cyan-500/10 flex flex-col justify-center min-h-[46px] transition-all">
+                <div class="font-bold text-cyan-600 dark:text-cyan-400 leading-tight">Solemn Judgment</div>
+                <div class="text-[9px] text-[var(--text-muted)]">[CL3 COUNTER]</div>
+              </div>
+              <div class="p-2 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] flex flex-col justify-center min-h-[46px]">
+                <div class="font-bold text-[var(--text-primary)] leading-tight">Dimensional Prison</div>
+                <div class="text-[9px] text-[var(--text-muted)]">Falle (Gesetzt)</div>
+              </div>
+              <div class="p-2 rounded border border-dashed border-[var(--border-hairline)] text-[var(--text-muted)] flex items-center justify-center min-h-[46px]">LEER</div>
+              <div class="p-2 rounded border border-dashed border-[var(--border-hairline)] text-[var(--text-muted)] flex items-center justify-center min-h-[46px]">LEER</div>
+            </div>
+            <!-- Monsters P1 -->
+            <div class="grid grid-cols-5 gap-2 text-center text-[10px]">
+              <div class="p-2 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] flex flex-col justify-center min-h-[52px]">
+                <div class="font-bold text-[var(--text-primary)] leading-tight">E-HERO Stratos</div>
+                <div class="text-[9px] text-[var(--text-muted)]">ATK 1800 / DEF 300</div>
+              </div>
+              <div class="p-2 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] flex flex-col justify-center min-h-[52px]">
+                <div class="font-bold text-[var(--text-primary)] leading-tight">E-HERO Neos Alius</div>
+                <div class="text-[9px] text-[var(--text-muted)]">ATK 1900 / DEF 1300</div>
+              </div>
+              <div class="p-2 rounded border border-dashed border-[var(--border-hairline)] text-[var(--text-muted)] flex items-center justify-center min-h-[52px]">LEER</div>
+              <div class="p-2 rounded border border-dashed border-[var(--border-hairline)] text-[var(--text-muted)] flex items-center justify-center min-h-[52px]">LEER</div>
+              <div class="p-2 rounded border border-dashed border-[var(--border-hairline)] text-[var(--text-muted)] flex items-center justify-center min-h-[52px]">LEER</div>
+            </div>
+            <div class="text-[9px] text-[var(--text-muted)] uppercase tracking-wider text-right">Eigene Feldzone (Pilot A):</div>
+          </div>
+
+        </div>
+
+        <!-- Pilot A (Hero Beat) Status Bar -->
+        <div class="p-3 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] space-y-2">
+          <div class="flex justify-between items-center text-[10px]">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="font-bold text-[var(--text-primary)]">PILOT A (HERO BEAT)</span>
+              <span class="text-[var(--text-muted)]">[P1]</span>
+            </div>
+            <div class="font-mono text-sm font-bold text-[var(--text-primary)]" id="edison-lp-p1">4,000 LP</div>
+          </div>
+          <!-- LP Bar -->
+          <div class="w-full h-2 bg-[var(--bg-secondary)] rounded-full overflow-hidden border border-[var(--border-hairline)]">
+            <div id="edison-lp-bar-p1" class="h-full bg-emerald-500 transition-all duration-300" style="width: 50%;"></div>
+          </div>
+          <!-- Hand Cards Representation -->
+          <div class="pt-1 flex items-center justify-between text-[10px] text-[var(--text-muted)]">
+            <span>HAND: 2 KARTEN</span>
+            <div class="flex gap-1.5">
+              <span class="px-1.5 py-0.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[var(--text-primary)]">Honest</span>
+              <span class="px-1.5 py-0.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[var(--text-primary)]">Miracle Fusion</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right: Chain Link Inspector & Referee Audit Trail -->
+      <div class="w-full md:w-88 border-t md:border-t-0 md:border-l border-[var(--border-hairline)] bg-[var(--bg-secondary)] p-4 flex flex-col justify-between overflow-y-auto space-y-4">
+        
+        <!-- Step-by-Step Chain Link Stack -->
+        <div class="space-y-3">
+          <div class="flex justify-between items-center text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-bold">
+            <span>LIFO-Ketten-Stack (Chain Link):</span>
+            <span id="edison-step-counter" class="text-[var(--text-primary)]">SCHRITT 3 / 4</span>
+          </div>
+
+          <!-- Chain Stack Items (Reverse Order: CL3 at top, then CL2, then CL1) -->
+          <div class="space-y-2">
+            <!-- CL3 -->
+            <div id="stack-cl3" class="p-2.5 rounded border border-cyan-500/40 bg-cyan-500/10 space-y-1 transition-all">
+              <div class="flex justify-between text-[10px] font-bold">
+                <span class="text-cyan-600 dark:text-cyan-400">CL 3 // SOLEMN JUDGMENT</span>
+                <span class="text-[9px] text-[var(--text-muted)]">PILOT A [COUNTER]</span>
+              </div>
+              <p class="text-[10px] text-[var(--text-secondary)] leading-relaxed">
+                Pilot A zahlt die Hälfte der Lebenspunkte (8000 &rarr; 4000 LP). Negiert die Aktivierung von Starlight Road und zerstört die Karte.
+              </p>
+            </div>
+
+            <!-- CL2 -->
+            <div id="stack-cl2" class="p-2.5 rounded border border-amber-500/40 bg-amber-500/10 space-y-1 transition-all">
+              <div class="flex justify-between text-[10px] font-bold">
+                <span class="text-amber-600 dark:text-amber-400">CL 2 // STARLIGHT ROAD</span>
+                <span class="text-[9px] text-[var(--text-muted)]">PILOT B [TRAP]</span>
+              </div>
+              <p class="text-[10px] text-[var(--text-secondary)] leading-relaxed">
+                Aktiviert als Reaktion auf Heavy Storm (Zerstörung von 2+ Karten). Versucht Heavy Storm zu negieren und Stardust Dragon zu beschwören.
+              </p>
+            </div>
+
+            <!-- CL1 -->
+            <div id="stack-cl1" class="p-2.5 rounded border border-emerald-500/40 bg-emerald-500/10 space-y-1 transition-all">
+              <div class="flex justify-between text-[10px] font-bold">
+                <span class="text-emerald-600 dark:text-emerald-400">CL 1 // HEAVY STORM</span>
+                <span class="text-[9px] text-[var(--text-muted)]">PILOT A [SPELL]</span>
+              </div>
+              <p class="text-[10px] text-[var(--text-secondary)] leading-relaxed">
+                Initiale Aktivierung. Zerstört alle Zauber- und Fallenkarten auf dem gesamten Spielfeld.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step Progression Controls -->
+          <div class="pt-2 flex items-center justify-between gap-2">
+            <button id="edison-btn-prev" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[10px] font-bold text-[var(--text-primary)] transition-all cursor-pointer">
+              &larr; VORHERIGE
+            </button>
+            <button id="edison-btn-auto" class="px-3 py-1.5 rounded border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] text-[10px] font-bold transition-all cursor-pointer flex-1">
+              &rtrif; LIFO AUFLÖSEN
+            </button>
+            <button id="edison-btn-next" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[10px] font-bold text-[var(--text-primary)] transition-all cursor-pointer">
+              NÄCHSTE &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- Section: Immutable Referee Audit Trail Log -->
+        <div class="p-3 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] space-y-2">
+          <div class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-bold">
+            Referee Audit-Trail (SQLite Log):
+          </div>
+          <div id="edison-audit-log" class="font-mono text-[9px] text-[var(--text-secondary)] space-y-1 max-h-28 overflow-y-auto">
+            <div><span class="text-[var(--text-muted)]">17:14:01</span> [CL1] Heavy Storm deklariert.</div>
+            <div><span class="text-[var(--text-muted)]">17:14:03</span> [CL2] Starlight Road gechaint.</div>
+            <div><span class="text-[var(--text-muted)]">17:14:07</span> [CL3] Solemn Judgment gechaint (LP: 8000 &rarr; 4000).</div>
+            <div><span class="text-emerald-500 font-bold">17:14:10</span> [RESOLVE] CL3 negiert CL2. CL1 zerstört Backrow.</div>
+          </div>
+        </div>
+
+        <!-- Call to Action Launchpad -->
+        <div class="pt-2 border-t border-[var(--border-hairline)] space-y-2">
+          <a 
+            href="https://play.aethelburg.network" 
+            target="_blank" 
+            rel="noreferrer"
+            class="w-full py-2 px-3 rounded border border-amber-600 bg-amber-600/10 hover:bg-amber-600 text-amber-600 hover:text-white dark:text-amber-400 dark:hover:text-black font-bold text-center block transition-all shadow-sm"
+          >
+            VOLLSTÄNDIGE STORE-PLATTFORM ÖFFNEN &nearr;
+          </a>
+          <div class="text-[9px] text-[var(--text-muted)] text-center">
+            Läuft live auf server-141 // C++ OCGCore via WebAssembly
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-5 py-2.5 border-t border-[var(--border-hairline)] bg-[var(--bg-secondary)] text-[10px] text-[var(--text-muted)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-[var(--text-primary)]">CORE:</span>
+        <span class="font-mono">WASM OCGCORE // KRYPTOGRAPHISCHER REFEREE AUDIT TRAIL // PRE-FLIGHT BANLIST</span>
+      </div>
+      <div>
+        <span>TASTATUR: [&larr;/&rarr;] SCHRITTE | [LEERTASTE] AUFLÖSEN | [G] GOD-MODE | [ESC] SCHLIESSEN</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function initEdisonReplayModal() {
+    const modal = document.getElementById('edison-replay-modal');
+    const closeBtn = document.getElementById('edison-close-btn');
+    const fogBtn = document.getElementById('edison-fog-btn');
+    const fogLabel = document.getElementById('edison-fog-label');
+    const fogLed = document.getElementById('edison-fog-led');
+
+    const btnPrev = document.getElementById('edison-btn-prev');
+    const btnNext = document.getElementById('edison-btn-next');
+    const btnAuto = document.getElementById('edison-btn-auto');
+    const stepCounter = document.getElementById('edison-step-counter');
+    const chainSummary = document.getElementById('edison-chain-summary');
+
+    const lpP1 = document.getElementById('edison-lp-p1');
+    const lpP2 = document.getElementById('edison-lp-p2');
+    const lpBarP1 = document.getElementById('edison-lp-bar-p1');
+    const lpBarP2 = document.getElementById('edison-lp-bar-p2');
+
+    const stackCl1 = document.getElementById('stack-cl1');
+    const stackCl2 = document.getElementById('stack-cl2');
+    const stackCl3 = document.getElementById('stack-cl3');
+    const cardHeavy = document.getElementById('card-heavystorm');
+    const cardStarlight = document.getElementById('card-starlight');
+    const cardSolemn = document.getElementById('card-solemn');
+    const revealCards = document.querySelectorAll('.card-reveal');
+
+    if (!modal) return;
+
+    let isGodMode = true;
+    let currentStep = 3; // 0: Init, 1: CL1, 2: CL2, 3: CL3, 4: Resolved
+    const maxSteps = 4;
+
+    const STEPS = [
+      {
+        name: 'SCHRITT 0 / 4: AUSGANGSLAGE',
+        p1Lp: 8000,
+        p2Lp: 3400,
+        summary: 'KETTE LEER // MAIN PHASE 1',
+        cl1Active: false,
+        cl2Active: false,
+        cl3Active: false,
+        resolved: false
+      },
+      {
+        name: 'SCHRITT 1 / 4: CL1 DEKLARIERT',
+        p1Lp: 8000,
+        p2Lp: 3400,
+        summary: '1 KETTENGLIED // AKTIV: CL1 HEAVY STORM',
+        cl1Active: true,
+        cl2Active: false,
+        cl3Active: false,
+        resolved: false
+      },
+      {
+        name: 'SCHRITT 2 / 4: CL2 GECHAINT',
+        p1Lp: 8000,
+        p2Lp: 3400,
+        summary: '2 KETTENGLIEDER // AKTIV: CL2 STARLIGHT ROAD',
+        cl1Active: true,
+        cl2Active: true,
+        cl3Active: false,
+        resolved: false
+      },
+      {
+        name: 'SCHRITT 3 / 4: CL3 COUNTER',
+        p1Lp: 4000,
+        p2Lp: 3400,
+        summary: '3 KETTENGLIEDER // AKTIV: CL3 SOLEMN JUDGMENT',
+        cl1Active: true,
+        cl2Active: true,
+        cl3Active: true,
+        resolved: false
+      },
+      {
+        name: 'SCHRITT 4 / 4: LIFO AUFGELÖST',
+        p1Lp: 4000,
+        p2Lp: 3400,
+        summary: 'KETTE BEENDET // CL3 NEGIERT CL2 &rarr; CL1 ERFOLGREICH',
+        cl1Active: false,
+        cl2Active: false,
+        cl3Active: false,
+        resolved: true
+      }
+    ];
+
+    function renderStep(idx: number) {
+      currentStep = idx;
+      const s = STEPS[idx];
+
+      if (stepCounter) stepCounter.textContent = s.name;
+      if (chainSummary) chainSummary.innerHTML = s.summary;
+
+      // Update Life Points
+      if (lpP1) lpP1.textContent = `${s.p1Lp.toLocaleString()} LP`;
+      if (lpP2) lpP2.textContent = `${s.p2Lp.toLocaleString()} LP`;
+      if (lpBarP1) lpBarP1.style.width = `${(s.p1Lp / 8000) * 100}%`;
+      if (lpBarP2) lpBarP2.style.width = `${(s.p2Lp / 8000) * 100}%`;
+
+      // Highlight Stacks
+      if (stackCl1) stackCl1.style.opacity = s.cl1Active || s.resolved ? '1' : '0.35';
+      if (stackCl2) stackCl2.style.opacity = s.cl2Active ? '1' : '0.35';
+      if (stackCl3) stackCl3.style.opacity = s.cl3Active ? '1' : '0.35';
+
+      // Field Highlights
+      if (cardHeavy) cardHeavy.style.opacity = s.cl1Active ? '1' : (s.resolved ? '0.4' : '0.8');
+      if (cardStarlight) cardStarlight.style.opacity = s.cl2Active ? '1' : (s.resolved ? '0.2' : '0.8');
+      if (cardSolemn) cardSolemn.style.opacity = s.cl3Active ? '1' : (s.resolved ? '0.2' : '0.8');
+    }
+
+    function toggleFogOfWar() {
+      isGodMode = !isGodMode;
+      if (fogLabel) fogLabel.textContent = isGodMode ? 'GOD-MODE: UNMASKED' : 'POV: PILOT A (FOG OF WAR)';
+      if (fogLed) {
+        fogLed.className = isGodMode 
+          ? 'w-1.5 h-1.5 rounded-full bg-cyan-500' 
+          : 'w-1.5 h-1.5 rounded-full bg-amber-500';
+      }
+
+      revealCards.forEach(c => {
+        if (isGodMode) {
+          c.classList.remove('opacity-20', 'blur-[2px]');
+          c.textContent = c.getAttribute('data-real-name') || c.textContent;
+        } else {
+          c.setAttribute('data-real-name', c.textContent || '');
+          c.textContent = '??? [FACE-DOWN]';
+          c.classList.add('opacity-50');
+        }
+      });
+    }
+
+    fogBtn?.addEventListener('click', toggleFogOfWar);
+
+    btnPrev?.addEventListener('click', () => {
+      if (currentStep > 0) renderStep(currentStep - 1);
+    });
+
+    btnNext?.addEventListener('click', () => {
+      if (currentStep < maxSteps) renderStep(currentStep + 1);
+    });
+
+    let autoInterval: any = null;
+    btnAuto?.addEventListener('click', () => {
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+        if (btnAuto) btnAuto.textContent = '▶ LIFO AUFLÖSEN';
+        return;
+      }
+      renderStep(0);
+      if (btnAuto) btnAuto.textContent = '⏸ ANHALTEN';
+      autoInterval = setInterval(() => {
+        if (currentStep < maxSteps) {
+          renderStep(currentStep + 1);
+        } else {
+          clearInterval(autoInterval);
+          autoInterval = null;
+          if (btnAuto) btnAuto.textContent = '⟲ WIEDERHOLEN';
+        }
+      }, 1200);
+    });
+
+    // Visibility
+    let isOpen = false;
+    function open() {
+      isOpen = true;
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      renderStep(3);
+    }
+
+    function close() {
+      isOpen = false;
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+      }
+    }
+
+    closeBtn?.addEventListener('click', close);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) close();
+    });
+
+    window.addEventListener('open-edison-replay', () => open());
+
+    window.addEventListener('keydown', (e) => {
+      if (!isOpen) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'g' || e.key === 'G') toggleFogOfWar();
+      if (e.key === 'ArrowLeft') {
+        if (currentStep > 0) renderStep(currentStep - 1);
+      }
+      if (e.key === 'ArrowRight') {
+        if (currentStep < maxSteps) renderStep(currentStep + 1);
+      }
+      if (e.code === 'Space') {
+        e.preventDefault();
+        btnAuto?.click();
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initEdisonReplayModal);
+  } else {
+    initEdisonReplayModal();
+  }
+</script>

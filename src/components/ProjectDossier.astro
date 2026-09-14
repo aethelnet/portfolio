@@ -204,6 +204,10 @@
         interactiveContainer?.classList.remove('hidden');
         const lbl = document.getElementById('dossier-interactive-label');
         if (lbl) lbl.textContent = 'INTERAKTIVEN PROVENIENZ-GRAPHEN ÖFFNEN';
+      } else if (id === 'edison') {
+        interactiveContainer?.classList.remove('hidden');
+        const lbl = document.getElementById('dossier-interactive-label');
+        if (lbl) lbl.textContent = 'INTERAKTIVEN MATCH-FORENSIK-INSPECTOR STARTEN';
       } else if (id === 'lgnn') {
         interactiveContainer?.classList.remove('hidden');
         const lbl = document.getElementById('dossier-interactive-label');
@@ -233,6 +237,8 @@
         window.dispatchEvent(new CustomEvent('open-arc-scrubber'));
       } else if (activeId === 'museum') {
         window.dispatchEvent(new CustomEvent('open-museum-graph'));
+      } else if (activeId === 'edison') {
+        window.dispatchEvent(new CustomEvent('open-edison-replay'));
       } else if (activeId === 'lgnn') {
         window.dispatchEvent(new CustomEvent('open-lgnn-sandbox'));
       }
