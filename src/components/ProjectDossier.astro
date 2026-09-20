@@ -152,6 +152,24 @@
       ],
       link: 'https://github.com/ProphitEngine',
       linkLabel: 'LGNN MATHEMATISCHE SPEZIFIKATION'
+    },
+    volt: {
+      index: 'DOSSIER // 05 - CYBER-PHYSICAL SYSTEMS',
+      title: 'VoltGrid Cyber-Physical Core',
+      sub: 'Kontinuierliche 3-Phasen-Dynamik, Fortescue-Transformation & DIN VDE Constraint Solver',
+      metrics: [
+        { label: 'Phasor Decomposition', value: 'Fortescue Symmetrische Komponenten' },
+        { label: 'Verification Engine', value: 'Symbolische DIN VDE 0701-0702 Schranken' },
+        { label: 'High-Speed Ingest', value: 'SQLite WAL Mode (< 0.5 ms Query)' },
+        { label: 'Edge Deployment', value: 'volt.aethelburg.network' }
+      ],
+      paragraphs: [
+        'Ein cyber-physikalisches Modellierungs- und Verifikationssystem für dreiphasige Drehstrom-Verteilernetze (TN-S/TN-C-S). Verknüpft zeitkontinuierliche Vektorfelder in der komplexen Ebene mit deterministischer Sicherheitsverifikation nach europäischen Normen.',
+        'Das System zerlegt asymmetrische Phasenströme in Echtzeit mittels Fortescue-Transformation in Mit-, Gegen- und Nullsysteme (I₁, I₂, I₀), um Schieflasten und thermische Überlastungen von Neutralleitern prädiktiv zu detektieren.',
+        'Die Verifikations-Engine prüft elektrotechnische Betriebsmittel formal gegen parametrische Sicherheitsgrenzwerte (Schutzleiter- und Isolationswiderstände unter dynamischen Leitungslängenzuschlägen) und archiviert manipulationssichere Audit-Trails in einer hochperformanten WAL-Datenbank.'
+      ],
+      link: 'http://localhost:8000',
+      linkLabel: 'VOLTGRID LIVE NODE AUFRUFEN'
     }
   };
 
@@ -212,6 +230,10 @@
         interactiveContainer?.classList.remove('hidden');
         const lbl = document.getElementById('dossier-interactive-label');
         if (lbl) lbl.textContent = 'INTERAKTIVE LIQUID-ODE SANDBOX STARTEN';
+      } else if (id === 'volt') {
+        interactiveContainer?.classList.remove('hidden');
+        const lbl = document.getElementById('dossier-interactive-label');
+        if (lbl) lbl.textContent = 'INTERAKTIVES PHASENRAUM-DREHSTROM-LABOR STARTEN';
       } else {
         interactiveContainer?.classList.add('hidden');
       }
@@ -241,6 +263,8 @@
         window.dispatchEvent(new CustomEvent('open-edison-replay'));
       } else if (activeId === 'lgnn') {
         window.dispatchEvent(new CustomEvent('open-lgnn-sandbox'));
+      } else if (activeId === 'volt') {
+        window.dispatchEvent(new CustomEvent('open-volt-grid'));
       }
     });
 

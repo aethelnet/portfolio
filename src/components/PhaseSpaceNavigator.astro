@@ -60,6 +60,19 @@
         </div>
       </div>
     </div>
+
+    <!-- Node E: VoltGrid Cyber-Physical Dynamics -->
+    <div id="node-volt" class="project-node absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="volt">
+      <div class="flex items-center gap-2.5">
+        <div class="w-3 h-3 rounded-full border-2 border-[var(--text-primary)] bg-[var(--bg-primary)] group-hover:scale-125 transition-transform flex items-center justify-center">
+          <div class="w-1 h-1 rounded-full bg-[var(--text-primary)]"></div>
+        </div>
+        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm backdrop-blur-md">
+          <div class="text-[10px] uppercase font-mono-tech tracking-wider text-[var(--text-muted)]">05 // CYBER-PHYSICAL SYSTEMS</div>
+          <div class="text-xs font-bold text-[var(--text-primary)] group-hover:underline underline-offset-4">VoltGrid Dynamics</div>
+        </div>
+      </div>
+    </div>
   </div>
 
 <script>
@@ -82,6 +95,7 @@
     { id: 'museum', name: 'Shadow Museum', sub: 'Provenance Cartography', hx: 1.4, hy: 0.8, w11: -0.4, w12: -1.2, w21: 1.2, w22: -0.4, u: -0.6 },
     { id: 'edison', name: 'Edison Engine', sub: 'Deterministic State Machine', hx: -0.9, hy: -1.2, w11: 0.6, w12: -2.0, w21: 2.0, w22: 0.6, u: -1.0 },
     { id: 'lgnn', name: 'Liquid Neural Core', sub: 'Continuous-Time ODE', hx: 1.2, hy: -1.0, w11: 0.0, w12: -1.4, w21: 1.4, w22: 0.0, u: 0.0 },
+    { id: 'volt', name: 'VoltGrid Dynamics', sub: 'Cyber-Physical Phasor Plane', hx: 0.0, hy: 1.45, w11: -0.5, w12: 1.8, w21: -1.8, w22: -0.5, u: 0.4 },
   ];
 
   function initPhaseSpace() {

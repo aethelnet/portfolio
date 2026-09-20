@@ -6,6 +6,7 @@ import ArcScrubberModal from '../components/ArcScrubberModal.astro';
 import MuseumGraphModal from '../components/MuseumGraphModal.astro';
 import LgnnSandboxModal from '../components/LgnnSandboxModal.astro';
 import EdisonReplayModal from '../components/EdisonReplayModal.astro';
+import VoltGridModal from '../components/VoltGridModal.astro';
 import '../styles/global.css';
 ---
 
@@ -98,6 +99,10 @@ import '../styles/global.css';
           <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="lgnn">
             04 // LIQUID ODE
           </button>
+          
+          <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="volt">
+            05 // VOLT GRID
+          </button>
         </div>
 
         <!-- Meta & Links -->
@@ -124,6 +129,9 @@ import '../styles/global.css';
 
     <!-- 08 // Interactive Edison Match Forensics Modal -->
     <EdisonReplayModal />
+
+    <!-- 09 // Interactive VoltGrid Cyber-Physical Phasor Modal -->
+    <VoltGridModal />
 
     <script>
       // Live Clock & Light/Dark Theme Controller
