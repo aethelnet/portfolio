@@ -1,5 +1,6 @@
 ---
 // ArcScrubberModal.astro - Interactive Step-by-Step & Live WebSocket ARC-AGI-3 Solver Console
+import ProjectIcon from './ProjectIcon.astro';
 ---
 
 <div id="arc-scrubber-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300">
@@ -8,6 +9,7 @@
     <!-- Modal Header -->
     <div class="px-4 sm:px-5 py-3 border-b border-[var(--border-hairline)] bg-[var(--bg-secondary)] flex items-center justify-between flex-shrink-0">
       <div class="flex items-center gap-2.5">
+        <ProjectIcon id="arc" class="w-4 h-4 text-emerald-500 shrink-0" />
         <span id="scrubber-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
         <span class="font-bold text-[var(--text-primary)] tracking-wide">ARC-AGI-3 // SOVEREIGN SOLVER CONSOLE</span>
         <span id="scrubber-game-badge" class="text-[10px] text-[var(--text-muted)] hidden sm:inline">[GAME: lp85 // LEVEL 0 SOLVED]</span>
@@ -458,11 +460,11 @@
       gameBtns.forEach(btn => {
         const gid = btn.getAttribute('data-game');
         if (gid === gameId) {
-          btn.classList.remove('bg-[var(--bg-card)]', 'text-[var(--text-primary)]');
-          btn.classList.add('bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'font-bold');
+          btn.classList.remove('bg-[var(--bg-card)]', 'text-[var(--text-primary)]', 'border-[var(--border-hairline)]');
+          btn.classList.add('bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'border-[var(--text-primary)]', 'font-bold');
         } else {
-          btn.classList.remove('bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'font-bold');
-          btn.classList.add('bg-[var(--bg-card)]', 'text-[var(--text-primary)]');
+          btn.classList.remove('bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'border-[var(--text-primary)]', 'font-bold');
+          btn.classList.add('bg-[var(--bg-card)]', 'text-[var(--text-primary)]', 'border-[var(--border-hairline)]');
         }
       });
 

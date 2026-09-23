@@ -1,6 +1,7 @@
 ---
 // index.astro - Aethelburg White Light Brutalism & Fullscreen Dynamic Systems Portfolio
 import PhaseSpaceNavigator from '../components/PhaseSpaceNavigator.astro';
+import ProjectIcon from '../components/ProjectIcon.astro';
 import ProjectDossier from '../components/ProjectDossier.astro';
 import ArcScrubberModal from '../components/ArcScrubberModal.astro';
 import MuseumGraphModal from '../components/MuseumGraphModal.astro';
@@ -19,6 +20,18 @@ import '../styles/global.css';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AETHELBURG // Autonomous Neurosymbolics & Dynamical Systems</title>
     <meta name="description" content="Portfolio für autonome Neurosymbolik, kontinuierliche Liquid Neural Networks, ARC-AGI-3 World Models und Provenienz-Kartographie." />
+    
+    <!-- OpenGraph & Social Previews -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://aethelburg.info/" />
+    <meta property="og:title" content="AETHELBURG // Autonomous Neurosymbolics & Dynamical Systems" />
+    <meta property="og:description" content="Engineering lab for autonomous causal world models, real-time C++20 DSP engines, continuous liquid ODEs, and cyber-physical networks." />
+    <meta property="og:image" content="https://aethelburg.info/og-preview.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AETHELBURG // Autonomous Neurosymbolics & Dynamical Systems" />
+    <meta name="twitter:description" content="Engineering lab for autonomous causal world models, real-time C++20 DSP engines, continuous liquid ODEs, and cyber-physical networks." />
+    <meta name="twitter:image" content="https://aethelburg.info/og-preview.svg" />
+    <link rel="canonical" href="https://aethelburg.info/" />
     
     <!-- Dutch & Swiss Typography Stack: Space Grotesk + Newsreader + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -81,38 +94,44 @@ import '../styles/global.css';
     <!-- 03 // Bottom Horizontal Project Attractor Reel -->
     <footer class="relative z-10 w-full px-5 sm:px-10 py-5 border-t border-[var(--border-hairline)] bg-[var(--bg-primary)]/80 backdrop-blur-md">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <!-- Waypoint Triggers -->
-        <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-mono-tech">
-          <span class="text-[10px] text-[var(--text-muted)] mr-1 uppercase">ATTRAKTOREN:</span>
+        <!-- Waypoint Triggers (Horizontal Snap-Reel on Mobile, clean flex on desktop) -->
+        <div class="flex items-center gap-2 sm:gap-2.5 text-xs font-mono-tech overflow-x-auto no-scrollbar max-w-full py-1">
+          <span class="text-[10px] text-[var(--text-muted)] mr-1 uppercase shrink-0">ATTRAKTOREN:</span>
           
-          <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="arc">
-            01 // ARC-AGI-3
+          <button class="waypoint-btn px-2.5 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shrink-0" data-id="arc">
+            <ProjectIcon id="arc" class="w-3.5 h-3.5 text-emerald-500" />
+            <span>01 // ARC-AGI-3</span>
           </button>
           
-          <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="museum">
-            02 // SHADOW MUSEUM
+          <button class="waypoint-btn px-2.5 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shrink-0" data-id="museum">
+            <ProjectIcon id="museum" class="w-3.5 h-3.5 text-amber-500" />
+            <span>02 // SHADOW MUSEUM</span>
           </button>
           
-          <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="edison">
-            03 // EDISON ENGINE
+          <button class="waypoint-btn px-2.5 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shrink-0" data-id="edison">
+            <ProjectIcon id="edison" class="w-3.5 h-3.5 text-cyan-500" />
+            <span>03 // EDISON ENGINE</span>
           </button>
           
-          <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="lgnn">
-            04 // LIQUID ODE
+          <button class="waypoint-btn px-2.5 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shrink-0" data-id="lgnn">
+            <ProjectIcon id="lgnn" class="w-3.5 h-3.5 text-purple-500" />
+            <span>04 // LIQUID ODE</span>
           </button>
           
-          <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="volt">
-            05 // VOLT GRID
+          <button class="waypoint-btn px-2.5 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shrink-0" data-id="volt">
+            <ProjectIcon id="volt" class="w-3.5 h-3.5 text-amber-400" />
+            <span>05 // VOLT GRID</span>
           </button>
 
-          <button class="waypoint-btn px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer" data-id="audio">
-            06 // AUDIO CORE
+          <button class="waypoint-btn px-2.5 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shrink-0" data-id="audio">
+            <ProjectIcon id="audio" class="w-3.5 h-3.5 text-rose-500" />
+            <span>06 // AUDIO CORE</span>
           </button>
         </div>
 
         <!-- Meta & Links -->
         <div class="flex items-center gap-5 text-[11px] font-mono-tech text-[var(--text-muted)]">
-          <a href="https://github.com/ProphitEngine" target="_blank" rel="noreferrer" class="hover:text-[var(--text-primary)] transition-colors">
+          <a href="https://github.com/aethelnet" target="_blank" rel="noreferrer" class="hover:text-[var(--text-primary)] transition-colors">
             GITHUB ↗
           </a>
           <span>BERLIN // 52.5200° N, 13.4050° E</span>

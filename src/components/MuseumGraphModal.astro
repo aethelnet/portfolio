@@ -1,5 +1,6 @@
 ---
 // MuseumGraphModal.astro - Interactive Force-Directed Provenance Network Graph
+import ProjectIcon from './ProjectIcon.astro';
 ---
 
 <div id="museum-graph-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300 font-mono-tech text-xs select-none">
@@ -8,6 +9,7 @@
     <!-- Modal Header -->
     <div class="px-5 py-3 border-b border-[var(--border-hairline)] bg-[var(--bg-secondary)] flex items-center justify-between">
       <div class="flex items-center gap-3">
+        <ProjectIcon id="museum" class="w-4 h-4 text-amber-500 shrink-0" />
         <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
         <span class="font-bold text-[var(--text-primary)] tracking-wide">SHADOW MUSEUM ATLAS // FORENSISCHER WISSENSGRAPH</span>
         <span class="text-[10px] text-[var(--text-muted)] hidden sm:inline">[FALLSTUDIE: NGONNSO / TIBATI / KUMBO EXPEDITION]</span>
@@ -21,9 +23,9 @@
     </div>
 
     <!-- Main Workspace (Canvas + Node Inspector Panel) -->
-    <div class="relative flex-1 w-full h-full overflow-hidden flex">
+    <div class="relative flex-1 w-full h-full overflow-y-auto md:overflow-hidden flex flex-col md:flex-row">
       <!-- Fullscreen Graph Canvas Stage -->
-      <div class="relative flex-1 h-full bg-[var(--bg-primary)] overflow-hidden">
+      <div class="relative w-full h-72 sm:h-96 md:h-full md:flex-1 shrink-0 bg-[var(--bg-primary)] overflow-hidden">
         <canvas id="museum-canvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
 
         <!-- Canvas HUD & Legend (Bottom-Left) -->
@@ -40,7 +42,7 @@
       </div>
 
       <!-- Node Inspector Sidebar (Collapsible / Dynamic) -->
-      <div id="node-inspector" class="w-80 border-l border-[var(--border-hairline)] bg-[var(--bg-secondary)] p-5 flex flex-col justify-between overflow-y-auto hidden md:flex">
+      <div id="node-inspector" class="w-full md:w-80 border-t md:border-t-0 md:border-l border-[var(--border-hairline)] bg-[var(--bg-secondary)] p-4 sm:p-5 flex flex-col justify-between overflow-y-auto">
         <div class="space-y-4">
           <div class="border-b border-[var(--border-hairline)] pb-2">
             <div class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Entitäts-Inspektor</div>

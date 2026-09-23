@@ -7,16 +7,21 @@
 <aside id="dossier-panel" class="fixed top-0 right-0 bottom-0 w-full max-w-xl bg-[var(--bg-primary)] border-l border-[var(--border-hairline)] z-50 translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between shadow-2xl overflow-y-auto">
   <!-- Dossier Header -->
   <div class="p-6 sm:p-8 border-b border-[var(--border-hairline)] flex items-start justify-between">
-    <div>
-      <div id="dossier-index" class="text-[11px] font-mono-tech uppercase tracking-widest text-[var(--text-muted)]">
-        DOSSIER // 01
+    <div class="flex items-start gap-3.5">
+      <div id="dossier-icon" class="w-10 h-10 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] flex items-center justify-center p-2 text-[var(--text-primary)] shrink-0 mt-0.5 shadow-sm">
+        <!-- Dynamically injected ProjectIcon -->
       </div>
-      <h2 id="dossier-title" class="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)] mt-1">
-        ARC-AGI-3 Solver
-      </h2>
-      <p id="dossier-sub" class="text-xs font-editorial text-[var(--text-secondary)] mt-1 text-base">
-        Autonomous Causal Graph Search & Fluid Intelligence
-      </p>
+      <div>
+        <div id="dossier-index" class="text-[11px] font-mono-tech uppercase tracking-widest text-[var(--text-muted)]">
+          DOSSIER // 01
+        </div>
+        <h2 id="dossier-title" class="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)] mt-0.5">
+          ARC-AGI-3 Solver
+        </h2>
+        <p id="dossier-sub" class="text-xs font-editorial text-[var(--text-secondary)] mt-1 text-base">
+          Autonomous Causal Graph Search & Fluid Intelligence
+        </p>
+      </div>
     </div>
     <button id="dossier-close-btn" class="px-3 py-1.5 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-xs font-mono-tech text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all">
       [ESC // SCHLIESSEN]
@@ -99,8 +104,8 @@
         'Die Konsole bietet einen dualen Modus: Über die integrierte WebSocket-Bridge streamt der echte Python-Solver (SovereignARC3Agent) seine Aktionen und kausalen Inferenzen Schritt für Schritt live in den Browser; offline steht ein forensischer Trajektorien-Scrubber zur Verfügung.',
         'Läuft vollständig offline innerhalb des 12-stündigen Kaggle-Budgets ohne Internetzugriff.'
       ],
-      link: 'https://github.com/ProphitEngine',
-      linkLabel: 'ARC-3 KERNEL AUDIT'
+      link: 'https://github.com/aethelnet/arc-solver',
+      linkLabel: 'ARC-3 REPOSITORY ÖFFNEN'
     },
     museum: {
       index: 'DOSSIER // 02 - HUMANITIES & GRAPHS',
@@ -116,8 +121,8 @@
         'Interdisziplinäres Forschungssystem zur visuellen und juristischen Rekonstruktion kolonialer Raubgut-Trajektorien aus dem späten 19. und frühen 20. Jahrhundert.',
         'Verknüpft unvollständige Archiv-Notizen, militärische Tagebücher und Museumsinventare zu einem dynamischen Wissensgraphen. Das System generiert automatisch strukturierte, juristisch belastbare Restitutionsersuchen gemäß Haager Landkriegsordnung (HLKO).'
       ],
-      link: 'https://github.com/ProphitEngine',
-      linkLabel: 'SHADOW MUSEUM ATLAS'
+      link: 'https://echo.aethelburg.network',
+      linkLabel: 'SHADOW MUSEUM LIVE-NODE'
     },
     edison: {
       index: 'DOSSIER // 03 - DETERMINISTIC STATE MACHINE',
@@ -150,8 +155,8 @@
         'Mathematische Implementierung von Liquid Neural Networks (zeitkontinuierliche ODEs mit adaptiver Viskosität tau(u)). Entwickelt für latenzarme Zeitreihenanalyse unter hochgradig nichtstationären Bedingungen.',
         'Das System passt seine interne Gedächtnisabklingzeit dynamisch an: In stabilen Regimen filtert hohe Viskosität Marktrauschen aus; bei Schock-Ereignissen bricht tau(u) zusammen und schaltet blitzschnelle Reflexe frei.'
       ],
-      link: 'https://github.com/ProphitEngine',
-      linkLabel: 'LGNN MATHEMATISCHE SPEZIFIKATION'
+      link: 'https://github.com/aethelnet/aethelnet-node',
+      linkLabel: 'LGNN REPOSITORY ÖFFNEN'
     },
     volt: {
       index: 'DOSSIER // 05 - CYBER-PHYSICAL SYSTEMS',
@@ -168,7 +173,7 @@
         'Das System zerlegt asymmetrische Phasenströme in Echtzeit mittels Fortescue-Transformation in Mit-, Gegen- und Nullsysteme (I₁, I₂, I₀), um Schieflasten und thermische Überlastungen von Neutralleitern prädiktiv zu detektieren.',
         'Die Verifikations-Engine prüft elektrotechnische Betriebsmittel formal gegen parametrische Sicherheitsgrenzwerte (Schutzleiter- und Isolationswiderstände unter dynamischen Leitungslängenzuschlägen) und archiviert manipulationssichere Audit-Trails in einer hochperformanten WAL-Datenbank.'
       ],
-      link: 'http://localhost:8000',
+      link: 'https://volt.aethelburg.network',
       linkLabel: 'VOLTGRID LIVE NODE AUFRUFEN'
     },
     audio: {
@@ -176,17 +181,18 @@
       title: 'Audio Engine Core',
       sub: 'C++20 Real-Time DSP, Lock-Free Streaming & Plugin Delay Compensation',
       metrics: [
-        { label: 'CTest Suite', value: '56 / 56 Passed (100%)' },
+        { label: 'CTest Suite', value: '59 / 59 Passed (100%)' },
         { label: 'Real-Time Safety', value: 'Zero Heap Alloc / Zero Mutex' },
         { label: 'PDC Engine', value: 'Bit-Exakte Phasen-Kompensation' },
         { label: 'Disk Streaming', value: '0.0 ms RAM Pre-Roll & SPSC' }
       ],
       paragraphs: [
         'Eine hochperformante, echtzeitfähige C++20 Digital Signal Processing (DSP) Engine für latenzkritische Workstations und Audio-Server. Garantiert strikt null Heap-Allokationen und null blockierende Mutexes innerhalb des Audio-Render-Callbacks.',
-        'Verfügt über automatische Plugin Delay Compensation (PDC) mittels Ringpuffer-Verzögerungsleitungen zur vollständigen Eliminierung von Phasenauslöschungen sowie kontinuierliches Sample-Accurate Parameter Ramping (Vektorisierte lineare FMA-Interpolation) gegen Klick- und Reißverschluss-Artefakte.',
+        'Verfügt über automatische Plugin Delay Compensation (PDC) mittels Ringpuffer-Verzögerungsleitungen zur vollständigen Eliminierung von Phasenauslöschungen sowie kontinuierliches Sample-Accurate Parameter Ramping (vektorisierte lineare FMA-Interpolation) gegen Klick- und Reißverschluss-Artefakte.',
+        'Integrierte analoge DSP-Emulationen basieren auf den Algorithmen von Chris Johnson (Airwindows) — darunter Baxandall-EQ, ButterComp2, PurestDrive, DeRez2, ClipOnly2 und Interstage — adaptiert für latenzfreie C++20 Vektorarchitektur.',
         'Inklusive asynchroner Disk-Streaming-Engine mit latenzfreiem RAM-Pre-Roll-Header (0.0 ms Ansprechzeit) und lock-freiem SPSC-Ringpuffer-Prefetching sowie einer Golden-Master-Prüfsummensuite zur bit-exakten Verifikation aller Signalpfade.'
       ],
-      link: 'https://github.com/ProphitEngine/audio-engine-core',
+      link: 'https://github.com/aethelnet/audio-engine-core',
       linkLabel: 'C++ AUDIO REPOSITORY ÖFFNEN'
     }
   };
@@ -201,14 +207,25 @@
     const dSub = document.getElementById('dossier-sub');
     const dMetrics = document.getElementById('dossier-metrics');
     const dBody = document.getElementById('dossier-body');
+    const dIcon = document.getElementById('dossier-icon');
     const dLink = document.getElementById('dossier-link') as HTMLAnchorElement | null;
     const interactiveContainer = document.getElementById('dossier-interactive-container');
     const interactiveBtn = document.getElementById('dossier-interactive-btn');
+
+    const ICONS: Record<string, string> = {
+      arc: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-6 h-6 text-emerald-500" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1.5" stroke-width="1.5"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18" stroke-width="0.75" stroke-dasharray="1.5 2" stroke-opacity="0.6"/><rect x="9" y="9" width="6" height="6" fill="currentColor" fill-opacity="0.25" stroke-width="1.5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>`,
+      museum: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-6 h-6 text-amber-500" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="4.5" stroke-width="0.75" stroke-dasharray="2 2" stroke-opacity="0.5"/><path d="M7.8 16.2L10.8 7.8M13.2 7.8L16.2 16.2M8.5 18h7" stroke-width="1.25"/><circle cx="6" cy="18" r="2.5" stroke-width="1.5"/><circle cx="18" cy="18" r="2.5" stroke-width="1.5"/><circle cx="12" cy="6" r="2.5" stroke-width="1.5" fill="currentColor" fill-opacity="0.3"/></svg>`,
+      edison: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-6 h-6 text-cyan-500" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2.5 20.5 7.5 20.5 16.5 12 21.5 3.5 16.5 3.5 7.5" stroke-width="1.5"/><path d="M12 7.5v9M7.5 10l9 4M7.5 14l9-4" stroke-width="0.9" stroke-opacity="0.7"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>`,
+      lgnn: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-6 h-6 text-purple-500" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-width="0.75" stroke-dasharray="2 2" stroke-opacity="0.5"/><path d="M12 3a9 9 0 0 1 8.5 6M20.5 9l-3.5-.5M20.5 9l-1 3.5" stroke-width="1.5"/><path d="M3.5 15a9 9 0 0 0 14.5 3M18 18l-3.5.5M18 18l.5-3.5" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" stroke-width="1.25"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>`,
+      volt: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-6 h-6 text-amber-400" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-width="0.75" stroke-dasharray="2 2" stroke-opacity="0.5"/><path d="M12 12V3.5" stroke-width="1.75"/><path d="M12 12l7.36 4.25" stroke-width="1.75"/><path d="M12 12l-7.36 4.25" stroke-width="1.75"/><circle cx="12" cy="3.5" r="1.5" fill="currentColor"/><circle cx="19.36" cy="16.25" r="1.5" fill="currentColor"/><circle cx="4.64" cy="16.25" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>`,
+      audio: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-6 h-6 text-rose-500" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20" stroke-width="0.75" stroke-dasharray="2 2" stroke-opacity="0.5"/><path d="M2 12c2.5-8 4-8 6.5 0s4 8 6.5 0c2-5 3.5-5 5 0" stroke-width="1.75"/><path d="M3 4.5h18M3 19.5h18" stroke-width="0.75" stroke-opacity="0.4"/><circle cx="8.5" cy="12" r="1.25" fill="currentColor"/><circle cx="15" cy="12" r="1.25" fill="currentColor"/></svg>`
+    };
 
     function open(id: string) {
       const data = DOSSIERS[id];
       if (!data) return;
 
+      if (dIcon && ICONS[id]) dIcon.innerHTML = ICONS[id];
       if (dIndex) dIndex.textContent = data.index;
       if (dTitle) dTitle.textContent = data.title;
       if (dSub) dSub.textContent = data.sub;

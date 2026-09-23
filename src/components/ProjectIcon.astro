@@ -1,0 +1,87 @@
+---
+// ProjectIcon.astro - Architects Desk Brutalist Vector Glyphs for Research Dossiers
+interface Props {
+  id: 'arc' | 'museum' | 'edison' | 'lgnn' | 'volt' | 'audio' | string;
+  class?: string;
+}
+
+const { id, class: className = "w-4 h-4" } = Astro.props;
+---
+
+{id === 'arc' && (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class={className} stroke-linecap="round" stroke-linejoin="round" aria-label="ARC-AGI-3 Grid Icon">
+    <!-- Outer Invariant Frame -->
+    <rect x="3" y="3" width="18" height="18" rx="1.5" stroke-width="1.5" />
+    <!-- Discrete 4x4 Grid -->
+    <path d="M9 3v18M15 3v18M3 9h18M3 15h18" stroke-width="0.75" stroke-dasharray="1.5 2" stroke-opacity="0.6" />
+    <!-- Active Cellular Tesseract -->
+    <rect x="9" y="9" width="6" height="6" fill="currentColor" fill-opacity="0.25" stroke-width="1.5" />
+    <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+  </svg>
+)}
+
+{id === 'museum' && (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class={className} stroke-linecap="round" stroke-linejoin="round" aria-label="Shadow Museum Provenance Graph Icon">
+    <!-- Radial Provenance Horizon -->
+    <circle cx="12" cy="6" r="4.5" stroke-width="0.75" stroke-dasharray="2 2" stroke-opacity="0.5" />
+    <!-- Connecting Spatial Trajectories -->
+    <path d="M7.8 16.2L10.8 7.8M13.2 7.8L16.2 16.2M8.5 18h7" stroke-width="1.25" />
+    <!-- Provenance Origin & Recipient Nodes -->
+    <circle cx="6" cy="18" r="2.5" stroke-width="1.5" />
+    <circle cx="18" cy="18" r="2.5" stroke-width="1.5" />
+    <circle cx="12" cy="6" r="2.5" stroke-width="1.5" fill="currentColor" fill-opacity="0.3" />
+  </svg>
+)}
+
+{id === 'edison' && (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class={className} stroke-linecap="round" stroke-linejoin="round" aria-label="Edison Duel Engine State Machine Icon">
+    <!-- Hexagonal State Lattice -->
+    <polygon points="12 2.5 20.5 7.5 20.5 16.5 12 21.5 3.5 16.5 3.5 7.5" stroke-width="1.5" />
+    <!-- State Priority Dispatch Vectors -->
+    <path d="M12 7.5v9M7.5 10l9 4M7.5 14l9-4" stroke-width="0.9" stroke-opacity="0.7" />
+    <circle cx="12" cy="12" r="2" fill="currentColor" />
+  </svg>
+)}
+
+{id === 'lgnn' && (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class={className} stroke-linecap="round" stroke-linejoin="round" aria-label="Liquid Neural Continuous ODE Icon">
+    <!-- Limit Cycle Guide -->
+    <circle cx="12" cy="12" r="9" stroke-width="0.75" stroke-dasharray="2 2" stroke-opacity="0.5" />
+    <!-- Nonlinear Phase-Space Spiral -->
+    <path d="M12 3a9 9 0 0 1 8.5 6M20.5 9l-3.5-.5M20.5 9l-1 3.5" stroke-width="1.5" />
+    <path d="M3.5 15a9 9 0 0 0 14.5 3M18 18l-3.5.5M18 18l.5-3.5" stroke-width="1.5" />
+    <!-- Equilibrium Attractor Center -->
+    <circle cx="12" cy="12" r="2.5" stroke-width="1.25" />
+    <circle cx="12" cy="12" r="1" fill="currentColor" />
+  </svg>
+)}
+
+{id === 'volt' && (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class={className} stroke-linecap="round" stroke-linejoin="round" aria-label="VoltGrid 3-Phase Symmetrical Phasor Icon">
+    <!-- Unit Circle Reference -->
+    <circle cx="12" cy="12" r="9" stroke-width="0.75" stroke-dasharray="2 2" stroke-opacity="0.5" />
+    <!-- Fortescue Symmetrical Phasors (120 Deg Star: L1, L2, L3) -->
+    <path d="M12 12V3.5" stroke-width="1.75" />
+    <path d="M12 12l7.36 4.25" stroke-width="1.75" />
+    <path d="M12 12l-7.36 4.25" stroke-width="1.75" />
+    <!-- Phase Terminal Indicators -->
+    <circle cx="12" cy="3.5" r="1.5" fill="currentColor" />
+    <circle cx="19.36" cy="16.25" r="1.5" fill="currentColor" />
+    <circle cx="4.64" cy="16.25" r="1.5" fill="currentColor" />
+    <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+  </svg>
+)}
+
+{id === 'audio' && (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class={className} stroke-linecap="round" stroke-linejoin="round" aria-label="Audio Engine Real-Time DSP Waveform Icon">
+    <!-- Zero Crossing Axis -->
+    <path d="M2 12h20" stroke-width="0.75" stroke-dasharray="2 2" stroke-opacity="0.5" />
+    <!-- Continuous Audio Waveform -->
+    <path d="M2 12c2.5-8 4-8 6.5 0s4 8 6.5 0c2-5 3.5-5 5 0" stroke-width="1.75" />
+    <!-- Limiter Ceilings -->
+    <path d="M3 4.5h18M3 19.5h18" stroke-width="0.75" stroke-opacity="0.4" />
+    <!-- Sample Points -->
+    <circle cx="8.5" cy="12" r="1.25" fill="currentColor" />
+    <circle cx="15" cy="12" r="1.25" fill="currentColor" />
+  </svg>
+)}
