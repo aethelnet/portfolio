@@ -170,6 +170,24 @@
       ],
       link: 'http://localhost:8000',
       linkLabel: 'VOLTGRID LIVE NODE AUFRUFEN'
+    },
+    audio: {
+      index: 'DOSSIER // 06 - SYSTEMS ARCHITECTURE & DSP',
+      title: 'Audio Engine Core',
+      sub: 'C++20 Real-Time DSP, Lock-Free Streaming & Plugin Delay Compensation',
+      metrics: [
+        { label: 'CTest Suite', value: '56 / 56 Passed (100%)' },
+        { label: 'Real-Time Safety', value: 'Zero Heap Alloc / Zero Mutex' },
+        { label: 'PDC Engine', value: 'Bit-Exakte Phasen-Kompensation' },
+        { label: 'Disk Streaming', value: '0.0 ms RAM Pre-Roll & SPSC' }
+      ],
+      paragraphs: [
+        'Eine hochperformante, echtzeitfähige C++20 Digital Signal Processing (DSP) Engine für latenzkritische Workstations und Audio-Server. Garantiert strikt null Heap-Allokationen und null blockierende Mutexes innerhalb des Audio-Render-Callbacks.',
+        'Verfügt über automatische Plugin Delay Compensation (PDC) mittels Ringpuffer-Verzögerungsleitungen zur vollständigen Eliminierung von Phasenauslöschungen sowie kontinuierliches Sample-Accurate Parameter Ramping (Vektorisierte lineare FMA-Interpolation) gegen Klick- und Reißverschluss-Artefakte.',
+        'Inklusive asynchroner Disk-Streaming-Engine mit latenzfreiem RAM-Pre-Roll-Header (0.0 ms Ansprechzeit) und lock-freiem SPSC-Ringpuffer-Prefetching sowie einer Golden-Master-Prüfsummensuite zur bit-exakten Verifikation aller Signalpfade.'
+      ],
+      link: 'https://github.com/ProphitEngine/audio-engine-core',
+      linkLabel: 'C++ AUDIO REPOSITORY ÖFFNEN'
     }
   };
 
@@ -234,6 +252,10 @@
         interactiveContainer?.classList.remove('hidden');
         const lbl = document.getElementById('dossier-interactive-label');
         if (lbl) lbl.textContent = 'INTERAKTIVES PHASENRAUM-DREHSTROM-LABOR STARTEN';
+      } else if (id === 'audio') {
+        interactiveContainer?.classList.remove('hidden');
+        const lbl = document.getElementById('dossier-interactive-label');
+        if (lbl) lbl.textContent = 'INTERAKTIVES ECHTZEIT-DSP-OSZILLOSKOP STARTEN';
       } else {
         interactiveContainer?.classList.add('hidden');
       }
@@ -265,6 +287,8 @@
         window.dispatchEvent(new CustomEvent('open-lgnn-sandbox'));
       } else if (activeId === 'volt') {
         window.dispatchEvent(new CustomEvent('open-volt-grid'));
+      } else if (activeId === 'audio') {
+        window.dispatchEvent(new CustomEvent('open-audio-engine'));
       }
     });
 

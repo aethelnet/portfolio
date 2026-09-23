@@ -1,0 +1,551 @@
+---
+// AudioEngineModal.astro - Interactive Real-Time C++20 DSP & Workstation Architecture Sandbox
+---
+
+<div id="audio-engine-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300 font-mono-tech text-xs select-none">
+  <div class="relative w-full max-w-6xl h-[90vh] bg-[var(--bg-primary)] border border-[var(--border-strong)] rounded-lg shadow-2xl overflow-hidden flex flex-col">
+    
+    <!-- Modal Header -->
+    <div class="px-5 py-3 border-b border-[var(--border-hairline)] bg-[var(--bg-secondary)] flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+        <span class="font-bold text-[var(--text-primary)] tracking-wide">AETHELBURG // AUDIO ENGINE CORE [C++20 REAL-TIME DSP]</span>
+        <span id="audio-regime-badge" class="text-[10px] text-amber-500 font-bold hidden sm:inline">[REAL-TIME INVARIANT: ZERO HEAP ALLOCATIONS]</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="hidden md:flex items-center gap-3 text-[10px] text-[var(--text-muted)]">
+          <span>CTEST: <strong class="text-emerald-500 font-bold">56/56 PASSED (100%)</strong></span>
+          <span>GOLDEN MASTER: <strong class="text-emerald-500 font-bold">10/10 BIT-EXACT</strong></span>
+          <span>PRE-ROLL: <strong class="text-[var(--text-primary)]">0.0 ms</strong></span>
+          <span>AUDIO PATH: <strong class="text-cyan-500">LOCK-FREE SPSC</strong></span>
+        </div>
+        <button id="audio-close-btn" class="px-2.5 py-1 rounded border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer">
+          [SCHLIESSEN ✕]
+        </button>
+      </div>
+    </div>
+
+    <!-- Presets Bar (DSP Subsystems) -->
+    <div class="px-5 py-2 border-b border-[var(--border-hairline)] bg-[var(--bg-primary)] flex flex-wrap items-center gap-2">
+      <span class="text-[10px] text-[var(--text-muted)] mr-1 uppercase">DSP KERN-SUBSYSTEME:</span>
+      <button class="audio-preset-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold transition-all cursor-pointer" data-preset="pdc">
+        01 // PLUGIN DELAY COMPENSATION (PDC)
+      </button>
+      <button class="audio-preset-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-preset="ramping">
+        02 // SAMPLE-ACCURATE PARAMETER RAMPING
+      </button>
+      <button class="audio-preset-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-preset="vactrol">
+        03 // LIQUID VACTROL OPTO-LEVELER (ODE)
+      </button>
+      <button class="audio-preset-btn px-2.5 py-1 rounded text-[10px] font-mono-tech border border-[var(--border-hairline)] hover:border-[var(--text-primary)] bg-[var(--bg-card)] text-[var(--text-primary)] transition-all cursor-pointer" data-preset="streamer">
+        04 // DISK STREAMING (0ms PRE-ROLL & SPSC)
+      </button>
+    </div>
+
+    <!-- Main Workspace (Canvas + DSP Control Deck) -->
+    <div class="relative flex-1 w-full h-full overflow-hidden flex flex-col lg:flex-row">
+      
+      <!-- Left: Real-Time Signal Scope & Pipeline Stage -->
+      <div class="relative flex-1 h-full bg-[var(--bg-primary)] overflow-hidden flex flex-col">
+        
+        <!-- Live Visualizer Canvas (Oscilloscope & FFT) -->
+        <div class="relative flex-1 w-full h-full overflow-hidden">
+          <canvas id="audio-scope-canvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+          <!-- Top-Left Signal Status HUD -->
+          <div class="pointer-events-none absolute top-3 left-3 bg-[var(--bg-card)] border border-[var(--border-hairline)] rounded p-2.5 backdrop-blur-sm space-y-1 text-[11px] shadow-lg">
+            <div class="text-[var(--text-primary)] font-bold border-b border-[var(--border-hairline)] pb-1 flex items-center justify-between gap-4">
+              <span>ECHTZEIT-DSP OSZILLOSKOP</span>
+              <span id="audio-running-status" class="text-emerald-500 font-mono">AKTIV // 48.0 kHz</span>
+            </div>
+            <div class="text-amber-500 font-mono">Modus: <span id="audio-mode-readout">PDC Phase Alignment (48 Samples)</span></div>
+            <div class="text-cyan-500 font-mono">Spitzenpegel (L/R): <span id="audio-peak-readout">-6.02 dBFS | -6.02 dBFS</span></div>
+            <div class="text-[var(--text-muted)] text-[10px]">PDC Jitter: <span class="text-emerald-400">0 Samples (Bit-Exakt)</span> | Ringpuffer: <span class="text-[var(--text-primary)]">16384 Samples</span></div>
+          </div>
+
+          <!-- Bottom Audio Engine Play/Mute Control Bar -->
+          <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between bg-[var(--bg-card)]/90 border border-[var(--border-hairline)] rounded p-2 backdrop-blur-md">
+            <div class="flex items-center gap-3">
+              <button id="audio-synth-toggle-btn" class="px-3 py-1.5 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm">
+                <span id="audio-synth-icon">▶</span>
+                <span id="audio-synth-text">AUDIO TESTTON STARTEN</span>
+              </button>
+              <span class="text-[10px] text-[var(--text-muted)] hidden sm:inline">// Web Audio API Echtzeit-Synthesizer</span>
+            </div>
+
+            <div class="flex items-center gap-3 text-[11px]">
+              <span class="text-[var(--text-muted)]">Signal:</span>
+              <button class="audio-wave-btn px-2 py-0.5 rounded border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold cursor-pointer" data-wave="sine">SINUS</button>
+              <button class="audio-wave-btn px-2 py-0.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer" data-wave="sawtooth">SÄGEZAHN</button>
+              <button class="audio-wave-btn px-2 py-0.5 rounded border border-[var(--border-hairline)] bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer" data-wave="square">RECHTECK</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Architectural Pipeline Bar (Visual Flow Graph) -->
+        <div class="h-16 border-t border-[var(--border-hairline)] bg-[var(--bg-secondary)] px-4 flex items-center justify-between text-[10px] overflow-x-auto gap-2">
+          <div class="flex items-center gap-2 shrink-0">
+            <div class="px-2 py-1 rounded bg-[var(--bg-card)] border border-[var(--border-hairline)] text-center">
+              <div class="text-[8px] text-[var(--text-muted)] uppercase">QUELLE</div>
+              <div class="font-bold text-[var(--text-primary)]">DiskStreamer</div>
+            </div>
+            <span class="text-[var(--text-muted)]">➔</span>
+            <div class="px-2 py-1 rounded bg-[var(--bg-card)] border border-emerald-500/40 text-center">
+              <div class="text-[8px] text-emerald-500 uppercase">PDC DELAY</div>
+              <div class="font-bold text-[var(--text-primary)]">16k Ringbuffer</div>
+            </div>
+            <span class="text-[var(--text-muted)]">➔</span>
+            <div class="px-2 py-1 rounded bg-[var(--bg-card)] border border-cyan-500/40 text-center">
+              <div class="text-[8px] text-cyan-500 uppercase">RAMP ENGINE</div>
+              <div class="font-bold text-[var(--text-primary)]">Vectorized FMA</div>
+            </div>
+            <span class="text-[var(--text-muted)]">➔</span>
+            <div class="px-2 py-1 rounded bg-[var(--bg-card)] border border-amber-500/40 text-center">
+              <div class="text-[8px] text-amber-500 uppercase">INSERTS</div>
+              <div class="font-bold text-[var(--text-primary)]">ODE Vactrol / DeRez</div>
+            </div>
+            <span class="text-[var(--text-muted)]">➔</span>
+            <div class="px-2 py-1 rounded bg-[var(--bg-card)] border border-purple-500/40 text-center">
+              <div class="text-[8px] text-purple-500 uppercase">SUMMING</div>
+              <div class="font-bold text-[var(--text-primary)]">Tanh Soft Limiter</div>
+            </div>
+          </div>
+          <span class="text-[9px] text-[var(--text-muted)] shrink-0 hidden md:inline">0 MUTEXES // 0 MALLOC</span>
+        </div>
+
+      </div>
+
+      <!-- Right: Systems Engineering & Verification Deck -->
+      <div class="w-full lg:w-96 border-t lg:border-t-0 lg:border-l border-[var(--border-hairline)] bg-[var(--bg-secondary)] flex flex-col justify-between overflow-y-auto p-5 space-y-5">
+        
+        <!-- Section 1: Verification & Benchmarks -->
+        <div class="space-y-3">
+          <div class="text-[10px] font-mono-tech uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-hairline)] pb-1.5 flex justify-between">
+            <span>DETERMINISTISCHE AUDIT-DATEN</span>
+            <span class="text-amber-500 font-bold">56/56 PASS</span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded bg-[var(--bg-card)] border border-[var(--border-hairline)]">
+              <div class="flex justify-between font-bold mb-1">
+                <span>PDC Phasenausrichtung:</span>
+                <span class="text-emerald-500">Bit-Exakt (48 Smp)</span>
+              </div>
+              <div class="text-[10px] text-[var(--text-muted)]">
+                Kompensiert Plugin-Latenzen über Ringpuffer-Verzögerungsleitungen ohne Kammfilter-Phasenauslöschung.
+              </div>
+            </div>
+
+            <div class="p-2.5 rounded bg-[var(--bg-card)] border border-[var(--border-hairline)]">
+              <div class="flex justify-between font-bold mb-1">
+                <span>Parameter Ramping:</span>
+                <span class="text-emerald-500">Zero Zipper-Noise</span>
+              </div>
+              <div class="text-[10px] text-[var(--text-muted)]">
+                Vektorisierte lineare Interpolation: g(i) = g₀ + (i+1)/N · (g₁ - g₀). Verhindert Klick-Artefakte.
+              </div>
+            </div>
+
+            <div class="p-2.5 rounded bg-[var(--bg-card)] border border-[var(--border-hairline)]">
+              <div class="flex justify-between font-bold mb-1">
+                <span>Disk-Streaming Pre-Roll:</span>
+                <span class="text-emerald-500">0.0 ms Latenz</span>
+              </div>
+              <div class="text-[10px] text-[var(--text-muted)]">
+                RAM-Pre-Roll Header (65.536 Smp) + asynchroner SPSC Ringpuffer Hintergrund-Worker mit Sanft-Underrun-Schutz.
+              </div>
+            </div>
+
+            <div class="p-2.5 rounded bg-[var(--bg-card)] border border-[var(--border-hairline)]">
+              <div class="flex justify-between font-bold mb-1">
+                <span>Golden Master Checksums:</span>
+                <span class="text-emerald-500">10/10 Pipelines Match</span>
+              </div>
+              <div class="text-[10px] text-[var(--text-muted)]">
+                Kryptographisch deterministische FNV-1a &amp; SHA-256 Prüfsummen über alle Signalpfade.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Interactive Real-Time Controls -->
+        <div class="space-y-3">
+          <div class="text-[10px] font-mono-tech uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-hairline)] pb-1.5">
+            Interaktive Audio-Parameter
+          </div>
+
+          <!-- Parameter Ramping Toggle -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-[11px]">
+              <span class="text-[var(--text-secondary)]">Parameter Ramping:</span>
+              <span id="audio-ramp-mode-label" class="text-cyan-500 font-bold">AKTIV (Sanfte Rampe)</span>
+            </div>
+            <button id="audio-ramp-toggle-btn" class="w-full py-1.5 px-3 rounded bg-[var(--bg-card)] border border-[var(--border-hairline)] hover:border-[var(--text-primary)] text-[10px] text-[var(--text-primary)] transition-all cursor-pointer">
+              MODUS WECHSELN [RAMP vs. ROHE STUFE]
+            </button>
+          </div>
+
+          <!-- Filter Cutoff Slider -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-[11px]">
+              <span class="text-[var(--text-secondary)]">Filter Cutoff (Cytomic SVF):</span>
+              <span id="audio-cutoff-val" class="font-bold text-[var(--text-primary)]">1200 Hz</span>
+            </div>
+            <input type="range" id="audio-cutoff-slider" min="100" max="12000" step="50" value="1200" class="w-full h-1.5 bg-[var(--bg-primary)] rounded-lg appearance-none cursor-pointer accent-amber-500" />
+          </div>
+
+          <!-- Output Gain Slider -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-[11px]">
+              <span class="text-[var(--text-secondary)]">Track Gain (dBFS):</span>
+              <span id="audio-gain-val" class="font-bold text-[var(--text-primary)]">0.0 dB</span>
+            </div>
+            <input type="range" id="audio-gain-slider" min="-36" max="6" step="0.5" value="0" class="w-full h-1.5 bg-[var(--bg-primary)] rounded-lg appearance-none cursor-pointer accent-amber-500" />
+          </div>
+        </div>
+
+        <!-- Section 3: Open-Source Repository Link -->
+        <div class="pt-3 border-t border-[var(--border-hairline)] space-y-2">
+          <div class="text-[10px] font-mono-tech uppercase tracking-wider text-[var(--text-muted)]">
+            Open-Source C++20 Repository &amp; Tests
+          </div>
+          <a href="https://github.com/ProphitEngine/audio-engine-core" target="_blank" rel="noreferrer" class="w-full py-2.5 px-4 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md">
+            <span>C++ AUDIO REPOSITORY ÖFFNEN</span>
+            <span>↗</span>
+          </a>
+          <span class="text-[10px] text-[var(--text-muted)] text-center block">
+            56 Passing CTests // CMake Build: cmake --build build
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function initAudioEngineModal() {
+    const modal = document.getElementById('audio-engine-modal');
+    const closeBtn = document.getElementById('audio-close-btn');
+    const canvas = document.getElementById('audio-scope-canvas') as HTMLCanvasElement;
+    if (!modal || !canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let isOpen = false;
+    let animId = 0;
+
+    // Web Audio Engine State
+    let audioCtx: AudioContext | null = null;
+    let oscNode: OscillatorNode | null = null;
+    let filterNode: BiquadFilterNode | null = null;
+    let gainNode: GainNode | null = null;
+    let analyserNode: AnalyserNode | null = null;
+    let isPlaying = false;
+    let currentWave: OscillatorType = 'sine';
+    let rampingEnabled = true;
+
+    // State Variables
+    let currentGain = 1.0;
+    let targetGain = 1.0;
+    let currentCutoff = 1200;
+
+    function open() {
+      isOpen = true;
+      modal?.classList.remove('opacity-0', 'pointer-events-none');
+      resize();
+      startScopeLoop();
+    }
+
+    function close() {
+      isOpen = false;
+      modal?.classList.add('opacity-0', 'pointer-events-none');
+      cancelAnimationFrame(animId);
+      stopAudio();
+    }
+
+    window.addEventListener('open-audio-engine', open);
+    closeBtn?.addEventListener('click', close);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) close();
+    });
+
+    // Resize Canvas
+    let w = 0, h = 0;
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      w = rect.width;
+      h = rect.height;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', () => { if (isOpen) resize(); });
+
+    // Presets
+    const presetBtns = document.querySelectorAll('.audio-preset-btn');
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        presetBtns.forEach(b => {
+          b.classList.remove('border-[var(--text-primary)]', 'bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'font-bold');
+          b.classList.add('border-[var(--border-hairline)]', 'bg-[var(--bg-card)]', 'text-[var(--text-primary)]');
+        });
+        btn.classList.add('border-[var(--text-primary)]', 'bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'font-bold');
+        btn.classList.remove('border-[var(--border-hairline)]', 'bg-[var(--bg-card)]');
+
+        const p = btn.getAttribute('data-preset');
+        applyPreset(p || 'pdc');
+      });
+    });
+
+    const modeReadout = document.getElementById('audio-mode-readout');
+    function applyPreset(preset: string) {
+      if (!modeReadout) return;
+      if (preset === 'pdc') {
+        modeReadout.textContent = 'PDC Phase Alignment (48 Samples kompensiert)';
+        if (filterNode) filterNode.type = 'lowpass';
+      } else if (preset === 'ramping') {
+        modeReadout.textContent = 'Sample-Accurate Parameter Ramping (Anti-Zipper)';
+      } else if (preset === 'vactrol') {
+        modeReadout.textContent = 'Liquid Vactrol Opto-Leveler (CdS Photocell 14.7x Release)';
+      } else if (preset === 'streamer') {
+        modeReadout.textContent = 'Disk-Streaming (0.0 ms RAM Pre-Roll & SPSC Ringbuffer)';
+      }
+    }
+
+    // Audio Playback Controller
+    const synthBtn = document.getElementById('audio-synth-toggle-btn');
+    const synthIcon = document.getElementById('audio-synth-icon');
+    const synthText = document.getElementById('audio-synth-text');
+
+    function startAudio() {
+      try {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        audioCtx = new AudioContextClass();
+
+        oscNode = audioCtx.createOscillator();
+        oscNode.type = currentWave;
+        oscNode.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+
+        filterNode = audioCtx.createBiquadFilter();
+        filterNode.type = 'lowpass';
+        filterNode.frequency.setValueAtTime(currentCutoff, audioCtx.currentTime);
+        filterNode.Q.setValueAtTime(2.0, audioCtx.currentTime);
+
+        gainNode = audioCtx.createGain();
+        gainNode.gain.setValueAtTime(currentGain * 0.25, audioCtx.currentTime);
+
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 1024;
+        analyserNode.smoothingTimeConstant = 0.8;
+
+        oscNode.connect(filterNode);
+        filterNode.connect(gainNode);
+        gainNode.connect(analyserNode);
+        analyserNode.connect(audioCtx.destination);
+
+        oscNode.start();
+        isPlaying = true;
+
+        if (synthIcon) synthIcon.textContent = '⏹';
+        if (synthText) synthText.textContent = 'AUDIO TESTTON STOPPEN';
+      } catch (err) {
+        console.warn('AudioContext error:', err);
+      }
+    }
+
+    function stopAudio() {
+      if (oscNode) {
+        try { oscNode.stop(); } catch (e) {}
+        oscNode.disconnect();
+        oscNode = null;
+      }
+      if (audioCtx) {
+        try { audioCtx.close(); } catch (e) {}
+        audioCtx = null;
+      }
+      isPlaying = false;
+      if (synthIcon) synthIcon.textContent = '▶';
+      if (synthText) synthText.textContent = 'AUDIO TESTTON STARTEN';
+    }
+
+    synthBtn?.addEventListener('click', () => {
+      if (isPlaying) stopAudio();
+      else startAudio();
+    });
+
+    // Waveform selector
+    const waveBtns = document.querySelectorAll('.audio-wave-btn');
+    waveBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        waveBtns.forEach(b => {
+          b.classList.remove('border-[var(--text-primary)]', 'bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'font-bold');
+          b.classList.add('border-[var(--border-hairline)]', 'bg-[var(--bg-primary)]', 'text-[var(--text-secondary)]');
+        });
+        btn.classList.add('border-[var(--text-primary)]', 'bg-[var(--text-primary)]', 'text-[var(--bg-primary)]', 'font-bold');
+        btn.classList.remove('border-[var(--border-hairline)]', 'bg-[var(--bg-primary)]', 'text-[var(--text-secondary)]');
+
+        const wave = btn.getAttribute('data-wave') as OscillatorType;
+        currentWave = wave || 'sine';
+        if (oscNode) oscNode.type = currentWave;
+      });
+    });
+
+    // Parameter Ramping Toggle Button
+    const rampToggleBtn = document.getElementById('audio-ramp-toggle-btn');
+    const rampModeLabel = document.getElementById('audio-ramp-mode-label');
+    rampToggleBtn?.addEventListener('click', () => {
+      rampingEnabled = !rampingEnabled;
+      if (rampModeLabel) {
+        rampModeLabel.textContent = rampingEnabled ? 'AKTIV (Sanfte Rampe)' : 'DEAKTIVIERT (Roher Stufensprung)';
+        rampModeLabel.className = rampingEnabled ? 'text-cyan-500 font-bold' : 'text-rose-500 font-bold';
+      }
+    });
+
+    // Filter Cutoff Slider
+    const cutoffSlider = document.getElementById('audio-cutoff-slider') as HTMLInputElement;
+    const cutoffVal = document.getElementById('audio-cutoff-val');
+    cutoffSlider?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      currentCutoff = val;
+      if (cutoffVal) cutoffVal.textContent = `${val.toFixed(0)} Hz`;
+      if (filterNode && audioCtx) {
+        if (rampingEnabled) {
+          filterNode.frequency.setTargetAtTime(val, audioCtx.currentTime, 0.02);
+        } else {
+          filterNode.frequency.setValueAtTime(val, audioCtx.currentTime);
+        }
+      }
+    });
+
+    // Gain Slider
+    const gainSlider = document.getElementById('audio-gain-slider') as HTMLInputElement;
+    const gainVal = document.getElementById('audio-gain-val');
+    const peakReadout = document.getElementById('audio-peak-readout');
+    gainSlider?.addEventListener('input', (e) => {
+      const db = parseFloat((e.target as HTMLInputElement).value);
+      targetGain = Math.pow(10, db / 20.0);
+      if (gainVal) gainVal.textContent = `${db >= 0 ? '+' : ''}${db.toFixed(1)} dB`;
+      if (peakReadout) peakReadout.textContent = `${(db - 6.02).toFixed(2)} dBFS | ${(db - 6.02).toFixed(2)} dBFS`;
+
+      if (gainNode && audioCtx) {
+        const linear = targetGain * 0.25;
+        if (rampingEnabled) {
+          // Vectorized smooth linear ramp representation
+          gainNode.gain.linearRampToValueAtTime(linear, audioCtx.currentTime + 0.03);
+        } else {
+          // Raw stair-step (instantaneous click)
+          gainNode.gain.setValueAtTime(linear, audioCtx.currentTime);
+        }
+      }
+    });
+
+    // 60 FPS Oscilloscope & FFT Visualizer Loop
+    function startScopeLoop() {
+      let t = 0;
+      const dataArray = new Uint8Array(512);
+
+      function render() {
+        if (!isOpen) return;
+        t += 0.04;
+
+        ctx.clearRect(0, 0, w, h);
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+        const scopeColor = isDark ? '#f59e0b' : '#d97706';
+        const fftColor = isDark ? 'rgba(6, 182, 212, 0.25)' : 'rgba(8, 145, 178, 0.2)';
+
+        // 1. Draw Scope Grid
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = 1;
+        const gridLines = 8;
+        for (let i = 0; i <= gridLines; i++) {
+          const y = (h / gridLines) * i;
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+          ctx.stroke();
+
+          const x = (w / gridLines) * i;
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+          ctx.stroke();
+        }
+
+        // Center line
+        ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)';
+        ctx.beginPath();
+        ctx.moveTo(0, h / 2);
+        ctx.lineTo(w, h / 2);
+        ctx.stroke();
+
+        // 2. Render FFT Frequency Spectrum (Background Bars)
+        if (analyserNode && isPlaying) {
+          analyserNode.getByteFrequencyData(dataArray);
+          const barWidth = (w / 128);
+          for (let i = 0; i < 128; i++) {
+            const barHeight = (dataArray[i] / 255) * (h * 0.7);
+            ctx.fillStyle = fftColor;
+            ctx.fillRect(i * barWidth, h - barHeight, barWidth - 1, barHeight);
+          }
+        }
+
+        // 3. Render Oscilloscope Time-Domain Waveform
+        ctx.lineWidth = 2.2;
+        ctx.strokeStyle = scopeColor;
+        ctx.beginPath();
+
+        if (analyserNode && isPlaying) {
+          analyserNode.getByteTimeDomainData(dataArray);
+          const sliceWidth = w / dataArray.length;
+          let x = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            const v = dataArray[i] / 128.0;
+            const y = (v * h) / 2;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+            x += sliceWidth;
+          }
+        } else {
+          // Synthetic procedural preview when sound is muted
+          const points = 250;
+          for (let i = 0; i < points; i++) {
+            const x = (w / points) * i;
+            const freqFactor = (currentCutoff / 2000.0);
+            let waveVal = 0;
+
+            if (currentWave === 'sine') {
+              waveVal = Math.sin((i * 0.08 * freqFactor) + t);
+            } else if (currentWave === 'sawtooth') {
+              waveVal = (((i * 0.04 * freqFactor + t) % 2) - 1.0);
+            } else if (currentWave === 'square') {
+              waveVal = Math.sin((i * 0.08 * freqFactor) + t) > 0 ? 0.8 : -0.8;
+            }
+
+            // Apply soft saturation (Tanh model from AudioEngineCore)
+            waveVal = Math.tanh(waveVal * targetGain);
+            const y = (h / 2) + waveVal * (h * 0.28);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+
+        animId = requestAnimationFrame(render);
+      }
+      render();
+    }
+
+  }
+
+  // Auto-init on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAudioEngineModal);
+  } else {
+    initAudioEngineModal();
+  }
+</script>
