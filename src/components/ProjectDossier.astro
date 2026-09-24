@@ -58,15 +58,23 @@
       </button>
     </div>
 
-    <!-- Repository & Verification Link -->
-    <div class="pt-4 border-t border-[var(--border-hairline)]">
-      <div class="text-[10px] font-mono-tech uppercase tracking-wider text-[var(--text-muted)] mb-2">
-        Verifikation & Codebasis
+    <!-- Verification & Deployment Links: Dual Action Buttons -->
+    <div class="pt-4 border-t border-[var(--border-hairline)] space-y-2">
+      <div class="text-[10px] font-mono-tech uppercase tracking-wider text-[var(--text-muted)]">
+        Verifikation &amp; Deployment
       </div>
-      <a id="dossier-link" href="#" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 rounded bg-[var(--text-primary)] text-[var(--bg-primary)] font-mono-tech text-xs font-bold hover:opacity-90 transition-opacity">
-        <span>CODE-AUDIT ÖFFNEN</span>
-        <span>↗</span>
-      </a>
+      <div class="flex flex-col sm:flex-row items-stretch gap-2.5">
+        <!-- Live System Link (Primary) -->
+        <a id="dossier-live-link" href="#" target="_blank" rel="noreferrer" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[var(--text-primary)] text-[var(--bg-primary)] font-mono-tech text-xs font-bold hover:opacity-90 transition-opacity text-center shadow-xs">
+          <span id="dossier-live-label">LIVE DEPLOYMENT</span>
+          <span>↗</span>
+        </a>
+        <!-- GitHub Repo Link (Secondary / Code Audit) -->
+        <a id="dossier-repo-link" href="#" target="_blank" rel="noreferrer" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded border border-[var(--border-strong)] bg-[var(--bg-card)] hover:border-[var(--text-primary)] text-[var(--text-primary)] font-mono-tech text-xs font-bold transition-all text-center shadow-xs">
+          <span id="dossier-repo-label">GITHUB REPO</span>
+          <span>↗</span>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -84,8 +92,10 @@
     sub: string;
     metrics: { label: string; value: string }[];
     paragraphs: string[];
-    link: string;
-    linkLabel: string;
+    liveLink?: string | null;
+    liveLabel?: string;
+    repoLink: string;
+    repoLabel?: string;
   }
 
   const DOSSIERS: Record<string, DossierData> = {
@@ -104,8 +114,10 @@
         'Die Konsole bietet einen dualen Modus: Über die integrierte WebSocket-Bridge streamt der echte Python-Solver (SovereignARC3Agent) seine Aktionen und kausalen Inferenzen Schritt für Schritt live in den Browser; offline steht ein forensischer Trajektorien-Scrubber zur Verfügung.',
         'Läuft vollständig offline innerhalb des 12-stündigen Kaggle-Budgets ohne Internetzugriff.'
       ],
-      link: 'https://github.com/aethelnet/arc-solver',
-      linkLabel: 'ARC-3 REPOSITORY ÖFFNEN'
+      liveLink: 'https://www.kaggle.com/competitions/arc-prize-2026',
+      liveLabel: 'KAGGLE ENVIRONMENT',
+      repoLink: 'https://github.com/aethelnet/arc-solver',
+      repoLabel: 'ARC-3 REPOSITORY'
     },
     museum: {
       index: 'DOSSIER // 02 - FORENSIC MULTIGRAPH & RESTITUTION',
@@ -122,8 +134,10 @@
         'Verknüpft Primärquellen, Archiv-Inventare und Expeditionsberichte in einem kontinuierlich gewichteten Multigraphen. Ein epistemischer 4-Stufen-Evaluator löst Widersprüche mathematisch auf (Tier 1 Primärarchive vs. Tier 4 Museumsnarrative) und emittiert strukturierte ActionEvents bei Deadlocks.',
         'Dossier-Abschlüsse werden deterministisch als Merkle-Root gehasht und über das Aethelnet-Substrat via gasless Account Abstraction (ERC-4337 Paymaster) manipulationssicher on-chain notarisiert.'
       ],
-      link: 'https://echo.aethelburg.network',
-      linkLabel: 'PROJECT ECHO LIVE-ATLAS ÖFFNEN'
+      liveLink: 'https://echo.aethelburg.network',
+      liveLabel: 'PROJECT ECHO ATLAS',
+      repoLink: 'https://github.com/aethelnet/project-echo',
+      repoLabel: 'MULTIGRAPH REPO'
     },
     edison: {
       index: 'DOSSIER // 03 - DETERMINISTIC STATE MACHINE',
@@ -139,8 +153,10 @@
         'Vollständige Produktionsplattform für Yu-Gi-Oh Edison-Format-Turniere mit echter Game-State-Verifikation im Browser. Ausgestattet mit Pre-Flight-Banlist-Gates, automatischer Runden-Sirene und KDE-Tiebreaker-Automation (Turns 0–3).',
         'Inklusive Standalone Edge-Launcher (scripts/launch_store_locals.sh) für lokale Store-Turniere ohne Internetabhängigkeit und Cloud-Delta-Sync zum Hauptnetzwerk.'
       ],
-      link: 'https://play.aethelburg.network',
-      linkLabel: 'LIVE-SYSTEM AUFRUFEN'
+      liveLink: 'https://play.aethelburg.network',
+      liveLabel: 'DUEL SIMULATOR',
+      repoLink: 'https://github.com/aethelnet/edison-engine',
+      repoLabel: 'WASM ENGINE REPO'
     },
     lgnn: {
       index: 'DOSSIER // 04 - DYNAMICAL SYSTEMS',
@@ -156,8 +172,10 @@
         'Mathematische Implementierung von Liquid Neural Networks (zeitkontinuierliche ODEs mit adaptiver Viskosität tau(u)). Entwickelt für latenzarme Zeitreihenanalyse und dynamische Zustandsschätzung unter hochgradig nichtstationären Bedingungen.',
         'Das System fungiert als Inferenzkern für Aethelnet-Knoten und passt seine Gedächtnisabklingzeit kontinuierlich an: In stabilen Phasen filtert Trägheit Rauschen heraus; bei Phasenübergängen und Schocks bricht tau(u) zusammen und triggert sofortige Reaktionsdynamik.'
       ],
-      link: 'https://aethelburg.network',
-      linkLabel: 'LGNN NEURAL MANIFOLD ÖFFNEN'
+      liveLink: 'https://aethelburg.network',
+      liveLabel: 'NEURAL MANIFOLD',
+      repoLink: 'https://github.com/aethelnet/aethelnet-node',
+      repoLabel: 'LGNN NODE REPO'
     },
     volt: {
       index: 'DOSSIER // 05 - CYBER-PHYSICAL SYSTEMS',
@@ -174,8 +192,10 @@
         'Das System zerlegt asymmetrische Phasenströme in Echtzeit mittels Fortescue-Transformation in Mit-, Gegen- und Nullsysteme (I₁, I₂, I₀), um Schieflasten und thermische Überlastungen von Neutralleitern prädiktiv zu detektieren.',
         'Die Verifikations-Engine prüft elektrotechnische Betriebsmittel formal gegen parametrische Sicherheitsgrenzwerte (Schutzleiter- und Isolationswiderstände unter dynamischen Leitungslängenzuschlägen) und archiviert manipulationssichere Audit-Trails in einer hochperformanten WAL-Datenbank.'
       ],
-      link: 'https://volt.aethelburg.network',
-      linkLabel: 'VOLTGRID LIVE NODE AUFRUFEN'
+      liveLink: 'https://volt.aethelburg.network',
+      liveLabel: 'VOLTGRID STUDIO',
+      repoLink: 'https://github.com/aethelnet/volt-grid',
+      repoLabel: 'VOLTGRID REPO'
     },
     audio: {
       index: 'DOSSIER // 06 - SYSTEMS ARCHITECTURE & DSP',
@@ -193,8 +213,9 @@
         'Integrierte analoge DSP-Emulationen basieren auf den Algorithmen von Chris Johnson (Airwindows) — darunter Baxandall-EQ, ButterComp2, PurestDrive, DeRez2, ClipOnly2 und Interstage — adaptiert für latenzfreie C++20 Vektorarchitektur.',
         'Inklusive asynchroner Disk-Streaming-Engine mit latenzfreiem RAM-Pre-Roll-Header (0.0 ms Ansprechzeit) und lock-freiem SPSC-Ringpuffer-Prefetching sowie einer Golden-Master-Prüfsummensuite zur bit-exakten Verifikation aller Signalpfade.'
       ],
-      link: 'https://github.com/aethelnet/audio-engine-core',
-      linkLabel: 'C++ AUDIO REPOSITORY ÖFFNEN'
+      liveLink: null,
+      repoLink: 'https://github.com/aethelnet/audio-engine-core',
+      repoLabel: 'C++ REPOSITORY ÖFFNEN'
     }
   };
 
@@ -209,7 +230,10 @@
     const dMetrics = document.getElementById('dossier-metrics');
     const dBody = document.getElementById('dossier-body');
     const dIcon = document.getElementById('dossier-icon');
-    const dLink = document.getElementById('dossier-link') as HTMLAnchorElement | null;
+    const dLiveLink = document.getElementById('dossier-live-link') as HTMLAnchorElement | null;
+    const dLiveLabel = document.getElementById('dossier-live-label');
+    const dRepoLink = document.getElementById('dossier-repo-link') as HTMLAnchorElement | null;
+    const dRepoLabel = document.getElementById('dossier-repo-label');
     const interactiveContainer = document.getElementById('dossier-interactive-container');
     const interactiveBtn = document.getElementById('dossier-interactive-btn');
 
@@ -244,10 +268,18 @@
         dBody.innerHTML = data.paragraphs.map(p => `<p>${p}</p>`).join('');
       }
 
-      if (dLink) {
-        dLink.href = data.link;
-        const span = dLink.querySelector('span');
-        if (span) span.textContent = data.linkLabel;
+      if (dLiveLink && dRepoLink) {
+        if (data.liveLink) {
+          dLiveLink.classList.remove('hidden');
+          dLiveLink.href = data.liveLink;
+          if (dLiveLabel) dLiveLabel.textContent = data.liveLabel || 'LIVE DEPLOYMENT';
+          dRepoLink.className = "flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded border border-[var(--border-strong)] bg-[var(--bg-card)] hover:border-[var(--text-primary)] text-[var(--text-primary)] font-mono-tech text-xs font-bold transition-all text-center shadow-xs";
+        } else {
+          dLiveLink.classList.add('hidden');
+          dRepoLink.className = "w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[var(--text-primary)] text-[var(--bg-primary)] font-mono-tech text-xs font-bold hover:opacity-90 transition-opacity text-center shadow-xs";
+        }
+        dRepoLink.href = data.repoLink;
+        if (dRepoLabel) dRepoLabel.textContent = data.repoLabel || 'GITHUB REPO';
       }
 
       if (id === 'arc') {
