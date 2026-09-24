@@ -33,6 +33,29 @@ import '../styles/global.css';
     <meta name="twitter:image" content="https://aethelburg.info/og-preview.svg" />
     <link rel="canonical" href="https://aethelburg.info/" />
     
+    <!-- JSON-LD Technical Profile Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "mainEntity": {
+          "@type": "Person",
+          "name": "Aethelburg",
+          "jobTitle": "Systems & Research Engineer",
+          "description": "Autonomous Neurosymbolics, Continuous Liquid Neural ODEs, Real-Time C++20 DSP Engines, and Provenance Cartography.",
+          "url": "https://aethelburg.info/",
+          "knowsAbout": [
+            "Neurosymbolic AI",
+            "Continuous Liquid Neural Networks",
+            "Dynamical Systems & ODE Integrators",
+            "C++20 Real-Time Audio DSP",
+            "ARC-AGI-3 Reasoning & World Models",
+            "Cyber-Physical Energy Twins"
+          ]
+        }
+      }
+    </script>
+    
     <!-- Dutch & Swiss Typography Stack: Space Grotesk + Newsreader + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,13 +67,27 @@ import '../styles/global.css';
     <PhaseSpaceNavigator />
 
     <!-- 01 // Top Editorial Header -->
-    <header class="relative z-10 w-full px-5 sm:px-10 py-5 flex items-center justify-between border-b border-[var(--border-hairline)] bg-[var(--bg-primary)]/80 backdrop-blur-md">
-      <div class="flex items-center gap-4">
-        <div class="w-2.5 h-2.5 bg-[var(--text-primary)]"></div>
-        <div class="flex items-baseline gap-2">
-          <span class="font-bold tracking-tight text-sm text-[var(--text-primary)] uppercase">AETHELBURG</span>
-          <span class="text-[10px] font-mono-tech text-[var(--text-muted)] tracking-wider">[LAB-2026.09]</span>
-        </div>
+    <header class="relative z-10 w-full px-5 sm:px-10 py-4 flex items-center justify-between border-b border-[var(--border-hairline)] bg-[var(--bg-primary)]/80 backdrop-blur-md">
+      <div class="flex items-center gap-3.5">
+        <a href="/" class="flex items-center gap-3 group focus:outline-none" aria-label="Aethelburg Systems Home">
+          <div class="w-7 h-7 rounded border border-[var(--border-hairline)] group-hover:border-[var(--text-primary)] transition-all overflow-hidden flex items-center justify-center bg-[var(--bg-card)] shadow-xs">
+            <svg viewBox="0 0 64 64" fill="none" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+              <rect width="64" height="64" class="fill-[var(--bg-primary)] stroke-[var(--border-hairline)]" stroke-width="1.5"/>
+              <!-- Drafting Crosshair -->
+              <line x1="32" y1="6" x2="32" y2="12" class="stroke-[var(--text-muted)]" stroke-width="1.5"/>
+              <line x1="32" y1="52" x2="32" y2="58" class="stroke-[var(--text-muted)]" stroke-width="1.5"/>
+              <line x1="6" y1="32" x2="12" y2="32" class="stroke-[var(--text-muted)]" stroke-width="1.5"/>
+              <line x1="52" y1="32" x2="58" y2="32" class="stroke-[var(--text-muted)]" stroke-width="1.5"/>
+              <!-- Architectural Monogram [Æ] in Solid Vector Ink -->
+              <path d="M16 48 L28 16 L34 16 L34 48 L28 48 L28 36 L20 36 L17.5 48 Z M22.5 28 L28 28 L28 20.5 Z" class="fill-[var(--text-primary)]"/>
+              <path d="M34 16 L48 16 L48 22 L38 22 L38 29 L46 29 L46 35 L38 35 L38 42 L48 42 L48 48 L34 48 Z" class="fill-[var(--text-primary)]"/>
+            </svg>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="font-bold tracking-tight text-sm text-[var(--text-primary)] uppercase">AETHELBURG</span>
+            <span class="text-[10px] font-mono-tech text-[var(--text-muted)] tracking-wider">[LAB-2026.09]</span>
+          </div>
+        </a>
       </div>
 
       <!-- Real-Time Dynamic Coordinates Readout -->
