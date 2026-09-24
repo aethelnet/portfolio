@@ -2,7 +2,7 @@
 // ProjectDossier.astro - Minimalist Dutch Editorial Slide-Over Dossier
 ---
 
-<div id="dossier-backdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+<div id="dossier-backdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300" style="transform: translateZ(0); will-change: opacity; backface-visibility: hidden;"></div>
 
 <aside id="dossier-panel" class="fixed top-0 right-0 bottom-0 w-full max-w-xl bg-[var(--bg-primary)] border-l border-[var(--border-hairline)] z-50 translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between shadow-2xl overflow-y-auto">
   <!-- Dossier Header -->
@@ -285,6 +285,7 @@
     function close() {
       backdrop?.classList.add('opacity-0', 'pointer-events-none');
       panel?.classList.add('translate-x-full');
+      window.dispatchEvent(new CustomEvent('close-dossier'));
     }
 
     let activeId = 'arc';

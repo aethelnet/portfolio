@@ -5,18 +5,18 @@ import ProjectIcon from './ProjectIcon.astro';
 
 <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
   <!-- Fullscreen Interactive Canvas -->
-  <canvas id="world-canvas" class="w-full h-full block pointer-events-auto cursor-crosshair"></canvas>
+  <canvas id="world-canvas" class="w-full h-full block pointer-events-auto cursor-crosshair" style="transform: translate3d(0, 0, 0); will-change: transform; backface-visibility: hidden;"></canvas>
 </div>
 
 <!-- Interactive Project Nodes Overlay (Anchored to Screen Coords via JS) -->
-<div id="project-nodes-container" class="fixed inset-0 overflow-hidden pointer-events-none z-20 hidden md:block">
+<div id="project-nodes-container" class="fixed inset-0 overflow-hidden pointer-events-none z-20 hidden md:block transition-opacity duration-300 ease-in-out">
   <!-- Node A: ARC-AGI-3 -->
-  <div id="node-arc" class="project-node absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="arc">
+  <div id="node-arc" class="project-node absolute pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="arc" style="top: 0; left: 0; will-change: transform; backface-visibility: hidden;">
       <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm backdrop-blur-md p-1">
+        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm p-1">
           <ProjectIcon id="arc" class="w-4 h-4" />
         </div>
-        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm backdrop-blur-md">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm">
           <div class="text-[10px] uppercase font-mono-tech tracking-wider text-[var(--text-muted)]">01 // FRONTIER AI</div>
           <div class="text-xs font-bold text-[var(--text-primary)] group-hover:underline underline-offset-4">ARC-AGI-3 Solver</div>
         </div>
@@ -24,12 +24,12 @@ import ProjectIcon from './ProjectIcon.astro';
     </div>
 
     <!-- Node B: Shadow Museum -->
-    <div id="node-museum" class="project-node absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="museum">
+    <div id="node-museum" class="project-node absolute pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="museum" style="top: 0; left: 0; will-change: transform; backface-visibility: hidden;">
       <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm backdrop-blur-md p-1">
+        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm p-1">
           <ProjectIcon id="museum" class="w-4 h-4" />
         </div>
-        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm backdrop-blur-md">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm">
           <div class="text-[10px] uppercase font-mono-tech tracking-wider text-[var(--text-muted)]">02 // PROVENANCE GRAPH</div>
           <div class="text-xs font-bold text-[var(--text-primary)] group-hover:underline underline-offset-4">Shadow Museum Atlas</div>
         </div>
@@ -37,12 +37,12 @@ import ProjectIcon from './ProjectIcon.astro';
     </div>
 
     <!-- Node C: Yu-Gi-Oh Edison Engine -->
-    <div id="node-edison" class="project-node absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="edison">
+    <div id="node-edison" class="project-node absolute pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="edison" style="top: 0; left: 0; will-change: transform; backface-visibility: hidden;">
       <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm backdrop-blur-md p-1">
+        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm p-1">
           <ProjectIcon id="edison" class="w-4 h-4" />
         </div>
-        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm backdrop-blur-md">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm">
           <div class="text-[10px] uppercase font-mono-tech tracking-wider text-[var(--text-muted)]">03 // DETERMINISTIC STATE MACHINE</div>
           <div class="text-xs font-bold text-[var(--text-primary)] group-hover:underline underline-offset-4">Edison Engine (WASM)</div>
         </div>
@@ -50,12 +50,12 @@ import ProjectIcon from './ProjectIcon.astro';
     </div>
 
     <!-- Node D: Continuous Liquid ODE -->
-    <div id="node-lgnn" class="project-node absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="lgnn">
+    <div id="node-lgnn" class="project-node absolute pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="lgnn" style="top: 0; left: 0; will-change: transform; backface-visibility: hidden;">
       <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm backdrop-blur-md p-1">
+        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm p-1">
           <ProjectIcon id="lgnn" class="w-4 h-4" />
         </div>
-        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm backdrop-blur-md">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm">
           <div class="text-[10px] uppercase font-mono-tech tracking-wider text-[var(--text-muted)]">04 // DYNAMICAL SYSTEMS</div>
           <div class="text-xs font-bold text-[var(--text-primary)] group-hover:underline underline-offset-4">Liquid Neural Core</div>
         </div>
@@ -63,12 +63,12 @@ import ProjectIcon from './ProjectIcon.astro';
     </div>
 
     <!-- Node E: VoltGrid Cyber-Physical Dynamics -->
-    <div id="node-volt" class="project-node absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="volt">
+    <div id="node-volt" class="project-node absolute pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="volt" style="top: 0; left: 0; will-change: transform; backface-visibility: hidden;">
       <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm backdrop-blur-md p-1">
+        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm p-1">
           <ProjectIcon id="volt" class="w-4 h-4" />
         </div>
-        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm backdrop-blur-md">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm">
           <div class="text-[10px] uppercase font-mono-tech tracking-wider text-[var(--text-muted)]">05 // CYBER-PHYSICAL SYSTEMS</div>
           <div class="text-xs font-bold text-[var(--text-primary)] group-hover:underline underline-offset-4">VoltGrid Dynamics</div>
         </div>
@@ -76,18 +76,18 @@ import ProjectIcon from './ProjectIcon.astro';
     </div>
 
     <!-- Node F: Audio Engine Core -->
-    <div id="node-audio" class="project-node absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="audio">
+    <div id="node-audio" class="project-node absolute pointer-events-auto opacity-0 transition-opacity duration-300 group cursor-pointer" data-project="audio" style="top: 0; left: 0; will-change: transform; backface-visibility: hidden;">
       <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm backdrop-blur-md p-1">
+        <div class="w-7 h-7 rounded border border-[var(--border-hairline)] bg-[var(--bg-card)] group-hover:border-[var(--text-primary)] group-hover:scale-110 transition-all flex items-center justify-center text-[var(--text-primary)] shadow-sm p-1">
           <ProjectIcon id="audio" class="w-4 h-4" />
         </div>
-        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm backdrop-blur-md">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-hairline)] px-2.5 py-1 rounded shadow-sm">
           <div class="text-[10px] uppercase font-mono-tech tracking-wider text-[var(--text-muted)]">06 // REAL-TIME DSP</div>
           <div class="text-xs font-bold text-[var(--text-primary)] group-hover:underline underline-offset-4">Audio Engine Core</div>
         </div>
       </div>
     </div>
-  </div>
+</div>
 
 <script>
   // Dutch Architectural Phase Space Navigator
@@ -172,8 +172,7 @@ import ProjectIcon from './ProjectIcon.astro';
 
         const el = document.getElementById(`node-${wp.id}`);
         if (el) {
-          el.style.left = `${sx.toFixed(1)}px`;
-          el.style.top = `${sy.toFixed(1)}px`;
+          el.style.transform = `translate3d(${sx.toFixed(1)}px, ${sy.toFixed(1)}px, 0) translate(-50%, -50%)`;
           el.style.opacity = '1';
         }
       });
@@ -222,6 +221,26 @@ import ProjectIcon from './ProjectIcon.astro';
         targetW21 = wp.w21;
         targetW22 = wp.w22;
         targetU = wp.u;
+      }
+    });
+
+    // Dossier State Tracking (gracefully hide nodes while viewing dossier/modals)
+    let isDossierOpen = false;
+    window.addEventListener('open-dossier', () => {
+      isDossierOpen = true;
+      const container = document.getElementById('project-nodes-container');
+      if (container) {
+        container.classList.add('opacity-0', 'pointer-events-none');
+        container.classList.remove('opacity-100');
+      }
+    });
+
+    window.addEventListener('close-dossier', () => {
+      isDossierOpen = false;
+      const container = document.getElementById('project-nodes-container');
+      if (container) {
+        container.classList.remove('opacity-0', 'pointer-events-none');
+        container.classList.add('opacity-100');
       }
     });
 
@@ -431,10 +450,12 @@ import ProjectIcon from './ProjectIcon.astro';
         }
       }
 
-      // 6. Gentle continuous orbital drift for attractor nodes
-      orbitAngle += 0.0003;
-      if (orbitAngle > Math.PI * 2) orbitAngle -= Math.PI * 2;
-      updateNodePositions();
+      // 6. Gentle continuous orbital drift for attractor nodes (paused when dossier is open)
+      if (!isDossierOpen) {
+        orbitAngle += 0.0003;
+        if (orbitAngle > Math.PI * 2) orbitAngle -= Math.PI * 2;
+        updateNodePositions();
+      }
 
       requestAnimationFrame(animate);
     }
