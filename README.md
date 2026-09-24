@@ -1,43 +1,61 @@
-# Astro Starter Kit: Minimal
+# Aethelburg Systems: Engineering Portfolio & Research Terminal
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Production portfolio hub for autonomous neurosymbolics, continuous dynamical systems, C++20 real-time audio DSP, and cyber-physical networks.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Architecture
 
-## 🚀 Project Structure
+- **Continuous Dynamic Canvas**: 60 FPS phase-space trajectory integration via 4th-Order Runge-Kutta (RK4) ODE solver.
+- **Framework**: Astro 5 (Static Site Generation), Tailwind CSS v4, TypeScript.
+- **Design System**: Dutch White Light Brutalism with responsive dark/light adaptive CSS variable architecture.
+- **Metadata**: Schema.org JSON-LD `ProfilePage` structured data, OpenGraph, and Twitter card integrations.
+- **Host**: Reverse-proxied via Nginx on `server-141` (`https://aethelburg.info`).
 
-Inside of your Astro project, you'll see the following folders and files:
+## Directory Structure
 
 ```text
-/
+apps/portfolio/
 ├── public/
+│   ├── favicon.ico
+│   ├── favicon.svg          # Vector architectural [Æ] monogram
+│   └── og-preview.svg       # OpenGraph card preview
 ├── src/
-│   └── pages/
-│       └── index.astro
+│   ├── components/          # Interactive dossiers and modal laboratories
+│   │   ├── ArcScrubberModal.astro
+│   │   ├── AudioEngineModal.astro
+│   │   ├── EdisonReplayModal.astro
+│   │   ├── LgnnSandboxModal.astro
+│   │   ├── MuseumGraphModal.astro
+│   │   ├── PhaseSpaceNavigator.astro
+│   │   ├── ProjectDossier.astro
+│   │   ├── ProjectIcon.astro
+│   │   └── VoltGridModal.astro
+│   ├── pages/
+│   │   └── index.astro      # Main editorial layout & stage
+│   └── styles/
+│       └── global.css       # Brutalist design tokens & theme layer
 └── package.json
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Local Development & Build
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```bash
+# Install dependencies
+npm install
 
-Any static assets, like images, can be placed in the `public/` directory.
+# Start local development server
+npm run dev
 
-## 🧞 Commands
+# Compile production bundle
+npm run build
 
-All commands are run from the root of the project, from a terminal:
+# Preview static distribution
+npm run preview
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Production Deployment
 
-## 👀 Want to learn more?
+The static distribution `./dist/` is deployed to the production web server:
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```bash
+rsync -avz apps/portfolio/dist/ server-141:/home/ubuntu/portfolio/dist/
+```
