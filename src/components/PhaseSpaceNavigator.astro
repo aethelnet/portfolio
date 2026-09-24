@@ -105,12 +105,12 @@ import ProjectIcon from './ProjectIcon.astro';
   }
 
   const WAYPOINTS: Waypoint[] = [
-    { id: 'arc', name: 'ARC-AGI-3 Solver', sub: 'Causal World Model', hx: -1.3, hy: 0.7, w11: 0.2, w12: -1.6, w21: 1.6, w22: 0.2, u: 0.8 },
-    { id: 'museum', name: 'Shadow Museum', sub: 'Provenance Cartography', hx: 1.4, hy: 0.8, w11: -0.4, w12: -1.2, w21: 1.2, w22: -0.4, u: -0.6 },
-    { id: 'edison', name: 'Edison Engine', sub: 'Deterministic State Machine', hx: -0.9, hy: -1.2, w11: 0.6, w12: -2.0, w21: 2.0, w22: 0.6, u: -1.0 },
-    { id: 'lgnn', name: 'Liquid Neural Core', sub: 'Continuous-Time ODE', hx: 1.2, hy: -1.0, w11: 0.0, w12: -1.4, w21: 1.4, w22: 0.0, u: 0.0 },
-    { id: 'volt', name: 'VoltGrid Dynamics', sub: 'Cyber-Physical Phasor Plane', hx: 0.0, hy: 1.45, w11: -0.5, w12: 1.8, w21: -1.8, w22: -0.5, u: 0.4 },
-    { id: 'audio', name: 'Audio Engine Core', sub: 'C++20 Real-Time DSP', hx: 0.1, hy: -1.5, w11: -0.3, w12: -1.5, w21: 1.5, w22: -0.3, u: -0.5 },
+    { id: 'arc', name: 'ARC-AGI-3 Solver', sub: 'Causal World Model', hx: -1.3, hy: 0.7, w11: 0.42, w12: -1.7, w21: 1.5, w22: 0.38, u: 0.6 },
+    { id: 'museum', name: 'Shadow Museum', sub: 'Provenance Cartography', hx: 1.4, hy: 0.8, w11: 0.38, w12: -1.4, w21: 1.6, w22: 0.38, u: -0.5 },
+    { id: 'edison', name: 'Edison Engine', sub: 'Deterministic State Machine', hx: -0.9, hy: -1.2, w11: 0.52, w12: -2.1, w21: 2.1, w22: 0.52, u: -0.8 },
+    { id: 'lgnn', name: 'Liquid Neural Core', sub: 'Continuous-Time ODE', hx: 1.2, hy: -1.0, w11: 0.44, w12: -1.5, w21: 1.5, w22: 0.44, u: 0.0 },
+    { id: 'volt', name: 'VoltGrid Dynamics', sub: 'Cyber-Physical Phasor Plane', hx: 0.0, hy: 1.45, w11: 0.40, w12: 1.7, w21: -1.7, w22: 0.40, u: 0.3 },
+    { id: 'audio', name: 'Audio Engine Core', sub: 'C++20 Real-Time DSP', hx: 0.1, hy: -1.5, w11: 0.39, w12: -1.6, w21: 1.6, w22: 0.39, u: -0.4 },
   ];
 
   function initPhaseSpace() {
@@ -178,16 +178,16 @@ import ProjectIcon from './ProjectIcon.astro';
       });
     }
 
-    // Dynamic ODE Parameters
-    let curW11 = 0.3, curW12 = -1.6, curW21 = 1.6, curW22 = 0.3;
+    // Dynamic ODE Parameters (Hopf Limit Cycle Orbit)
+    let curW11 = 0.44, curW12 = -1.6, curW21 = 1.6, curW22 = 0.44;
     let targetW11 = curW11, targetW12 = curW12, targetW21 = curW21, targetW22 = curW22;
     let curU = 0.0, targetU = 0.0;
-    const tau_base = 8.0;
-    const beta = 0.8;
+    const tau_base = 6.0;
+    const beta = 0.6;
 
     // Simulation State
-    let h1 = 0.4;
-    let h2 = 0.3;
+    let h1 = 0.8;
+    let h2 = 0.2;
     const trailLength = 260;
     const trajectory: { x: number; y: number }[] = [];
 
@@ -200,17 +200,66 @@ import ProjectIcon from './ProjectIcon.astro';
       maxLife: 80 + Math.random() * 80
     }));
 
-    // Mouse Interaction (Soft Gravity Well)
+    // Mouse & Touch Drag Interaction
     let mouseX = width / 2;
     let mouseY = height / 2;
     let mouseIn = false;
+    let isDragging = false;
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      mouseIn = true;
+      canvas.style.cursor = 'grabbing';
+    });
 
     window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
       mouseIn = true;
+      if (!isDragging) {
+        const hx = toScreenX(h1);
+        const hy = toScreenY(h2);
+        const dist = Math.hypot(e.clientX - hx, e.clientY - hy);
+        canvas.style.cursor = dist < 50 ? 'grab' : 'crosshair';
+      }
     });
-    window.addEventListener('mouseleave', () => { mouseIn = false; });
+
+    window.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        canvas.style.cursor = 'crosshair';
+      }
+    });
+
+    window.addEventListener('mouseleave', () => {
+      mouseIn = false;
+      isDragging = false;
+      canvas.style.cursor = 'crosshair';
+    });
+
+    // Mobile / Tablet Touch Drag Support
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        isDragging = true;
+        mouseX = e.touches[0].clientX;
+        mouseY = e.touches[0].clientY;
+        mouseIn = true;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        mouseX = e.touches[0].clientX;
+        mouseY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      isDragging = false;
+      mouseIn = false;
+    });
 
     // Waypoint Selector Event
     window.addEventListener('select-waypoint', (e: any) => {
@@ -258,17 +307,17 @@ import ProjectIcon from './ProjectIcon.astro';
     function derivatives(x: number, y: number, u: number): [number, number] {
       const active_tau = tau_base / (1.0 + beta * Math.abs(u));
       let dh1 = (-1.0 / active_tau) * x + Math.tanh(curW11 * x + curW12 * y + u);
-      let dh2 = (-1.0 / 6.0) * y + Math.tanh(curW21 * x + curW22 * y);
+      let dh2 = (-1.0 / active_tau) * y + Math.tanh(curW21 * x + curW22 * y);
 
-      // Add gentle cursor gravity if mouse is present
-      if (mouseIn) {
+      // Add gentle cursor gravity if mouse is present and not dragging
+      if (mouseIn && !isDragging) {
         const mx = toPhaseX(mouseX);
         const my = toPhaseY(mouseY);
         const dx = mx - x;
         const dy = my - y;
-        const distSq = dx * dx + dy * dy + 0.1;
-        dh1 += (dx / distSq) * 0.15;
-        dh2 += (dy / distSq) * 0.15;
+        const distSq = dx * dx + dy * dy + 0.15;
+        dh1 += (dx / distSq) * 0.22;
+        dh2 += (dy / distSq) * 0.22;
       }
 
       return [dh1, dh2];
@@ -390,12 +439,19 @@ import ProjectIcon from './ProjectIcon.astro';
       }
 
       // 4. Primary Trajectory Step (Sub-steps)
-      const subSteps = 3;
-      const subDt = (dt * 1.8) / subSteps;
-      for (let s = 0; s < subSteps; s++) {
-        const [nx, ny] = rk4(h1, h2, subDt, curU);
-        h1 = nx;
-        h2 = ny;
+      if (isDragging) {
+        const targetH1 = toPhaseX(mouseX);
+        const targetH2 = toPhaseY(mouseY);
+        h1 += (targetH1 - h1) * 0.35;
+        h2 += (targetH2 - h2) * 0.35;
+      } else {
+        const subSteps = 3;
+        const subDt = (dt * 1.8) / subSteps;
+        for (let s = 0; s < subSteps; s++) {
+          const [nx, ny] = rk4(h1, h2, subDt, curU);
+          h1 = nx;
+          h2 = ny;
+        }
       }
 
       if (isNaN(h1) || isNaN(h2) || Math.abs(h1) > domain * 1.5 || Math.abs(h2) > domain * 1.5) {
@@ -431,16 +487,28 @@ import ProjectIcon from './ProjectIcon.astro';
         const hx = toScreenX(h1);
         const hy = toScreenY(h2);
 
+        // Tactile Drag Tether
+        if (isDragging) {
+          ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.45)' : 'rgba(18, 18, 18, 0.4)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 4]);
+          ctx.beginPath();
+          ctx.moveTo(hx, hy);
+          ctx.lineTo(mouseX, mouseY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
         ctx.fillStyle = inkSolid;
         ctx.beginPath();
-        ctx.arc(hx, hy, 3.5, 0, Math.PI * 2);
+        ctx.arc(hx, hy, isDragging ? 5.0 : 3.5, 0, Math.PI * 2);
         ctx.fill();
 
         // Subtle outer pulse
-        ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(18, 18, 18, 0.25)';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = isDark ? (isDragging ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.3)') : (isDragging ? 'rgba(18, 18, 18, 0.5)' : 'rgba(18, 18, 18, 0.25)');
+        ctx.lineWidth = isDragging ? 1.5 : 1;
         ctx.beginPath();
-        ctx.arc(hx, hy, 8, 0, Math.PI * 2);
+        ctx.arc(hx, hy, isDragging ? 16 : 8, 0, Math.PI * 2);
         ctx.stroke();
 
         // Update live coordinate telemetry in header
