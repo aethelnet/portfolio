@@ -215,17 +215,23 @@ import ProjectIcon from './ProjectIcon.astro';
           </div>
         </div>
 
-        <!-- Section 3: Open-Source Repository Link -->
+        <!-- Section 3: Dual Action Links (Live WASM & Repo) -->
         <div class="pt-3 border-t border-[var(--border-hairline)] space-y-2">
           <div class="text-[10px] font-mono-tech uppercase tracking-wider text-[var(--text-muted)]">
-            Open-Source C++20 Repository &amp; Tests
+            Live Deployment &amp; Open-Source C++20 Core
           </div>
-          <a href="https://github.com/aethelnet/audio-engine-core" target="_blank" rel="noreferrer" class="w-full py-2.5 px-4 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md">
-            <span>C++ AUDIO REPOSITORY ÖFFNEN</span>
-            <span>↗</span>
-          </a>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <a href="https://audio.aethelburg.network" target="_blank" rel="noreferrer" class="flex-1 py-2.5 px-3 rounded bg-rose-500 hover:bg-rose-400 text-slate-950 font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
+              <span>C++ WASM STUDIO</span>
+              <span>↗</span>
+            </a>
+            <a href="https://github.com/aethelnet/audio-engine-core" target="_blank" rel="noreferrer" class="flex-1 py-2.5 px-3 rounded border border-[var(--border-strong)] bg-[var(--bg-card)] hover:border-[var(--text-primary)] text-[var(--text-primary)] font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
+              <span>C++ REPOSITORY</span>
+              <span>↗</span>
+            </a>
+          </div>
           <span class="text-[10px] text-[var(--text-muted)] text-center block">
-            80 Passing CTests // CMake Build: cmake --build build
+            Airwindows C++20 DSP // WebAssembly Browser Studio // 59 CTests
           </span>
         </div>
 
