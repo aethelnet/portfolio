@@ -492,6 +492,9 @@ import ProjectIcon from './ProjectIcon.astro';
     }
 
     closeBtn?.addEventListener('click', closeModal);
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
     window.addEventListener('open-museum-graph', openModal);
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !modal?.classList.contains('pointer-events-none')) {
