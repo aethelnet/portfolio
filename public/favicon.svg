@@ -1,23 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" class="bg-rect" rx="0" fill="#121212"/>
   <!-- Architects Desk Drafting Crosshair -->
-  <line x1="32" y1="6" x2="32" y2="12" stroke="#666666" stroke-width="1"/>
-  <line x1="32" y1="52" x2="32" y2="58" stroke="#666666" stroke-width="1"/>
-  <line x1="6" y1="32" x2="12" y2="32" stroke="#666666" stroke-width="1"/>
-  <line x1="52" y1="32" x2="58" y2="32" stroke="#666666" stroke-width="1"/>
+  <line x1="32" y1="6" x2="32" y2="12" class="crosshair" stroke="#64748B" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="32" y1="52" x2="32" y2="58" class="crosshair" stroke="#64748B" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="6" y1="32" x2="12" y2="32" class="crosshair" stroke="#64748B" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="52" y1="32" x2="58" y2="32" class="crosshair" stroke="#64748B" stroke-width="1.5" stroke-linecap="round"/>
   
-  <!-- Architectural Monogram [Æ] in Solid Vector Ink -->
+  <!-- Architectural Monogram [Æ] in Solid Vector Ink (Pure Floating Canvas) -->
   <!-- Left A leg -->
-  <path d="M16 48 L28 16 L34 16 L34 48 L28 48 L28 36 L20 36 L17.5 48 Z M22.5 28 L28 28 L28 20.5 Z" class="fg-path" fill="#F8F8F6"/>
+  <path d="M16 48 L28 16 L34 16 L34 48 L28 48 L28 36 L20 36 L17.5 48 Z M22.5 28 L28 28 L28 20.5 Z" class="fg-path" fill="#0F172A"/>
   <!-- Right E component interlocking with A -->
-  <path d="M34 16 L48 16 L48 22 L38 22 L38 29 L46 29 L46 35 L38 35 L38 42 L48 42 L48 48 L34 48 Z" class="fg-path" fill="#F8F8F6"/>
+  <path d="M34 16 L48 16 L48 22 L38 22 L38 29 L46 29 L46 35 L38 35 L38 42 L48 42 L48 48 L34 48 Z" class="fg-path" fill="#0F172A"/>
   
   <style>
-    .bg-rect { fill: #121212; }
-    .fg-path { fill: #F8F8F6; }
-    @media (prefers-color-scheme: light) {
-      .bg-rect { fill: #F8F8F6; stroke: #121212; stroke-width: 2px; }
-      .fg-path { fill: #121212; }
+    .fg-path { fill: #0F172A; }
+    .crosshair { stroke: #64748B; }
+    @media (prefers-color-scheme: dark) {
+      .fg-path { fill: #F8FAFC; }
+      .crosshair { stroke: #94A3B8; }
     }
   </style>
 </svg>

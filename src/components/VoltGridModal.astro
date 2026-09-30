@@ -176,6 +176,9 @@ import ProjectIcon from './ProjectIcon.astro';
       i1: 18.4, i2: 17.8, i3: 19.1,
       cosPhi: 0.94,
       freq: 50.00,
+      phi1: 0,
+      phi2: -2 * Math.PI / 3,
+      phi3: 2 * Math.PI / 3,
       rPe: 0.14,
       rIso: 120.0,
       iEa: 0.22,
@@ -235,25 +238,30 @@ import ProjectIcon from './ProjectIcon.astro';
       if (p === 'balanced') {
         state.u1 = 230; state.u2 = 230; state.u3 = 230;
         state.i1 = 18.4; state.i2 = 17.8; state.i3 = 19.1;
+        state.phi1 = 0; state.phi2 = -2 * Math.PI / 3; state.phi3 = 2 * Math.PI / 3;
         state.cosPhi = 0.94; state.freq = 50.00;
         state.rPe = 0.14; state.rIso = 120.0; state.iEa = 0.22;
       } else if (p === 'inrush') {
         state.u1 = 221; state.u2 = 229; state.u3 = 230;
         state.i1 = 58.4; state.i2 = 14.2; state.i3 = 16.0;
+        state.phi1 = 0; state.phi2 = -2 * Math.PI / 3 - 0.08; state.phi3 = 2 * Math.PI / 3 + 0.05;
         state.cosPhi = 0.65; state.freq = 49.95;
         state.rPe = 0.16; state.rIso = 110.0; state.iEa = 0.28;
       } else if (p === 'asymmetry') {
-        state.u1 = 231; state.u2 = 233; state.u3 = 226;
-        state.i1 = 12.0; state.i2 = 3.1; state.i3 = 38.5;
-        state.cosPhi = 0.91; state.freq = 50.01;
+        state.u1 = 244; state.u2 = 232; state.u3 = 198;
+        state.i1 = 6.2; state.i2 = 4.8; state.i3 = 42.5;
+        state.phi1 = 0; state.phi2 = -2 * Math.PI / 3 + 0.18; state.phi3 = 2 * Math.PI / 3 - 0.25;
+        state.cosPhi = 0.88; state.freq = 50.01;
         state.rPe = 0.15; state.rIso = 95.0; state.iEa = 0.35;
       } else if (p === 'leakage') {
-        state.u1 = 228; state.u2 = 230; state.u3 = 231;
-        state.i1 = 18.0; state.i2 = 18.0; state.i3 = 18.0;
-        state.cosPhi = 0.95; state.freq = 50.00;
-        state.rPe = 0.85; // FAILS DIN VDE
-        state.rIso = 0.35; // FAILS DIN VDE
-        state.iEa = 4.20; // FAILS DIN VDE
+        // Massive DIN VDE Constraint Trip: Phase 1 insulation collapse / ground leakage fault!
+        state.u1 = 168; state.u2 = 246; state.u3 = 242;
+        state.i1 = 48.6; state.i2 = 11.2; state.i3 = 13.5;
+        state.phi1 = 0.35; state.phi2 = -2 * Math.PI / 3 - 0.22; state.phi3 = 2 * Math.PI / 3 + 0.15;
+        state.cosPhi = 0.52; state.freq = 49.88;
+        state.rPe = 0.85; // FAILS DIN VDE (> 0.30 Ohm)
+        state.rIso = 0.35; // FAILS DIN VDE (< 1.0 MOhm)
+        state.iEa = 4.20; // FAILS DIN VDE (> 3.50 mA)
       }
       updateDomReadouts();
     }
@@ -264,22 +272,71 @@ import ProjectIcon from './ProjectIcon.astro';
       const sinPhi = Math.sqrt(Math.max(0, 1 - state.cosPhi * state.cosPhi));
       const qTotal = ((state.u1 * state.i1 + state.u2 * state.i2 + state.u3 * state.i3) * sinPhi) / 1000;
 
-      // Fortescue Approximation
-      const iAvg = (state.i1 + state.i2 + state.i3) / 3;
-      const iMax = Math.max(state.i1, state.i2, state.i3);
-      const iMin = Math.min(state.i1, state.i2, state.i3);
-      const i2 = (iMax - iMin) / 2.0;
-      const u2Percent = (i2 / (iAvg || 1)) * 100;
+      // Fortescue Exact Calculation (Symmetrical Components)
+      const cosA = -0.5;
+      const sinA = Math.sqrt(3) / 2;
+
+      const c1x = state.i1 * Math.cos(state.phi1 || 0);
+      const c1y = state.i1 * Math.sin(state.phi1 || 0);
+      const c2x = state.i2 * Math.cos(state.phi2 !== undefined ? state.phi2 : -2 * Math.PI / 3);
+      const c2y = state.i2 * Math.sin(state.phi2 !== undefined ? state.phi2 : -2 * Math.PI / 3);
+      const c3x = state.i3 * Math.cos(state.phi3 !== undefined ? state.phi3 : 2 * Math.PI / 3);
+      const c3y = state.i3 * Math.sin(state.phi3 !== undefined ? state.phi3 : 2 * Math.PI / 3);
+
+      // a * c2
+      const ac2x = cosA * c2x - sinA * c2y;
+      const ac2y = sinA * c2x + cosA * c2y;
+      // a^2 * c3
+      const a2c3x = cosA * c3x + sinA * c3y;
+      const a2c3y = -sinA * c3x + cosA * c3y;
+
+      const i1x = (c1x + ac2x + a2c3x) / 3;
+      const i1y = (c1y + ac2y + a2c3y) / 3;
+      const i1Mag = Math.hypot(i1x, i1y);
+
+      // a^2 * c2
+      const a2c2x = cosA * c2x + sinA * c2y;
+      const a2c2y = -sinA * c2x + cosA * c2y;
+      // a * c3
+      const ac3x = cosA * c3x - sinA * c3y;
+      const ac3y = sinA * c3x + cosA * c3y;
+
+      const i2x = (c1x + a2c2x + ac3x) / 3;
+      const i2y = (c1y + a2c2y + ac3y) / 3;
+      const i2Mag = Math.hypot(i2x, i2y);
+
+      const i0x = (c1x + c2x + c3x) / 3;
+      const i0y = (c1y + c2y + c3y) / 3;
+      const i0Mag = Math.hypot(i0x, i0y);
+
+      const u2Percent = (i2Mag / Math.max(0.1, i1Mag)) * 100;
 
       // Update Header
       const fEl = document.getElementById('volt-freq-readout');
       const pEl = document.getElementById('volt-p-readout');
       const u2El = document.getElementById('volt-u2-readout');
+      const rBadge = document.getElementById('volt-regime-badge');
+
       if (fEl) fEl.textContent = `${state.freq.toFixed(2)} Hz`;
       if (pEl) pEl.textContent = `${pTotal.toFixed(1)} kW`;
       if (u2El) {
         u2El.textContent = `${u2Percent.toFixed(1)}%`;
         u2El.className = u2Percent > 5.0 ? 'text-rose-500 font-bold' : 'text-emerald-500 font-bold';
+      }
+      if (rBadge) {
+        if (state.regime === 'leakage') {
+          rBadge.textContent = '[TRIP: DIN VDE 0701 DEFECT DETECTED]';
+          rBadge.className = 'text-[10px] text-rose-500 font-bold animate-pulse hidden sm:inline';
+        } else if (state.regime === 'asymmetry') {
+          rBadge.textContent = '[ALERT: UNBALANCED FORTESCUE LOAD]';
+          rBadge.className = 'text-[10px] text-rose-400 font-bold hidden sm:inline';
+        } else if (state.regime === 'inrush') {
+          rBadge.textContent = '[TRANSIENT: HIGH-CURRENT INRUSH]';
+          rBadge.className = 'text-[10px] text-amber-400 font-bold hidden sm:inline';
+        } else {
+          rBadge.textContent = '[MODE: 3-PHASE CONTINUOUS STATE SPACE]';
+          rBadge.className = 'text-[10px] text-[var(--text-muted)] hidden sm:inline';
+        }
       }
 
       // Gauges
@@ -296,16 +353,30 @@ import ProjectIcon from './ProjectIcon.astro';
       const l1El = document.getElementById('volt-l1-readout');
       const l2El = document.getElementById('volt-l2-readout');
       const l3El = document.getElementById('volt-l3-readout');
-      if (l1El) l1El.textContent = `${state.u1.toFixed(0)}V ∠ 0° | ${state.i1.toFixed(1)}A`;
-      if (l2El) l2El.textContent = `${state.u2.toFixed(0)}V ∠ -120° | ${state.i2.toFixed(1)}A`;
-      if (l3El) l3El.textContent = `${state.u3.toFixed(0)}V ∠ +120° | ${state.i3.toFixed(1)}A`;
+      const deg1 = Math.round(((state.phi1 || 0) * 180) / Math.PI);
+      const deg2 = Math.round(((state.phi2 !== undefined ? state.phi2 : -2 * Math.PI / 3) * 180) / Math.PI);
+      const deg3 = Math.round(((state.phi3 !== undefined ? state.phi3 : 2 * Math.PI / 3) * 180) / Math.PI);
+      const phiDeg = Math.round((Math.acos(Math.min(1, Math.max(-1, state.cosPhi))) * 180) / Math.PI);
+      const iDeg1 = deg1 - phiDeg;
+      const iDeg2 = deg2 - phiDeg;
+      const iDeg3 = deg3 - phiDeg;
+
+      if (l1El) l1El.textContent = `${state.u1.toFixed(0)}V ∠ ${deg1}° | ${state.i1.toFixed(1)}A ∠ ${iDeg1}°`;
+      if (l2El) l2El.textContent = `${state.u2.toFixed(0)}V ∠ ${deg2}° | ${state.i2.toFixed(1)}A ∠ ${iDeg2}°`;
+      if (l3El) l3El.textContent = `${state.u3.toFixed(0)}V ∠ ${deg3}° | ${state.i3.toFixed(1)}A ∠ ${iDeg3}°`;
 
       const i1El = document.getElementById('volt-i1-val');
       const i2El = document.getElementById('volt-i2-val');
       const i0El = document.getElementById('volt-i0-val');
-      if (i1El) i1El.textContent = `${iAvg.toFixed(1)}A`;
-      if (i2El) i2El.textContent = `${i2.toFixed(1)}A`;
-      if (i0El) i0El.textContent = `${(Math.abs(state.i1 - state.i2) * 0.1).toFixed(1)}A`;
+      if (i1El) i1El.textContent = `${i1Mag.toFixed(1)}A`;
+      if (i2El) {
+        i2El.textContent = `${i2Mag.toFixed(1)}A`;
+        i2El.className = i2Mag > 5.0 ? 'text-rose-500 font-bold' : 'text-emerald-500';
+      }
+      if (i0El) {
+        i0El.textContent = `${i0Mag.toFixed(1)}A`;
+        i0El.className = i0Mag > 3.0 ? 'text-rose-500 font-bold' : 'text-[var(--text-muted)]';
+      }
 
       // DIN VDE Verification Gates
       const rpeStat = document.getElementById('vde-rpe-status');
@@ -390,11 +461,11 @@ import ProjectIcon from './ProjectIcon.astro';
         ctx.fillText('Re (+)', cx + maxRadius * 1.05, cy - 5);
         ctx.fillText('Im (+j)', cx + 5, cy - maxRadius * 1.05);
 
-        // Angles for L1, L2, L3 (120 deg apart)
-        const a1 = angle;
-        const a2 = angle - (2 * Math.PI / 3);
-        const a3 = angle + (2 * Math.PI / 3);
-        const phi = Math.acos(state.cosPhi);
+        // Angles for L1, L2, L3 (incorporating dynamic phase shifts)
+        const a1 = angle + (state.phi1 !== undefined ? state.phi1 : 0);
+        const a2 = angle + (state.phi2 !== undefined ? state.phi2 : -2 * Math.PI / 3);
+        const a3 = angle + (state.phi3 !== undefined ? state.phi3 : 2 * Math.PI / 3);
+        const phi = Math.acos(Math.min(1.0, Math.max(-1.0, state.cosPhi)));
 
         // Helper to draw vector
         function drawVector(theta: number, magFrac: number, color: string, label: string, isDashed: boolean = false) {
@@ -428,16 +499,38 @@ import ProjectIcon from './ProjectIcon.astro';
           ctx.fillText(label, ex + Math.cos(theta) * 12, ey + Math.sin(theta) * 12);
         }
 
-        // Draw Voltages (Thick Lines)
-        drawVector(a1, 0.85, '#f59e0b', 'U_L1');
-        drawVector(a2, 0.85, '#10b981', 'U_L2');
-        drawVector(a3, 0.85, '#06b6d4', 'U_L3');
+        // Draw Voltages (scaled to 230V nominal)
+        const lenU1 = Math.min(1.0, (state.u1 / 230.0) * 0.82);
+        const lenU2 = Math.min(1.0, (state.u2 / 230.0) * 0.82);
+        const lenU3 = Math.min(1.0, (state.u3 / 230.0) * 0.82);
+
+        drawVector(a1, lenU1, '#f59e0b', `U_L1 (${state.u1}V)`);
+        drawVector(a2, lenU2, '#10b981', `U_L2 (${state.u2}V)`);
+        drawVector(a3, lenU3, '#06b6d4', `U_L3 (${state.u3}V)`);
 
         // Draw Currents (Phase Lag phi)
         const iScale = 1.0 / 60.0; // scale relative to 60A
-        drawVector(a1 - phi, Math.min(1.0, state.i1 * iScale), '#d97706', 'I_L1', true);
-        drawVector(a2 - phi, Math.min(1.0, state.i2 * iScale), '#059669', 'I_L2', true);
-        drawVector(a3 - phi, Math.min(1.0, state.i3 * iScale), '#0891b2', 'I_L3', true);
+        drawVector(a1 - phi, Math.min(1.0, state.i1 * iScale), '#d97706', `I_L1 (${state.i1.toFixed(1)}A)`, true);
+        drawVector(a2 - phi, Math.min(1.0, state.i2 * iScale), '#059669', `I_L2 (${state.i2.toFixed(1)}A)`, true);
+        drawVector(a3 - phi, Math.min(1.0, state.i3 * iScale), '#0891b2', `I_L3 (${state.i3.toFixed(1)}A)`, true);
+
+        // Sternpunktverschiebung / Neutral Point Displacement: U_N = (U1 + U2 + U3) / 3
+        const uNx = (state.u1 * Math.cos(a1) + state.u2 * Math.cos(a2) + state.u3 * Math.cos(a3)) / 3.0;
+        const uNy = (state.u1 * Math.sin(a1) + state.u2 * Math.sin(a2) + state.u3 * Math.sin(a3)) / 3.0;
+        const magUn = Math.hypot(uNx, uNy);
+
+        if (magUn >= 2.5) {
+          const thetaUn = Math.atan2(uNy, uNx);
+          const lenUnFrac = Math.min(0.85, (magUn / 230.0) * 2.8);
+          drawVector(thetaUn, lenUnFrac, '#f43f5e', `ΔU_N (${magUn.toFixed(1)}V)`, true);
+
+          ctx.fillStyle = '#f43f5e';
+          ctx.font = 'bold 11px monospace';
+          const alertText = state.regime === 'leakage' 
+            ? `⚡ DIN VDE CONSTRAINT TRIP! R_PE=${state.rPe.toFixed(2)}Ω, ΔU_N=${magUn.toFixed(1)}V`
+            : `⚡ SCHIEFLAST-WARNUNG: ΔU_N = ${magUn.toFixed(1)}V (u₂ > 2%)`;
+          ctx.fillText(alertText, cx - maxRadius * 0.95, cy + maxRadius * 0.98);
+        }
 
         animId = requestAnimationFrame(render);
       }
