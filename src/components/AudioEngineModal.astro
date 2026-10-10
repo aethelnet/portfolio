@@ -345,22 +345,33 @@ import ProjectIcon from './ProjectIcon.astro';
     function startAudio() {
       try {
         const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-        audioCtx = new AudioContextClass();
+        if (!audioCtx || audioCtx.state === 'closed') {
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(() => {});
+        }
+        audioCtx.onstatechange = () => {
+          if (isPlaying && audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(() => {});
+          }
+        };
 
+        const now = audioCtx.currentTime;
         oscNode = audioCtx.createOscillator();
         oscNode.type = currentWave;
-        oscNode.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+        oscNode.frequency.setValueAtTime(220, now); // A3
 
         filterNode = audioCtx.createBiquadFilter();
         filterNode.type = 'lowpass';
-        filterNode.frequency.setValueAtTime(currentCutoff, audioCtx.currentTime);
-        filterNode.Q.setValueAtTime(2.0, audioCtx.currentTime);
+        filterNode.frequency.setValueAtTime(currentCutoff, now);
+        filterNode.Q.setValueAtTime(2.0, now);
 
         gainNode = audioCtx.createGain();
-        gainNode.gain.setValueAtTime(currentGain * 0.25, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(currentGain * 0.25, now);
 
         analyserNode = audioCtx.createAnalyser();
-        analyserNode.fftSize = 1024;
+        analyserNode.fftSize = 512;
         analyserNode.smoothingTimeConstant = 0.8;
 
         oscNode.connect(filterNode);
@@ -381,13 +392,30 @@ import ProjectIcon from './ProjectIcon.astro';
 
     function stopAudio() {
       if (oscNode) {
-        try { oscNode.stop(); } catch (e) {}
-        oscNode.disconnect();
-        oscNode = null;
+        try {
+          const now = audioCtx ? audioCtx.currentTime : 0;
+          if (gainNode && audioCtx) {
+            gainNode.gain.cancelScheduledValues(now);
+            gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+            gainNode.gain.linearRampToValueAtTime(0.0001, now + 0.02);
+          }
+          setTimeout(() => {
+            if (oscNode) {
+              try { oscNode.stop(); } catch (e) {}
+              oscNode.disconnect();
+              oscNode = null;
+            }
+          }, 25);
+        } catch (e) {
+          if (oscNode) {
+            try { oscNode.stop(); } catch (e) {}
+            oscNode.disconnect();
+            oscNode = null;
+          }
+        }
       }
-      if (audioCtx) {
-        try { audioCtx.close(); } catch (e) {}
-        audioCtx = null;
+      if (audioCtx && audioCtx.state === 'running') {
+        try { audioCtx.suspend().catch(() => {}); } catch (e) {}
       }
       isPlaying = false;
       synthIconPlay?.classList.remove('hidden');
@@ -428,7 +456,7 @@ import ProjectIcon from './ProjectIcon.astro';
       }
     });
 
-    // Filter Cutoff Slider
+    // Filter Cutoff Slider (Hardened against Android event floods)
     const cutoffSlider = document.getElementById('audio-cutoff-slider') as HTMLInputElement;
     const cutoffVal = document.getElementById('audio-cutoff-val');
     cutoffSlider?.addEventListener('input', (e) => {
@@ -436,15 +464,18 @@ import ProjectIcon from './ProjectIcon.astro';
       currentCutoff = val;
       if (cutoffVal) cutoffVal.textContent = `${val.toFixed(0)} Hz`;
       if (filterNode && audioCtx) {
+        const now = audioCtx.currentTime;
+        filterNode.frequency.cancelScheduledValues(now);
+        filterNode.frequency.setValueAtTime(filterNode.frequency.value, now);
         if (rampingEnabled) {
-          filterNode.frequency.setTargetAtTime(val, audioCtx.currentTime, 0.02);
+          filterNode.frequency.setTargetAtTime(val, now, 0.02);
         } else {
-          filterNode.frequency.setValueAtTime(val, audioCtx.currentTime);
+          filterNode.frequency.setValueAtTime(val, now);
         }
       }
     });
 
-    // Gain Slider
+    // Gain Slider (Hardened against Android event floods)
     const gainSlider = document.getElementById('audio-gain-slider') as HTMLInputElement;
     const gainVal = document.getElementById('audio-gain-val');
     const peakReadout = document.getElementById('audio-peak-readout');
@@ -456,20 +487,23 @@ import ProjectIcon from './ProjectIcon.astro';
 
       if (gainNode && audioCtx) {
         const linear = targetGain * 0.25;
+        const now = audioCtx.currentTime;
+        gainNode.gain.cancelScheduledValues(now);
+        gainNode.gain.setValueAtTime(gainNode.gain.value, now);
         if (rampingEnabled) {
           // Vectorized smooth linear ramp representation
-          gainNode.gain.linearRampToValueAtTime(linear, audioCtx.currentTime + 0.03);
+          gainNode.gain.linearRampToValueAtTime(linear, now + 0.03);
         } else {
           // Raw stair-step (instantaneous click)
-          gainNode.gain.setValueAtTime(linear, audioCtx.currentTime);
+          gainNode.gain.setValueAtTime(linear, now);
         }
       }
     });
 
-    // 60 FPS Oscilloscope & FFT Visualizer Loop
+    // 60 FPS Oscilloscope & FFT Visualizer Loop (Optimized for Mobile/Android GPU)
     function startScopeLoop() {
       let t = 0;
-      const dataArray = new Uint8Array(512);
+      const dataArray = new Uint8Array(256);
 
       function render() {
         if (!isOpen) return;
@@ -482,38 +516,34 @@ import ProjectIcon from './ProjectIcon.astro';
         const scopeColor = isDark ? '#f59e0b' : '#d97706';
         const fftColor = isDark ? 'rgba(6, 182, 212, 0.25)' : 'rgba(8, 145, 178, 0.2)';
 
-        // 1. Draw Scope Grid
+        // 1. Draw Scope Grid (Single batched stroke call to eliminate mobile GPU overhead)
         ctx.strokeStyle = gridColor;
         ctx.lineWidth = 1;
         const gridLines = 8;
+        ctx.beginPath();
         for (let i = 0; i <= gridLines; i++) {
           const y = (h / gridLines) * i;
-          ctx.beginPath();
           ctx.moveTo(0, y);
           ctx.lineTo(w, y);
-          ctx.stroke();
 
           const x = (w / gridLines) * i;
-          ctx.beginPath();
           ctx.moveTo(x, 0);
           ctx.lineTo(x, h);
-          ctx.stroke();
         }
-
-        // Center line
-        ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)';
-        ctx.beginPath();
         ctx.moveTo(0, h / 2);
         ctx.lineTo(w, h / 2);
         ctx.stroke();
 
-        // 2. Render FFT Frequency Spectrum (Background Bars)
+        // 2. Render FFT Frequency Spectrum (Batched bars, low CPU overhead)
         if (analyserNode && isPlaying) {
           analyserNode.getByteFrequencyData(dataArray);
-          const barWidth = (w / 128);
-          for (let i = 0; i < 128; i++) {
-            const barHeight = (dataArray[i] / 255) * (h * 0.7);
-            ctx.fillStyle = fftColor;
+          const bars = Math.min(64, Math.floor(w / 4));
+          const step = Math.floor(dataArray.length / bars);
+          const barWidth = w / bars;
+          ctx.fillStyle = fftColor;
+          for (let i = 0; i < bars; i++) {
+            const dataIdx = i * step;
+            const barHeight = (dataArray[dataIdx] / 255) * (h * 0.7);
             ctx.fillRect(i * barWidth, h - barHeight, barWidth - 1, barHeight);
           }
         }
