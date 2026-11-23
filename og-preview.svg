@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" fill="none">
+  <!-- Architectural Background: Warm Velum -->
+  <rect width="1200" height="630" fill="#F8F8F6"/>
+
+  <!-- Drafting Blueprint Grid -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E5E5DF" stroke-width="0.75"/>
+    </pattern>
+    <pattern id="subgrid" width="200" height="200" patternUnits="userSpaceOnUse">
+      <path d="M 200 0 L 0 0 0 200" fill="none" stroke="#D5D5CD" stroke-width="1.2"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#subgrid)"/>
+
+  <!-- Outer Drafting Frame -->
+  <rect x="40" y="40" width="1120" height="550" fill="none" stroke="#121212" stroke-width="2"/>
+  
+  <!-- Corner Crosshairs -->
+  <path d="M 30 40 L 50 40 M 40 30 L 40 50" stroke="#121212" stroke-width="1.5"/>
+  <path d="M 1150 40 L 1170 40 M 1160 30 L 1160 50" stroke="#121212" stroke-width="1.5"/>
+  <path d="M 30 590 L 50 590 M 40 580 L 40 600" stroke="#121212" stroke-width="1.5"/>
+  <path d="M 1150 590 L 1170 590 M 1160 580 L 1160 600" stroke="#121212" stroke-width="1.5"/>
+
+  <!-- Header Strip -->
+  <g transform="translate(80, 80)">
+    <!-- Official Auratic Systems Emblem Box -->
+    <g transform="scale(0.75)">
+      <rect width="64" height="64" fill="#0B0F19"/>
+      <circle cx="32" cy="32" r="27.5" stroke="#1E293B" stroke-width="0.75"/>
+      <path d="M 11.2 38.5 A 22.5 22.5 0 0 1 24.5 11.2" stroke="#64748B" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2.8 3.6"/>
+      <path d="M 39.5 11.2 A 22.5 22.5 0 0 1 52.8 38.5" stroke="#64748B" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2.8 3.6"/>
+      <path d="M 43.5 51.8 A 22.8 22.8 0 0 1 20.5 51.8" stroke="#64748B" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2.8 3.6"/>
+      <line x1="32" y1="13.5" x2="32" y2="34.5" stroke="#94A3B8" stroke-width="1.9" stroke-linecap="round"/>
+      <line x1="15.5" y1="44" x2="32" y2="34.5" stroke="#94A3B8" stroke-width="1.9" stroke-linecap="round"/>
+      <line x1="48.5" y1="44" x2="32" y2="34.5" stroke="#94A3B8" stroke-width="1.9" stroke-linecap="round"/>
+      <line x1="32" y1="13.5" x2="15.5" y2="44" stroke="#F8FAFC" stroke-width="2.6" stroke-linecap="round"/>
+      <line x1="32" y1="13.5" x2="48.5" y2="44" stroke="#F8FAFC" stroke-width="2.6" stroke-linecap="round"/>
+      <line x1="15.5" y1="44" x2="48.5" y2="44" stroke="#F8FAFC" stroke-width="2.6" stroke-linecap="round"/>
+      <circle cx="32" cy="13.5" r="4.3" fill="#F8FAFC"/>
+      <circle cx="15.5" cy="44" r="4.3" fill="#F8FAFC"/>
+      <circle cx="48.5" cy="44" r="4.3" fill="#F8FAFC"/>
+      <circle cx="32" cy="34.5" r="7.4" fill="#0B0F19"/>
+      <circle cx="32" cy="34.5" r="5.8" fill="#10B981"/>
+      <circle cx="32" cy="34.5" r="2.3" fill="#FFFFFF"/>
+    </g>
+    
+    <text x="64" y="24" fill="#121212" font-family="'Space Grotesk', -apple-system, sans-serif" font-size="18" font-weight="800" letter-spacing="2">AURATIC SYSTEMS</text>
+    <text x="64" y="42" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" letter-spacing="1">RESEARCH &amp; ENGINEERING LAB // 2026</text>
+  </g>
+
+  <!-- Main Monumental Typography -->
+  <g transform="translate(80, 200)">
+    <text x="0" y="0" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" letter-spacing="2">// AUTONOMOUS NEUROSYMBOLICS &amp; DYNAMICAL SYSTEMS</text>
+    <text x="0" y="60" fill="#121212" font-family="'Space Grotesk', -apple-system, sans-serif" font-size="54" font-weight="800" letter-spacing="-1">
+      Architektur für fluide Intelligenz.
+    </text>
+    <text x="0" y="115" fill="#52525B" font-family="'Newsreader', Georgia, serif" font-size="34" font-style="italic" font-weight="400">
+      Kontinuierliche physikalische Zustandsräume statt diskreter Textmuster.
+    </text>
+  </g>
+
+  <!-- Attractor System Badges -->
+  <g transform="translate(80, 390)">
+    <!-- 01 ARC -->
+    <rect x="0" y="0" width="160" height="52" fill="#FFFFFF" stroke="#121212" stroke-width="1.5"/>
+    <text x="12" y="20" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700">01 // FRONTIER AI</text>
+    <text x="12" y="38" fill="#121212" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="800">ARC-AGI-3</text>
+
+    <!-- 02 MUSEUM -->
+    <rect x="175" y="0" width="160" height="52" fill="#FFFFFF" stroke="#121212" stroke-width="1.5"/>
+    <text x="187" y="20" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700">02 // PROVENANCE</text>
+    <text x="187" y="38" fill="#121212" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="800">SHADOW ATLAS</text>
+
+    <!-- 03 EDISON -->
+    <rect x="350" y="0" width="160" height="52" fill="#FFFFFF" stroke="#121212" stroke-width="1.5"/>
+    <text x="362" y="20" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700">03 // DETERMINISTIC</text>
+    <text x="362" y="38" fill="#121212" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="800">EDISON ENGINE</text>
+
+    <!-- 04 LGNN -->
+    <rect x="525" y="0" width="160" height="52" fill="#FFFFFF" stroke="#121212" stroke-width="1.5"/>
+    <text x="537" y="20" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700">04 // DYNAMICAL</text>
+    <text x="537" y="38" fill="#121212" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="800">LIQUID ODE</text>
+
+    <!-- 05 VOLT -->
+    <rect x="700" y="0" width="160" height="52" fill="#FFFFFF" stroke="#121212" stroke-width="1.5"/>
+    <text x="712" y="20" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700">05 // CYBER-PHYSICAL</text>
+    <text x="712" y="38" fill="#121212" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="800">VOLTGRID</text>
+
+    <!-- 06 AUDIO -->
+    <rect x="875" y="0" width="160" height="52" fill="#FFFFFF" stroke="#121212" stroke-width="1.5"/>
+    <text x="887" y="20" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700">06 // REAL-TIME DSP</text>
+    <text x="887" y="38" fill="#121212" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="800">AUDIO CORE</text>
+  </g>
+
+  <!-- Footer Telemetry Strip -->
+  <g transform="translate(80, 545)">
+    <text x="0" y="0" fill="#121212" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700">
+      https://auraticsystems.com
+    </text>
+    <text x="520" y="0" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="500">
+      BERLIN // 52.5200° N, 13.4050° E
+    </text>
+    <text x="900" y="0" fill="#121212" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700">
+      GITHUB.COM/AETHELNET ↗
+    </text>
+  </g>
+</svg>
